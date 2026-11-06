@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}گشت‌وگذار مهمان | آکادمی زبان تُرنج{% endblock %}
+{% block content %}
+<section class="py-12 lg:py-16 bg-toranj-bg">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+        <div class="toranj-card bg-toranj-navy text-white flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div>
+                <span class="px-3 py-1 rounded-full bg-white/10 text-toranj-orange text-[12px] font-bold">حالت بازدیدکننده مهمان (Guest Mode)</span>
+                <h1 class="text-[24px] sm:text-[30px] font-black mt-2">آشنایی با دپارتمان‌ها و دوره‌های آکادمی زبان تُرنج</h1>
+                <p class="text-[13px] text-gray-300 mt-1">شما بدون نیاز به ثبت‌نام در حال مشاهده بخش‌های عمومی هستید. برای ثبت‌نام در کلاس یا مشاهده کارنامه، وارد حساب زبان‌آموز شوید.</p>
+            </div>
+            <div class="flex gap-3 shrink-0">
+                <a href="{% url 'accounts:register' %}" class="btn-primary-orange px-5">ثبت‌نام زبان‌آموز</a>
+                <a href="{% url 'core:student_portal_login' %}" class="px-4 py-2.5 rounded-xl border border-white/25 text-white font-bold text-[13px] flex items-center">ورود دانشجو</a>
+            </div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {% for lang in languages %}
+            <a href="/languages/{{ lang.slug }}/" class="toranj-card toranj-card-hover flex items-center justify-between">
+                <div>
+                    <h2 class="text-[16px] font-extrabold text-toranj-textMain">{{ lang.fa_name }}</h2>
+                    <span class="text-[12px] text-toranj-textMuted" dir="ltr">{{ lang.en_name }}</span>
+                </div>
+                <span class="text-3xl">{{ lang.flag_emoji }}</span>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

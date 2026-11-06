@@ -1,0 +1,39 @@
+<section id="why-toranj" class="py-16 lg:py-24 bg-toranj-bg">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <div class="max-w-2xl mx-auto text-center mb-12 lg:mb-16">
+            <span class="text-[13px] font-bold text-toranj-navy bg-toranj-navy/10 px-3.5 py-1 rounded-full">
+                مزایای آموزشی
+            </span>
+            <h2 class="mt-3 text-[28px] sm:text-[32px] font-extrabold text-toranj-textMain">
+                چرا آکادمی زبان تُرنج؟
+            </h2>
+            <p class="mt-3 text-[15px] sm:text-[16px] text-toranj-textMuted leading-relaxed">
+                ترکیبی از استانداردهای آموزشی روز، اساتید مجرب و زیرساخت هوشمند برای تضمین کیفیت یادگیری شما.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for item in advantages %}
+            <article class="toranj-card flex flex-col justify-between">
+                <div>
+                    <div class="w-12 h-12 rounded-xl bg-toranj-navy text-toranj-orange flex items-center justify-center mb-5 shadow-sm">
+                        <i data-lucide="{{ item.icon }}" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="text-[19px] font-bold text-toranj-textMain mb-2.5">
+                        {{ item.title }}
+                    </h3>
+                    <p class="text-[15px] text-toranj-textMuted leading-[1.75]">
+                        {{ item.description }}
+                    </p>
+                </div>
+                <div class="mt-5 pt-4 border-t border-toranj-border flex items-center justify-between text-[13px] text-toranj-navy font-semibold">
+                    <span>استاندارد آموزشی تُرنج</span>
+                    <i data-lucide="check" class="w-4 h-4 text-toranj-success"></i>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+
+    </div>
+</section>

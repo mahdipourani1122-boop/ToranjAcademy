@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% block title %}دوره‌های آموزشی | آکادمی زبان تُرنج{% endblock %}
+
+{% block content %}
+<section class="py-12 lg:py-16 bg-toranj-bg min-h-[calc(100vh-160px)]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        <div class="toranj-card mb-8">
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
+                <div>
+                    <h1 class="text-[26px] sm:text-[30px] font-extrabold text-toranj-textMain">کاتالوگ دوره‌ها و کلاس‌های آکادمی تُرنج</h1>
+                    <p class="text-[14px] text-toranj-textMuted mt-1">دوره مورد نظر خود را جستجو کرده و گروه کلاسی متناسب با برنامه زمانی‌تان را انتخاب کنید.</p>
+                </div>
+            </div>
+
+            <form method="get" class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                <input type="text" name="q" value="{{ request.GET.q }}" placeholder="جستجوی عنوان دوره..." class="h-[46px] px-4 rounded-xl bg-toranj-inputBg border border-toranj-border text-[14px]">
+                <select name="category" class="h-[46px] px-4 rounded-xl bg-toranj-inputBg border border-toranj-border text-[14px]">
+                    <option value="">همه دسته‌بندی‌ها</option>
+                    {% for cat in categories %}
+                        <option value="{{ cat.slug }}" {% if request.GET.category == cat.slug %}selected{% endif %}>{{ cat.name }}</option>
+                    {% endfor %}
+                </select>
+                <select name="level" class="h-[46px] px-4 rounded-xl bg-toranj-inputBg border border-toranj-border text-[14px]">
+                    <option value="">همه سطوح زبانی</option>
+                    {% for lvl_val, lvl_label in levels %}
+                        <option value="{{ lvl_val }}" {% if request.GET.level == lvl_val %}selected{% endif %}>{{ lvl_label }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="btn-primary-navy !h-[46px]">اعمال فیلتر و جستجو</button>
+            </form>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for course in courses %}
+            <article class="toranj-card flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="px-3 py-1 rounded-full text-[12px] font-bold bg-toranj-navy/10 text-toranj-navy">{{ course.category.name }}</span>
+                        <span class="text-[12px] font-semibold text-toranj-textMuted">{{ course.get_language_level_display }}</span>
+                    </div>
+                    <h2 class="text-[19px] font-extrabold text-toranj-textMain mb-2">{{ course.title }}</h2>
+                    <p class="text-[14px] text-toranj-textMuted leading-relaxed mb-4">{{ course.description|truncatewords:25 }}</p>
+
+                    <div class="p-3.5 rounded-xl bg-toranj-inputBg border border-toranj-border text-[13px] space-y-1.5 mb-4">
+                        <div class="flex justify-between"><span>تعداد جلسات:</span><strong>{{ course.sessions_count }} جلسه ({{ course.duration_weeks }} هفته)</strong></div>
+                        <div class="flex justify-between"><span>شیوه برگزاری:</span><strong>{{ course.get_course_format_display }} • {{ course.get_course_type_display }}</strong></div>
+                        <div class="flex justify-between"><span>شهریه دوره:</span><strong class="text-toranj-navy">{{ course.tuition_fee }} تومان</strong></div>
+                    </div>
+                </div>
+
+                <!-- گروه‌های کلاسی فعال این دوره -->
+                <div class="pt-3 border-t border-toranj-border space-y-2.5">
+                    <span class="block text-[12px] font-bold text-toranj-textMain">گروه‌های کلاسی قابل ثبت‌نام:</span>
+                    {% for cls in course.classes.all %}
+                        {% if not cls.is_archived and cls.status != 'cancelled' %}
+                        <div class="p-3 rounded-xl border border-toranj-border bg-white flex items-center justify-between gap-2 text-[12px]">
+                            <div>
+                                <p class="font-bold text-toranj-textMain">{{ cls.name }}</p>
+                                <p class="text-toranj-textMuted">{{ cls.schedule_summary }}</p>
+                            </div>
+                            {% if user.is_authenticated and user.role == 'student' %}
+                                <form method="post" action="{% url 'courses:student_enroll' cls.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn-primary-orange !h-[36px] px-3 !text-[12px]">درخواست ثبت‌نام</button>
+                                </form>
+                            {% else %}
+                                <a href="{% url 'accounts:login' %}" class="btn-outline !h-[36px] px-3 !text-[12px]">ورود برای ثبت‌نام</a>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                    {% empty %}
+                        <p class="text-[12px] text-toranj-textMuted">گروه کلاسی فعالی برای این دوره باز نشده است.</p>
+                    {% endfor %}
+                </div>
+            </article>
+            {% empty %}
+            <div class="col-span-full toranj-card text-center py-12">
+                <p class="text-[16px] font-bold text-toranj-textMain">هنوز دوره منتشرشده‌ای با این مشخصات ثبت نشده است.</p>
+                <p class="text-[14px] text-toranj-textMuted mt-1">مدیر سامانه می‌تواند از طریق پنل مدیریت، دوره‌های جدید را ایجاد و منتشر کند.</p>
+            </div>
+            {% endfor %}
+        </div>
+
+    </div>
+</section>
+{% endblock %}

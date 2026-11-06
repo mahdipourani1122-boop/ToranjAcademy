@@ -1,0 +1,46 @@
+{% extends 'dashboards/base_dashboard.html' %}
+{% block title %}کدهای بازیابی 2FA | آکادمی زبان تُرنج{% endblock %}
+
+{% block dashboard_body %}
+<div class="toranj-card max-w-2xl mx-auto space-y-5">
+    <div class="flex items-center justify-between border-b border-toranj-border pb-4">
+        <h2 class="text-[19px] font-extrabold text-toranj-textMain">کدهای بازیابی پشتیبان (Single-Use Recovery Codes)</h2>
+        <a href="{% url 'accounts:security_settings' %}" class="btn-outline px-4">بازگشت</a>
+    </div>
+
+    {% if fresh_codes %}
+        <div class="p-4 rounded-xl bg-amber-50 border border-toranj-warning text-[13px] space-y-3">
+            <p class="font-extrabold text-toranj-warning">⚠️ بسیار مهم: این کدها فقط همین یک‌بار نمایش داده می‌شوند!</p>
+            <p class="text-toranj-textMain">آن‌ها را در مکانی امن ذخیره کنید. هر کد تنها یک بار قابل استفاده است.</p>
+            <div class="grid grid-cols-2 gap-2 pt-2 font-mono text-[14px] font-bold text-toranj-navy" dir="ltr">
+                {% for code in fresh_codes %}
+                    <div class="p-2 rounded bg-white border border-toranj-border text-center">{{ code }}</div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+
+    <div>
+        <h3 class="text-[15px] font-bold mb-2">وضعیت کدهای فعلی شما:</h3>
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-[13px] font-mono" dir="ltr">
+            {% for rc in existing_codes %}
+                <div class="p-2.5 rounded-xl border border-toranj-border flex items-center justify-between {% if rc.used_at %}bg-gray-100 text-gray-400 line-through{% else %}bg-toranj-inputBg text-toranj-textMain{% endif %}">
+                    <span>{{ rc.code_prefix }}-****</span>
+                    <span class="text-[11px]">{% if rc.used_at %}مصرف‌شده{% else %}فعال{% endif %}</span>
+                </div>
+            {% empty %}
+                <p class="col-span-full text-toranj-textMuted" dir="rtl">هنوز کد بازیابی تولید نشده است.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <form method="post" class="pt-4 border-t border-toranj-border space-y-3">
+        {% csrf_token %}
+        <label class="block text-[13px] font-bold">برای صدور ۱۰ کد جدید (و ابطال کدهای قبلی)، رمز عبور فعلی خود را وارد کنید:</label>
+        <div class="flex flex-col sm:flex-row gap-3">
+            <input type="password" name="current_password" required placeholder="رمز عبور فعلی" dir="ltr" class="h-[44px] px-4 rounded-xl bg-toranj-inputBg border border-toranj-border flex-1">
+            <button type="submit" class="btn-primary-navy px-6">تولید مجدد کدهای بازیابی</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,121 @@
+{% extends 'dashboards/base_dashboard.html' %}
+{% block title %}تنظیمات امنیتی و هویت حساب | آکادمی زبان تُرنج{% endblock %}
+
+{% block dashboard_body %}
+<!-- ۱. کارت هویت رسمی آکادمی -->
+<section class="toranj-card">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 mb-4 border-b border-toranj-border">
+        <div>
+            <h2 class="text-[18px] font-extrabold text-toranj-textMain">هویت دیجیتال و کد اختصاصی آکادمی تُرنج</h2>
+            <p class="text-[13px] text-toranj-textMuted">تمامی سوابق آموزشی، نمرات و پرداخت‌های شما به شناسه تغییرناپذیر حساب متصل است.</p>
+        </div>
+        {% if user.academy_username %}
+            <div class="px-4 py-2 rounded-xl bg-toranj-navy text-toranj-orange font-mono font-extrabold text-[16px]" dir="ltr">
+                {{ user.academy_username }}
+            </div>
+        {% else %}
+            <span class="px-3.5 py-1.5 rounded-full text-[12px] font-bold badge-warning">در انتظار تأیید آموزشگاه جهت صدور کد TRJ</span>
+        {% endif %}
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-[13px]">
+        <div class="p-3.5 rounded-xl bg-toranj-inputBg border border-toranj-border">
+            <span class="text-toranj-textMuted block text-xs">نام کاربری آکادمی (دائمی):</span>
+            <strong class="text-toranj-navy font-mono" dir="ltr">{{ user.academy_username|default:"پس از تأیید صادر می‌شود" }}</strong>
+        </div>
+        <div class="p-3.5 rounded-xl bg-toranj-inputBg border border-toranj-border">
+            <span class="text-toranj-textMuted block text-xs">شماره موبایل:</span>
+            <strong class="text-toranj-textMain" dir="ltr">{{ user.phone }}</strong>
+        </div>
+        <div class="p-3.5 rounded-xl bg-toranj-inputBg border border-toranj-border">
+            <span class="text-toranj-textMuted block text-xs">وضعیت تأیید آموزشگاه:</span>
+            <strong class="text-toranj-success">{{ user.get_status_display }}</strong>
+        </div>
+    </div>
+</section>
+
+<!-- ۲. ماژول‌های امنیتی 2FA، رمز عبور و دستگاه‌ها -->
+<section class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="toranj-card flex flex-col justify-between space-y-4">
+        <div>
+            <div class="flex items-center justify-between mb-2">
+                <h3 class="text-[16px] font-bold text-toranj-textMain">اپلیکیشن احراز هویت (TOTP)</h3>
+                {% if has_totp %}
+                    <span class="px-2.5 py-0.5 rounded-full text-xs font-bold badge-success">فعال</span>
+                {% else %}
+                    <span class="px-2.5 py-0.5 rounded-full text-xs font-bold badge-warning">غیرفعال</span>
+                {% endif %}
+            </div>
+            <p class="text-[13px] text-toranj-textMuted">اتصال به Google Authenticator یا Microsoft Authenticator جهت تولید کد ۶ رقمی بدون نیاز به آنتن موبایل.</p>
+        </div>
+        <a href="{% url 'accounts:totp_setup' %}" class="btn-primary-navy px-5 self-start">مدیریت TOTP</a>
+    </div>
+
+    <div class="toranj-card flex flex-col justify-between space-y-4">
+        <div>
+            <div class="flex items-center justify-between mb-2">
+                <h3 class="text-[16px] font-bold text-toranj-textMain">کدهای بازیابی پشتیبان (Recovery Codes)</h3>
+                <span class="px-2.5 py-0.5 rounded-full text-xs font-bold badge-info">{{ unused_recovery_count }} کد باقی‌مانده</span>
+            </div>
+            <p class="text-[13px] text-toranj-textMuted">کدهای یک‌بارمصرف اضطراری برای مواقعی که به تلفن همراه خود دسترسی ندارید.</p>
+        </div>
+        <a href="{% url 'accounts:recovery_codes' %}" class="btn-outline px-5 self-start">مشاهده و تولید مجدد کدها</a>
+    </div>
+
+    <div class="toranj-card flex flex-col justify-between space-y-4">
+        <div>
+            <h3 class="text-[16px] font-bold text-toranj-textMain mb-2">تغییر رمز عبور حساب</h3>
+            <p class="text-[13px] text-toranj-textMuted">تغییر رمز عبور به صورت خودکار تمامی دستگاه‌های مورد اعتماد قبلی را لغو می‌کند.</p>
+        </div>
+        <a href="{% url 'accounts:password_change' %}" class="btn-outline px-5 self-start">تغییر رمز عبور</a>
+    </div>
+
+    <div class="toranj-card flex flex-col justify-between space-y-4">
+        <div>
+            <h3 class="text-[16px] font-bold text-toranj-textMain mb-2">دستگاه‌های مورد اعتماد ({{ trusted_devices|length }})</h3>
+            <p class="text-[13px] text-toranj-textMuted">مشاهده و لغو مرورگرهایی که به مدت ۳۰ روز مورد اعتماد قرار داده‌اید.</p>
+        </div>
+        <div class="flex items-center gap-3">
+            <a href="{% url 'accounts:trusted_devices' %}" class="btn-outline px-5">مدیریت دستگاه‌ها</a>
+            {% if user.role == 'student' %}
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="toggle_every_login_2fa">
+                <button type="submit" class="text-xs font-bold text-toranj-navy hover:text-toranj-orange">
+                    {% if user.require_2fa_every_login %}لغو الزام 2FA در هر ورود{% else %}الزام 2FA در تمامی ورودها{% endif %}
+                </button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- ۳. گزارش آخرین رویدادهای امنیتی -->
+<section class="toranj-card">
+    <h3 class="text-[16px] font-bold text-toranj-textMain mb-3">گزارش ممیزی رویدادهای امنیتی حساب</h3>
+    <div class="overflow-x-auto">
+        <table class="w-full text-right border-collapse text-[13px]">
+            <thead>
+                <tr class="border-b border-toranj-border text-toranj-textMuted bg-toranj-inputBg">
+                    <th class="py-2.5 px-4">رویداد</th>
+                    <th class="py-2.5 px-4">شرح</th>
+                    <th class="py-2.5 px-4">آدرس IP</th>
+                    <th class="py-2.5 px-4">زمان</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-toranj-border">
+                {% for ev in recent_events %}
+                <tr>
+                    <td class="py-2.5 px-4 font-mono text-xs font-bold text-toranj-navy">{{ ev.event_type }}</td>
+                    <td class="py-2.5 px-4">{{ ev.description }}</td>
+                    <td class="py-2.5 px-4 font-mono text-xs" dir="ltr">{{ ev.ip_address }}</td>
+                    <td class="py-2.5 px-4 text-toranj-textMuted">{{ ev.created_at|date:"Y/m/d H:i" }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4" class="py-4 text-center text-toranj-textMuted">رویدادی ثبت نشده است.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

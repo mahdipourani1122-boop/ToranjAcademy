@@ -1,0 +1,45 @@
+<section id="testimonials" class="py-16 lg:py-24 bg-toranj-bg border-t border-toranj-border">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <div class="max-w-2xl mx-auto text-center mb-12">
+            <span class="text-[13px] font-bold text-toranj-warning bg-toranj-warning/10 px-3.5 py-1 rounded-full">
+                پیش‌نمایش بخش دیدگاه‌ها (داده نمونه نمایشی)
+            </span>
+            <h2 class="mt-3 text-[28px] sm:text-[32px] font-extrabold text-toranj-textMain">
+                تجربه یادگیری از نگاه زبان‌آموزان
+            </h2>
+            <p class="mt-3 text-[15px] text-toranj-textMuted">
+                این کارت‌ها جهت نمایش طراحی رابط کاربری تعبیه شده‌اند و پس از راه‌اندازی پنل زبان‌آموزان، به سیستم بازخوردهای تاییدشده متصل می‌شوند.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {% for item in testimonials %}
+            <article class="toranj-card flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <i data-lucide="quote" class="w-8 h-8 text-toranj-navy/20"></i>
+                        <span class="text-[12px] font-medium px-2.5 py-0.5 rounded bg-toranj-inputBg border border-toranj-border text-toranj-textMuted">
+                            محتوای آزمایشی
+                        </span>
+                    </div>
+                    <p class="text-[15px] text-toranj-textMain leading-[1.8]">
+                        «{{ item.quote }}»
+                    </p>
+                </div>
+
+                <div class="mt-6 pt-4 border-t border-toranj-border flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-toranj-navy/10 text-toranj-navy flex items-center justify-center font-bold text-sm">
+                        <i data-lucide="user" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-[15px] font-bold text-toranj-textMain">{{ item.placeholder_name }}</h4>
+                        <p class="text-[13px] text-toranj-textMuted">{{ item.course_type }}</p>
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+
+    </div>
+</section>

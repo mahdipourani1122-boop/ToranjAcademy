@@ -1,0 +1,82 @@
+{% extends 'accounts/base_auth.html' %}
+{% block title %}تأیید دومرحله‌ای (2FA) | آکادمی زبان تُرنج{% endblock %}
+
+{% block auth_content %}
+<div class="text-center mb-6">
+    <div class="w-12 h-12 rounded-2xl bg-toranj-navy text-toranj-orange flex items-center justify-center mx-auto mb-3">
+        <i data-lucide="shield-check" class="w-6 h-6"></i>
+    </div>
+    <h1 class="text-[22px] font-extrabold text-toranj-textMain">احراز هویت دومرحله‌ای (2FA)</h1>
+    <p class="text-[13px] text-toranj-textMuted mt-1">
+        حساب: <strong>{{ pending_user.full_name }}</strong>
+        {% if pending_user.academy_username %}({{ pending_user.academy_username }}){% endif %}
+    </p>
+</div>
+
+<!-- انتخاب روش تأیید دومرحله‌ای -->
+<div class="grid grid-cols-3 gap-2 mb-5 text-[12px] font-bold">
+    <button type="button" onclick="select2FAMethod('otp', this)" class="method-tab py-2 px-2 rounded-xl border border-toranj-navy bg-toranj-navy text-white">
+        پیامک (OTP)
+    </button>
+    <button type="button" onclick="select2FAMethod('totp', this)" class="method-tab py-2 px-2 rounded-xl border border-toranj-border bg-toranj-inputBg text-toranj-textMain">
+        اپلیکیشن TOTP
+    </button>
+    <button type="button" onclick="select2FAMethod('recovery', this)" class="method-tab py-2 px-2 rounded-xl border border-toranj-border bg-toranj-inputBg text-toranj-textMain">
+        کد بازیابی
+    </button>
+</div>
+
+<form method="post" class="auth-form space-y-4" novalidate>
+    {% csrf_token %}
+    {{ form.method }}
+
+    <div>
+        <label id="codeLabel" class="block text-[13px] font-bold text-toranj-textMain mb-1.5">
+            کد ۶ رقمی ارسال‌شده به شماره {{ pending_user.phone }}
+        </label>
+        {{ form.code }}
+        {% if form.code.errors %}
+            <p class="mt-1 text-[12px] text-toranj-error font-semibold">{{ form.code.errors.0 }}</p>
+        {% endif %}
+    </div>
+
+    {% if is_student %}
+    <div class="p-3 rounded-xl bg-toranj-inputBg border border-toranj-border">
+        <label class="flex items-center gap-2.5 cursor-pointer select-none">
+            {{ form.trust_device }}
+            <span class="text-[13px] text-toranj-textMain">اعتماد به این دستگاه تا ۳۰ روز آینده</span>
+        </label>
+    </div>
+    {% endif %}
+
+    <button type="submit" class="w-full btn-primary-orange">
+        <span>تأیید و ورود به داشبورد</span>
+        <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+    </button>
+</form>
+
+<div class="mt-5 pt-4 border-t border-toranj-border flex items-center justify-between text-[13px]">
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" name="resend_otp" value="1" class="font-bold text-toranj-navy hover:text-toranj-orange">
+            ارسال مجدد کد پیامکی (پس از ۶۰ ثانیه)
+        </button>
+    </form>
+    <a href="{% url 'accounts:login' %}" class="text-toranj-textMuted hover:text-toranj-textMain">انصراف</a>
+</div>
+
+<script>
+    function select2FAMethod(method, btn) {
+        document.querySelector('input[name="method"]').value = method;
+        document.querySelectorAll('.method-tab').forEach(el => {
+            el.className = 'method-tab py-2 px-2 rounded-xl border border-toranj-border bg-toranj-inputBg text-toranj-textMain';
+        });
+        btn.className = 'method-tab py-2 px-2 rounded-xl border border-toranj-navy bg-toranj-navy text-white';
+
+        const label = document.getElementById('codeLabel');
+        if (method === 'totp') label.textContent = 'کد ۶ رقمی اپلیکیشن Authenticator را وارد کنید:';
+        else if (method === 'recovery') label.textContent = 'یکی از کدهای بازیابی یک‌بارمصرف (TRJ-XXXX-XXXX) را وارد کنید:';
+        else label.textContent = 'کد ۶ رقمی ارسال‌شده به موبایل را وارد کنید:';
+    }
+</script>
+{% endblock %}

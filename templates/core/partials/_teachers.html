@@ -1,0 +1,43 @@
+<section id="teachers" class="py-16 lg:py-24 bg-white border-t border-toranj-border">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <div class="max-w-2xl mx-auto text-center mb-12 lg:mb-16">
+            <span class="text-[13px] font-bold text-toranj-navy bg-toranj-bg border border-toranj-border px-3.5 py-1 rounded-full">
+                کادر آموزشی (جایگاه‌های نمونه)
+            </span>
+            <h2 class="mt-3 text-[28px] sm:text-[32px] font-extrabold text-toranj-textMain">
+                اساتید و دپارتمان‌های تخصصی تُرنج
+            </h2>
+            <p class="mt-3 text-[15px] sm:text-[16px] text-toranj-textMuted">
+                کارت‌های زیر قالب استاندارد نمایش پروفایل اساتید هستند که پس از ثبت اطلاعات مدرسین در پنل مدیریت، با مشخصات رسمی تکمیل می‌شوند.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {% for teacher in teachers %}
+            <article class="toranj-card flex flex-col items-center text-center">
+                <div class="w-24 h-24 rounded-2xl bg-toranj-bg border-2 border-toranj-border flex items-center justify-center text-toranj-navy mb-4">
+                    <i data-lucide="user-check" class="w-10 h-10 stroke-[1.5]"></i>
+                </div>
+
+                <span class="text-[12px] font-semibold text-toranj-info bg-toranj-info/10 px-3 py-0.5 rounded-full mb-2">
+                    {{ teacher.tag }}
+                </span>
+
+                <h3 class="text-[18px] font-bold text-toranj-textMain">
+                    {{ teacher.name }}
+                </h3>
+
+                <p class="text-[13px] font-semibold text-toranj-navy mt-1 mb-3">
+                    {{ teacher.specialization }}
+                </p>
+
+                <p class="text-[14px] text-toranj-textMuted leading-relaxed">
+                    {{ teacher.bio }}
+                </p>
+            </article>
+            {% endfor %}
+        </div>
+
+    </div>
+</section>

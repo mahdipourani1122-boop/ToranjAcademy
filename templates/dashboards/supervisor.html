@@ -1,0 +1,36 @@
+{% extends 'dashboards/base_dashboard.html' %}
+{% block title %}پنل سوپروایزر آموزشی | آکادمی زبان تُرنج{% endblock %}
+
+{% block dashboard_body %}
+<section id="sec-classes" class="toranj-card space-y-4">
+    <h2 class="text-[18px] font-extrabold text-toranj-textMain">پایش کلاس‌ها و بار آموزشی اساتید</h2>
+    <div class="overflow-x-auto">
+        <table class="w-full text-right border-collapse">
+            <thead>
+                <tr class="border-b border-toranj-border text-[13px] text-toranj-textMuted bg-toranj-inputBg">
+                    <th class="py-3 px-4">کلاس و دوره</th>
+                    <th class="py-3 px-4">استاد</th>
+                    <th class="py-3 px-4">زمان‌بندی</th>
+                    <th class="py-3 px-4">ظرفیت</th>
+                    <th class="py-3 px-4">لیست کلاس</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-toranj-border text-[13px]">
+                {% for cls in all_classes %}
+                <tr>
+                    <td class="py-3 px-4 font-bold">{{ cls.course.title }} — {{ cls.name }}</td>
+                    <td class="py-3 px-4">{{ cls.teacher.full_name|default:"بدون استاد" }}</td>
+                    <td class="py-3 px-4 text-toranj-textMuted">{{ cls.schedule_summary }}</td>
+                    <td class="py-3 px-4 font-bold">{{ cls.approved_enrollments_count }}/{{ cls.max_capacity }}</td>
+                    <td class="py-3 px-4">
+                        <a href="{% url 'courses:class_roster' cls.id %}" class="px-2.5 py-1 rounded badge-info font-bold text-xs">بررسی لیست</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5" class="py-6 text-center text-toranj-textMuted">کلاسی ثبت نشده است.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

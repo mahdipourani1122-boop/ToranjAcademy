@@ -1,0 +1,89 @@
+{% extends 'dashboards/base_dashboard.html' %}
+{% block title %}پروفایل و تحلیل تحصیلی {{ target_student.full_name }} | آکادمی زبان تُرنج{% endblock %}
+{% block dashboard_body %}
+<section class="toranj-card bg-gradient-to-l from-toranj-navy to-toranj-navyLight text-white !border-0">
+    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+        <div class="flex items-center gap-4">
+            <div class="w-16 h-16 rounded-2xl bg-toranj-orange text-toranj-textMain font-extrabold text-2xl flex items-center justify-center shadow-md">
+                {{ target_student.first_name|slice:":1" }}
+            </div>
+            <div>
+                <div class="flex flex-wrap items-center gap-2.5">
+                    <h2 class="text-[22px] font-extrabold">{{ target_student.full_name }}</h2>
+                    <span class="px-3 py-1 rounded-full bg-toranj-orange text-toranj-textMain font-mono font-extrabold text-xs" dir="ltr">
+                        {{ target_student.academy_username|default:"TRJ-PENDING" }}
+                    </span>
+                </div>
+                <p class="text-[13px] text-gray-200 mt-1">
+                    موبایل: <span dir="ltr">{{ target_student.phone }}</span> • سطح: <strong>{{ student_profile.current_level }}</strong>
+                </p>
+            </div>
+        </div>
+        <div class="flex items-center gap-3">
+            <a href="{% url 'academics:student_report' target_student.id %}" class="btn-primary-orange px-4 !h-[40px] !text-[13px]">گزارش پیشرفت تحصیلی</a>
+        </div>
+    </div>
+</section>
+
+{% if analytics.insufficient_data_reasons %}
+<section class="p-4 rounded-2xl bg-amber-50 border border-toranj-warning/40 text-toranj-textMain text-[13px] space-y-1">
+    <p class="font-extrabold text-toranj-warning">اطلاعیه شفافیت داده‌های تحلیلی:</p>
+    {% for reason in analytics.insufficient_data_reasons %}
+        <p class="mr-4 text-toranj-textMuted">• {{ reason }}</p>
+    {% endfor %}
+</section>
+{% endif %}
+
+<section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="toranj-card">
+        <span class="text-[12px] text-toranj-textMuted font-bold">معدل کل (GPA)</span>
+        <p class="text-[24px] font-extrabold text-toranj-navy mt-1">{{ analytics.overall_gpa_100|default:"ثبت نشده" }}</p>
+    </div>
+    <div class="toranj-card">
+        <span class="text-[12px] text-toranj-textMuted font-bold">تغییرات نسبت به ترم قبل</span>
+        <p class="text-[20px] font-extrabold text-toranj-success mt-1" dir="ltr">{{ analytics.semester_delta|default:"—" }}</p>
+    </div>
+    <div class="toranj-card">
+        <span class="text-[12px] text-toranj-textMuted font-bold">نرخ حضور در جلسات</span>
+        <p class="text-[24px] font-extrabold text-toranj-success mt-1">{% if analytics.attendance.attendance_rate is not None %}{{ analytics.attendance.attendance_rate }}٪{% else %}ثبت نشده{% endif %}</p>
+    </div>
+    <div class="toranj-card">
+        <span class="text-[12px] text-toranj-textMuted font-bold">نرخ تکمیل تکالیف</span>
+        <p class="text-[24px] font-extrabold text-toranj-navy mt-1">{% if analytics.assignments.completion_rate is not None %}{{ analytics.assignments.completion_rate }}٪{% else %}ثبت نشده{% endif %}</p>
+    </div>
+</section>
+
+<section class="toranj-card space-y-4">
+    <h3 class="text-[17px] font-extrabold text-toranj-textMain">تحلیل عملکرد ۶ مهارت زبانی (Speaking, Listening, Reading, Writing, Grammar, Vocabulary)</h3>
+    <div class="space-y-3">
+        {% for sk in analytics.skills_breakdown %}
+        <div>
+            <div class="flex justify-between text-[13px] mb-1">
+                <span class="font-bold">{{ sk.label }}</span>
+                <span>{% if sk.has_data %}{{ sk.average }} / ۱۰۰{% else %}ارزیابی ثبت نشده{% endif %}</span>
+            </div>
+            <div class="w-full h-3 bg-toranj-inputBg border border-toranj-border rounded-full overflow-hidden">
+                {% if sk.has_data %}<div class="h-full bg-toranj-navy rounded-full" style="width: {{ sk.average }}%"></div>{% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="toranj-card space-y-3">
+    <h3 class="text-[16px] font-extrabold text-toranj-navy">پیشنهادهای کمک‌آموزشی هوش مصنوعی (مستند به نمرات)</h3>
+    <p class="text-[12px] text-toranj-textMuted">{{ ai_recommendations.disclaimer }}</p>
+    <p class="text-[14px] font-semibold text-toranj-textMain">{{ ai_recommendations.next_semester_recommendation }}</p>
+</section>
+
+<section class="toranj-card space-y-3">
+    <h3 class="text-[16px] font-extrabold text-toranj-textMain">یادداشت‌های آموزشی اساتید</h3>
+    {% for note in teacher_notes %}
+        <div class="p-3 rounded-xl bg-toranj-inputBg border border-toranj-border text-[13px]">
+            <strong>{{ note.author.full_name }}:</strong> {{ note.note_text }}
+        </div>
+    {% empty %}
+        <p class="text-[13px] text-toranj-textMuted">یادداشتی ثبت نشده است.</p>
+    {% endfor %}
+</section>
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends 'dashboards/base_dashboard.html' %}
+{% block title %}دستگاه‌های مورد اعتماد | آکادمی زبان تُرنج{% endblock %}
+
+{% block dashboard_body %}
+<div class="toranj-card max-w-3xl mx-auto space-y-5">
+    <div class="flex items-center justify-between border-b border-toranj-border pb-4">
+        <div>
+            <h2 class="text-[19px] font-extrabold text-toranj-textMain">دستگاه‌های مورد اعتماد (۳۰ روزه)</h2>
+            <p class="text-[13px] text-toranj-textMuted">مخصوص حساب‌های زبان‌آموز؛ اساتید و مدیران همواره نیازمند 2FA در هر ورود هستند.</p>
+        </div>
+        <a href="{% url 'accounts:security_settings' %}" class="btn-outline px-4">بازگشت</a>
+    </div>
+
+    <div class="space-y-3">
+        {% for dev in devices %}
+        <div class="p-4 rounded-xl bg-toranj-inputBg border border-toranj-border flex items-center justify-between gap-4">
+            <div>
+                <p class="text-[14px] font-bold text-toranj-textMain">{{ dev.device_name }}</p>
+                <p class="text-[12px] text-toranj-textMuted mt-0.5">
+                    IP: <span dir="ltr">{{ dev.ip_address }}</span> • انقضا: {{ dev.expires_at|date:"Y/m/d" }}
+                </p>
+            </div>
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="device_id" value="{{ dev.id }}">
+                <button type="submit" class="px-3 py-1.5 rounded-lg badge-error text-xs font-bold">لغو اعتماد</button>
+            </form>
+        </div>
+        {% empty %}
+        <p class="text-center py-6 text-toranj-textMuted text-[14px]">هیچ دستگاه مورد اعتمادی ثبت نشده است.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

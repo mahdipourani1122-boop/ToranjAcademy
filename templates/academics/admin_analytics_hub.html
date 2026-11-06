@@ -1,0 +1,16 @@
+{% extends 'dashboards/base_dashboard.html' %}
+{% block title %}مرکز پایش تحلیلی | آکادمی زبان تُرنج{% endblock %}
+{% block dashboard_body %}
+<section class="toranj-card space-y-4">
+    <h2 class="text-[19px] font-extrabold text-toranj-textMain">مرکز پایش تحلیلی زبان‌آموزان و اساتید</h2>
+    <p class="text-[13px] text-toranj-textMuted">تعداد زبان‌آموزان نیازمند پشتیبانی: {{ at_risk_count }}</p>
+    <div class="space-y-2">
+        {% for row in student_rows %}
+            <div class="p-3 rounded-xl bg-toranj-inputBg border border-toranj-border flex justify-between items-center text-[13px]">
+                <span><strong>{{ row.student.full_name }}</strong> — معدل: {{ row.analytics.overall_gpa_100|default:"—" }}</span>
+                <a href="{% url 'academics:student_profile' row.student.id %}" class="px-3 py-1 rounded badge-info font-bold text-xs">مشاهده پرونده</a>
+            </div>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

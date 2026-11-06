@@ -1,0 +1,19 @@
+{% extends 'dashboards/base_dashboard.html' %}
+{% block title %}پروفایل استاد | آکادمی زبان تُرنج{% endblock %}
+{% block dashboard_body %}
+<section class="toranj-card">
+    <h2 class="text-[20px] font-extrabold text-toranj-textMain">استاد {{ target_teacher.full_name }}</h2>
+    <p class="text-[13px] text-toranj-textMuted mt-1">تخصص: {{ teacher_profile.specialization }}</p>
+</section>
+<section class="toranj-card space-y-4">
+    <h3 class="text-[17px] font-extrabold">زبان‌آموزان تحت تدریس من</h3>
+    {% for item in current_students_analytics %}
+        <div class="p-3 rounded-xl border border-toranj-border flex justify-between items-center text-[13px]">
+            <span>{{ item.student.full_name }} (معدل: {{ item.summary.overall_gpa_100|default:"—" }})</span>
+            <a href="{% url 'academics:student_profile' item.student.id %}" class="btn-primary-navy px-3 !h-[36px] !text-xs">مشاهده پروفایل</a>
+        </div>
+    {% empty %}
+        <p class="text-[13px] text-toranj-textMuted">زبان‌آموزی ثبت نشده است.</p>
+    {% endfor %}
+</section>
+{% endblock %}

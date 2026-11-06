@@ -1,0 +1,33 @@
+{% extends 'dashboards/base_dashboard.html' %}
+{% block title %}پنل آموزشی استاد | آکادمی زبان تُرنج{% endblock %}
+
+{% block dashboard_body %}
+<section id="sec-classes" class="toranj-card space-y-4">
+    <div>
+        <h2 class="text-[18px] font-extrabold text-toranj-textMain">کلاس‌های تخصیص‌یافته به من ({{ assigned_classes|length }} کلاس)</h2>
+        <p class="text-[13px] text-toranj-textMuted">شما فقط به اطلاعات و لیست زبان‌آموزان کلاس‌های خودتان دسترسی دارید.</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {% for cls in assigned_classes %}
+        <div class="p-4 rounded-xl bg-toranj-inputBg border border-toranj-border flex flex-col justify-between space-y-3">
+            <div>
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-mono font-bold text-toranj-info" dir="ltr">{{ cls.code }}</span>
+                    <span class="px-2.5 py-0.5 rounded-full text-xs font-bold badge-success">{{ cls.get_status_display }}</span>
+                </div>
+                <h3 class="text-[16px] font-bold text-toranj-textMain mt-2">{{ cls.course.title }} — {{ cls.name }}</h3>
+                <p class="text-[13px] text-toranj-textMuted mt-1">برنامه هفتگی: {{ cls.schedule_summary }}</p>
+                <p class="text-[12px] text-toranj-textMuted mt-0.5">محل برگزاری: {{ cls.location_or_link }}</p>
+            </div>
+            <div class="pt-3 border-t border-toranj-border flex items-center justify-between text-[13px]">
+                <span class="font-semibold text-toranj-navy">زبان‌آموزان تاییدشده: {{ cls.approved_enrollments_count }}/{{ cls.max_capacity }}</span>
+                <a href="{% url 'courses:class_roster' cls.id %}" class="btn-outline !h-[36px] px-3 !text-xs">مشاهده لیست زبان‌آموزان ←</a>
+            </div>
+        </div>
+        {% empty %}
+        <p class="col-span-full text-center py-6 text-toranj-textMuted">هنوز گروه کلاسی فعالی به شما تخصیص داده نشده است.</p>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}
