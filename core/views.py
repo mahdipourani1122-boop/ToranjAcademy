@@ -1,373 +1,240 @@
-from pathlib import Path
-from django.conf import settings
-from django.db.models import Q
 from django.shortcuts import render
-from django.views.generic import TemplateView
-from accounts.models import User
-from accounts.forms import ToranjLoginForm
-from accounts.views import UserLoginView
-from courses.models import Course, CourseCategory, ClassGroup
+from django.http import Http404
+from django.apps import apps
+from django.contrib.auth import get_user_model
 
-
-LANGUAGE_DEPARTMENTS = {
+DEPARTMENTS_DATA = {
     'english': {
         'slug': 'english',
-        'en_name': 'English',
-        'fa_name': 'زبان انگلیسی',
+        'name_short': 'زبان انگلیسی',
+        'title_fa': 'دپارتمان زبان انگلیسی',
+        'title_en': 'British & International Academic English',
         'flag_emoji': '🇬🇧',
-        'flag_code': 'GB',
-        'country_label': 'United Kingdom (UK Standard)',
-        'tagline': 'آموزش جامع زبان انگلیسی با استاندارد کمبریج و CEFR بریتانیا',
-        'description': 'دپارتمان زبان انگلیسی آکادمی تُرنج با پوشش سطوح A1 تا C2، دوره‌های مکالمه‌محور بزرگسالان، نوجوانان و کودکان و کارگاه‌های تخصصی آمادگی IELTS را با اساتید مجرب برگزار می‌کند.',
-        'levels': [
-            {'code': 'A1 - Beginner', 'title': 'مبتدی (Starter / Beginner)', 'desc': 'ساختارهای پایه، مکالمات روزمره اولیه و تلفظ صحیح استاندارد بریتانیایی.'},
-            {'code': 'A2 - Elementary', 'title': 'مقدماتی (Elementary)', 'desc': 'گسترش دامنه واژگان کاربردی، زمان‌های اصلی گرامری و درک متون کوتاه.'},
-            {'code': 'B1 - Intermediate', 'title': 'متوسط (Pre-Intermediate & Intermediate)', 'desc': 'مکالمه روان در موقعیت‌های کاری، تحصیلی و سفر به همراه نگارش ساختاریافته.'},
-            {'code': 'B2 - Upper-Intermediate', 'title': 'فرامتوسط (Upper-Intermediate)', 'desc': 'بحث‌های تحلیلی، درک فیلم و سخنرانی‌های دانشگاهی و نگارش مقالات استاندارد.'},
-            {'code': 'C1/C2 - Advanced & IELTS', 'title': 'پیشرفته و آمادگی آزمون IELTS', 'desc': 'تسلط حرفه‌ای بر هر ۴ مهارت و تکنیک‌های کسب نمره ۷.۵+ در آزمون آیلتس.'},
+        'code_label': 'UK • A1–C2',
+        'exam_focus': 'IELTS • Cambridge • Academic English',
+        'image': 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=1000&q=80',
+        'short_desc': 'آموزش آکادمیک و بین‌المللی زبان انگلیسی با تمرکز بر مهارت‌های چهارگانه، مکالمه پیشرفته و آمادگی آزمون‌های IELTS و کمبریج.',
+        'hero_heading': 'تسلط آکادمیک و بین‌المللی بر زبان انگلیسی 🇬🇧',
+        'full_intro': 'دپارتمان زبان انگلیسی آموزشگاه تُرَنج با تکیه بر استانداردهای آموزشی بریتانیا و چارچوب CEFR، زبان‌آموزان را از سطح پایه تا تسلط کامل آکادمیک و حرفه‌ای همراهی می‌کند.',
+        'levels': ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'],
+        'methodology': 'بهره‌گیری از متد Communicative و Task-Based Learning با تمرکز بر لهجه استاندارد، نگارش آکادمیک و شبیه‌سازی آزمون‌های بین‌المللی.',
+        'benefits': [
+            'آمادگی کامل برای آزمون‌های بین‌المللی IELTS و مدارک کمبریج',
+            'تقویت مهارت Speaking و مکالمه روان در محیط‌های علمی و کاری',
+            'پیگیری دقیق نمرات و پیشرفت زبان‌آموز در پورتال اختصاصی تُرَنج',
         ],
-        'search_keywords': ['انگلیسی', 'english', 'ielts', 'آیلتس', 'مکالمه', 'conversation', 'b1', 'b2'],
-        'template_name': 'core/languages/english.html',
+        'cefr_details': [
+            {'code': 'A1', 'title_en': 'Beginner', 'title_fa': 'مبتدی پایه', 'desc': 'آشنایی با ساختارهای پایه، معرفی خود و مکالمات روزمره ساده.'},
+            {'code': 'A2', 'title_en': 'Elementary', 'title_fa': 'مقدماتی', 'desc': 'برقراری ارتباط در موقعیت‌های روزمره، خرید، سفر و توصیف محیط.'},
+            {'code': 'B1', 'title_en': 'Intermediate', 'title_fa': 'متوسط', 'desc': 'ورود به مرحله استقلال زبانی، بیان تجربیات، اهداف و نگارش متون منسجم.'},
+            {'code': 'B2', 'title_en': 'Upper-Intermediate', 'title_fa': 'فرامتوسط', 'desc': 'درک متون پیچیده، بحث‌های تخصصی و مکالمه روان بدون مکث طولانی.'},
+            {'code': 'C1', 'title_en': 'Advanced', 'title_fa': 'پیشرفته آکادمیک', 'desc': 'تسلط بالا برای تحصیل در دانشگاه‌های بین‌المللی و محیط‌های حرفه‌ای.'},
+            {'code': 'C2', 'title_en': 'Mastery', 'title_fa': 'تسلط کامل', 'desc': 'بالاترین سطح استاندارد جهانی معادل گویشوران تحصیل‌کرده زبان انگلیسی.'},
+        ],
+        'faqs': [
+            {'q': 'منابع آموزشی دپارتمان انگلیسی بر چه استانداردی است؟', 'a': 'سرفصل‌ها بر اساس استاندارد British و بین‌المللی منطبق بر CEFR طراحی شده‌اند.'},
+            {'q': 'آیا کلاس‌های آمادگی آیلتس هم برگزار می‌شود؟', 'a': 'بله، پس از تعیین سطح و رسیدن به سطح B1/B2 می‌توانید وارد دوره‌های تخصصی IELTS شوید.'},
+        ],
     },
     'german': {
         'slug': 'german',
-        'en_name': 'Deutsch',
-        'fa_name': 'زبان آلمانی',
+        'name_short': 'زبان آلمانی',
+        'title_fa': 'دپارتمان زبان آلمانی',
+        'title_en': 'German Department • Goethe & TestDaF',
         'flag_emoji': '🇩🇪',
-        'flag_code': 'DE',
-        'country_label': 'Germany (Goethe & ÖSD Standard)',
-        'tagline': 'مسیر تخصصی مهاجرت تحصیلی، کاری و آزمون‌های سفارت آلمان',
-        'description': 'دپارتمان زبان آلمانی تُرنج بر اساس سرفصل‌های رسمی انستیتو گوته (Goethe-Institut) و آزمون‌های ÖSD و TestDaF طراحی شده و زبان‌آموزان را از سطح پایه A1 تا سطح پیشرفته C1 آماده می‌سازد.',
-        'levels': [
-            {'code': 'Start Deutsch A1', 'title': 'سطح پایه A1.1 و A1.2', 'desc': 'مبانی ساختار جمله در آلمانی، جنسیت اسامی، مکالمات روزمره و آمادگی آزمون A1 سفارت.'},
-            {'code': 'Goethe-Zertifikat A2', 'title': 'سطح مقدماتی A2.1 و A2.2', 'desc': 'گسترش ارتباطات روزمره، گرامر کاربردی و درک متون و پیام‌های رسمی.'},
-            {'code': 'Zertifikat Deutsch B1', 'title': 'سطح مستقل B1', 'desc': 'مکالمه مستقل در محیط کار و زندگی در آلمان و قبولی در آزمون رسمی B1 گوته/ÖSD.'},
-            {'code': 'Goethe-Zertifikat B2', 'title': 'سطح پیشرفته کاری و تحصیلی B2', 'desc': 'شرط اصلی پذیرش کاری، کالج و کادر درمان در آلمان با تمرکز بر مکاتبات رسمی و تخصصی.'},
-            {'code': 'TestDaF / C1 Hochschule', 'title': 'سطح دانشگاهی C1', 'desc': 'آمادگی ورود مستقیم به دانشگاه‌های آلمان و نگارش علمی به زبان آلمانی.'},
+        'code_label': 'DE • A1–C1',
+        'exam_focus': 'Goethe-Zertifikat • ÖSD • TestDaF',
+        'image': 'https://images.unsplash.com/photo-1467269204594-9661b134dd2b?auto=format&fit=crop&w=1000&q=80',
+        'short_desc': 'برنامه‌ریزی دقیق و ساختارمند ویژه متقاضیان تحصیل، کار و مهاجرت به آلمان، اتریش و سوئیس با تمرکز بر آزمون‌های گوته و ÖSD.',
+        'hero_heading': 'آموزش دقیق و ساختارمند زبان آلمانی 🇩🇪',
+        'full_intro': 'دپارتمان آلمانی تُرَنج با ساختاری منظم و گام‌به‌گام، زبان‌آموزان را برای کسب مدارک رسمی سفارت (Goethe، ÖSD و TestDaF) و زندگی تحصیلی و کاری در کشورهای آلمانی‌زبان آماده می‌سازد.',
+        'levels': ['A1', 'A2', 'B1', 'B2', 'C1'],
+        'methodology': 'آموزش سیستماتیک گرامر و واژگان کاربردی همراه با تمرین مستمر ماک‌های امتحانی گوته (Lesen, Hören, Schreiben, Sprechen).',
+        'benefits': [
+            'پوشش کامل سرفصل‌های آزمون‌های Goethe و ÖSD از سطح A1 تا C1',
+            'آموزش ساختارمند گرامر آلمانی به زبان ساده و کاربردی',
+            'شبیه‌سازی بخش شفاهی (Sprechen) و نگارش نامه‌های رسمی و آکادمیک',
         ],
-        'search_keywords': ['آلمانی', 'german', 'deutsch', 'گوته', 'goethe', 'testdaf'],
-        'template_name': 'core/languages/german.html',
+        'cefr_details': [
+            {'code': 'A1', 'title_en': 'Start Deutsch 1', 'title_fa': 'سطح پایه A1', 'desc': 'شروع یادگیری آلمانی، جمله‌سازی پایه و مکالمات اولیه روزمره.'},
+            {'code': 'A2', 'title_en': 'Goethe-Zertifikat A2', 'title_fa': 'سطح مقدماتی A2', 'desc': 'گسترش دایره واژگان و درک مکالمات روزمره و محیط کار.'},
+            {'code': 'B1', 'title_en': 'Zertifikat Deutsch B1', 'title_fa': 'سطح متوسط B1', 'desc': 'سطح کلیدی مورد نیاز برای بسیاری از ویزاهای کاری، آوسبیلدونگ و پیوست.'},
+            {'code': 'B2', 'title_en': 'Goethe / ÖSD B2', 'title_fa': 'سطح فرامتوسط B2', 'desc': 'مکالمه تخصصی و پیش‌نیاز اصلی ورود به کالج‌ها و محیط‌های حرفه‌ای آلمان.'},
+            {'code': 'C1', 'title_en': 'Hochschulzugang C1', 'title_fa': 'سطح پیشرفته دانشگاهی C1', 'desc': 'تسلط آکادمیک برای تحصیل مستقیم در دانشگاه‌های آلمان و اتریش.'},
+        ],
+        'faqs': [
+            {'q': 'برای مهاجرت تحصیلی یا کاری به چه سطحی از آلمانی نیاز است؟', 'a': 'بسته به رشته و نوع ویزا، معمولاً سطح B1 یا B2 (و برای برخی رشته‌های دانشگاهی C1) مورد نیاز است.'},
+        ],
     },
     'french': {
         'slug': 'french',
-        'en_name': 'Français',
-        'fa_name': 'زبان فرانسوی',
+        'name_short': 'زبان فرانسوی',
+        'title_fa': 'دپارتمان زبان فرانسوی',
+        'title_en': 'French Department • DELF / DALF & TCF',
         'flag_emoji': '🇫🇷',
-        'flag_code': 'FR',
-        'country_label': 'France (DELF / DALF & TCF Standard)',
-        'tagline': 'آموزش اصیل زبان فرانسه ویژه مکالمه، تحصیل در فرانسه و مهاجرت به کانادا',
-        'description': 'دپارتمان زبان فرانسوی آکادمی تُرنج با تمرکز بر آواشناسی دقیق فرانسوی، مکالمه روان و آمادگی آزمون‌های بین‌المللی DELF، DALF، TCF و TEF مسیر یادگیری شما را هدفمند می‌کند.',
-        'levels': [
-            {'code': 'DELF A1', 'title': 'سطح آغازین A1 (Découverte)', 'desc': 'آواشناسی و تلفظ صحیح فرانسوی، معرفی خود و تعاملات پایه روزمره.'},
-            {'code': 'DELF A2', 'title': 'سطح مقدماتی A2 (Survie)', 'desc': 'مکالمه در موقعیت‌های سفر، خرید و زندگی شهری به همراه زمان‌های گذشته و آینده.'},
-            {'code': 'DELF B1', 'title': 'سطح مستقل B1 (Seuil)', 'desc': 'بیان دیدگاه‌ها، روایت رویدادها و درک برنامه‌های رادیویی و تلویزیونی فرانسه.'},
-            {'code': 'DELF B2 / TCF', 'title': 'سطح پیشرفته B2 (Avancé)', 'desc': 'کسب حد نصاب پذیرش دانشگاه‌های فرانسه و امتیاز زبان فرانسوی مهاجرت کانادا (TEF/TCF).'},
-            {'code': 'DALF C1', 'title': 'سطح تسلط حرفه‌ای C1', 'desc': 'تسلط کامل بر متون ادبی، آکادمیک و سخنرانی حرفه‌ای به زبان فرانسه.'},
+        'code_label': 'FR • A1–C1',
+        'exam_focus': 'DELF • DALF • TCF / TEF',
+        'image': 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=1000&q=80',
+        'short_desc': 'یادگیری اصولی زبان فرانسوی با تلفظ استاندارد، درک فرهنگی و آمادگی آزمون‌های بین‌المللی DELF، DALF و TCF.',
+        'hero_heading': 'ظرافت زبانی و تسلط آکادمیک در دپارتمان فرانسوی 🇫🇷',
+        'full_intro': 'در دپارتمان زبان فرانسوی آموزشگاه تُرَنج، زیبایی و ساختار دقیق زبان فرانسه با متدهای روز اروپا آموزش داده می‌شود تا زبان‌آموزان برای تحصیل در فرانسه، کانادا و سوئیس یا مطالعه ادبیات و هنر آماده شوند.',
+        'levels': ['A1', 'A2', 'B1', 'B2', 'C1'],
+        'methodology': 'تمرکز ویژه بر آواشناسی (Phonétique)، درک شنیداری سریع و نگارش ساختارمند فرانسوی مطابق استانداردهای DELF/DALF.',
+        'benefits': [
+            'آمادگی هدفمند برای آزمون‌های DELF، DALF، TCF و TEF',
+            'آموزش دقیق قواعد تلفظ و گفتار روان فرانسوی از سطح A1',
+            'مناسب برای متقاضیان تحصیل در دانشگاه‌های فرانسه و مهاجرت به کانادا',
         ],
-        'search_keywords': ['فرانسوی', 'فرانسه', 'french', 'francais', 'français', 'delf', 'tcf'],
-        'template_name': 'core/languages/french.html',
+        'cefr_details': [
+            {'code': 'A1', 'title_en': 'DELF A1', 'title_fa': 'سطح پایه A1', 'desc': 'آشنایی با آواها، تلفظ صحیح و مکالمات مقدماتی روزمره.'},
+            {'code': 'A2', 'title_en': 'DELF A2', 'title_fa': 'سطح مقدماتی A2', 'desc': 'توانایی بیان نیازهای روزمره و درک متون کوتاه فرانسوی.'},
+            {'code': 'B1', 'title_en': 'DELF B1', 'title_fa': 'سطح متوسط B1', 'desc': 'بیان دیدگاه‌ها، روایت رویدادها و مکالمه مستقل در سفر و کار.'},
+            {'code': 'B2', 'title_en': 'DELF B2', 'title_fa': 'سطح فرامتوسط B2', 'desc': 'سطح استاندارد پذیرش در دانشگاه‌های فرانسه و استدلال حرفه‌ای.'},
+            {'code': 'C1', 'title_en': 'DALF C1', 'title_fa': 'سطح پیشرفته C1', 'desc': 'تسلط کامل بر متون آکادمیک، ادبی و سخنرانی حرفه‌ای.'},
+        ],
+        'faqs': [
+            {'q': 'آیا دوره‌ها برای آزمون TCF و مهاجرت کانادا نیز مناسب است؟', 'a': 'بله، تمامی مهارت‌های چهارگانه مورد نیاز آزمون‌های TCF، TEF و DELF پوشش داده می‌شوند.'},
+        ],
     },
     'turkish': {
         'slug': 'turkish',
-        'en_name': 'Türkçe',
-        'fa_name': 'زبان ترکی استانبولی',
+        'name_short': 'ترکی استانبولی',
+        'title_fa': 'دپارتمان ترکی استانبولی',
+        'title_en': 'Istanbul Turkish • TÖMER Standard',
         'flag_emoji': '🇹🇷',
-        'flag_code': 'TR',
-        'country_label': 'Turkey (TÖMER Standard)',
-        'tagline': 'مکالمه کاربردی، بازرگانی و آمادگی آزمون TÖMER دانشگاه‌های ترکیه',
-        'description': 'دپارتمان زبان ترکی استانبولی تُرنج بر اساس متد استاندارد دانشگاه آنکارا (Yeni Hitit / İstanbul) برای اهداف مکالمه روزمره، تجارت، زندگی و تحصیل در دانشگاه‌های ترکیه طراحی شده است.',
-        'levels': [
-            {'code': 'Temel A1', 'title': 'سطح پایه A1', 'desc': 'الفبای لاتین ترکی، هماهنگی اصوات، پسوندها و مکالمات ضروری سفر و زندگی.'},
-            {'code': 'Temel A2', 'title': 'سطح مقدماتی A2', 'desc': 'زمان‌های فعلی، گذشته و آینده و برقراری ارتباط روان در محیط‌های اجتماعی ترکیه.'},
-            {'code': 'Orta B1', 'title': 'سطح متوسط B1', 'desc': 'مکالمه درباره موضوعات کاری، خبری و فرهنگی بدون نیاز به مترجم.'},
-            {'code': 'Orta B2', 'title': 'سطح فرامتوسط B2', 'desc': 'مذاکرات کاری و تجاری، درک سریال‌ها و اخبار ترکیه و نگارش رسمی.'},
-            {'code': 'Yüksek C1 (TÖMER)', 'title': 'سطح پیشرفته و دیپلم TÖMER C1', 'desc': 'اخذ مدرک رسمی تومر جهت ورود به رشته‌های پزشکی، مهندسی و تحصیلات تکمیلی در ترکیه.'},
+        'code_label': 'TR • A1–C1',
+        'exam_focus': 'Istanbul Turkish • TÖMER & YÖS',
+        'image': 'https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?auto=format&fit=crop&w=1000&q=80',
+        'short_desc': 'آموزش کاربردی و معیار زبان ترکی استانبولی ویژه مکالمه روزمره، تجارت، زندگی و دریافت مدرک معتبر TÖMER دانشگاه‌های ترکیه.',
+        'hero_heading': 'مکالمه روان و تسلط کاربردی بر ترکی استانبولی 🇹🇷',
+        'full_intro': 'دپارتمان ترکی استانبولی آموزشگاه تُرَنج بر پایه استاندارد دانشگاه استانبول (مجموعه آموزشی İstanbul) طراحی شده و زبان‌آموزان را برای مکالمه روان، محیط‌های تجاری و آزمون بین‌المللی TÖMER آماده می‌کند.',
+        'levels': ['A1', 'A2', 'B1', 'B2', 'C1'],
+        'methodology': 'تدریس بر اساس سیستم آموزشی دانشگاه استانبول با تمرکز بر لهجه معیار استانبولی، اصطلاحات روزمره و مهارت‌های آزمون تومر.',
+        'benefits': [
+            'تمرکز کامل بر لهجه معیار ترکی استانبولی (Istanbul Turkish)',
+            'آمادگی کامل جهت کسب مدرک TÖMER برای پذیرش دانشگاه‌های ترکیه',
+            'پیشرفت سریع در مکالمات روزمره، سفر و مذاکرات کاری',
         ],
-        'search_keywords': ['ترکی', 'استانبولی', 'turkish', 'turkce', 'türkçe', 'تومر', 'tomer', 'tömer'],
-        'template_name': 'core/languages/turkish.html',
+        'cefr_details': [
+            {'code': 'A1', 'title_en': 'Temel A1', 'title_fa': 'سطح پایه A1', 'desc': 'الفبا، قواعد هماهنگی مصوت‌ها و مکالمات ضروری روزمره در استانبول.'},
+            {'code': 'A2', 'title_en': 'Temel A2', 'title_fa': 'سطح مقدماتی A2', 'desc': 'گسترش جمله‌سازی در زمان‌های مختلف و ارتباط راحت در سفر و خرید.'},
+            {'code': 'B1', 'title_en': 'Orta B1', 'title_fa': 'سطح متوسط B1', 'desc': 'مکالمه روان درباره موضوعات اجتماعی، کاری و درک رسانه‌های ترکی.'},
+            {'code': 'B2', 'title_en': 'Orta B2', 'title_fa': 'سطح فرامتوسط B2', 'desc': 'سطح مورد نیاز اکثر دانشگاه‌های ترکیه و ارتباطات رسمی و تجاری.'},
+            {'code': 'C1', 'title_en': 'İleri C1', 'title_fa': 'سطح پیشرفته TÖMER C1', 'desc': 'تسلط کامل آکادمیک و دریافت بالاترین سطح مدرک رسمی TÖMER.'},
+        ],
+        'faqs': [
+            {'q': 'چه منبعی در دپارتمان ترکی استانبولی تدریس می‌شود؟', 'a': 'سری کتاب‌های استاندارد دانشگاه استانبول (Yeni İstanbul) به همراه منابع تکمیلی آزمون TÖMER.'},
+        ],
     },
 }
 
 
-def _ensure_subtemplates_and_static_dirs():
-    """ایجاد خودکار پوشه static/images و قالب‌های صفحات فرعي در صورت عدم وجود"""
-    base_dir = Path(settings.BASE_DIR)
-    (base_dir / 'static' / 'images').mkdir(parents=True, exist_ok=True)
-    lang_dir = base_dir / 'templates' / 'core' / 'languages'
-    lang_dir.mkdir(parents=True, exist_ok=True)
+def _get_real_courses(language_slug=None):
+    """واکشی ایمن دوره‌های واقعی از دیتابیس بدون تولید داده ساختگی"""
+    courses_list = []
+    try:
+        CourseModel = apps.get_model('courses', 'Course')
+        qs = CourseModel.objects.all()
+        if hasattr(CourseModel, 'is_active'):
+            qs = qs.filter(is_active=True)
 
-    lang_html = """{% extends 'base.html' %}
-{% block title %}دپارتمان {{ dept.fa_name }} ({{ dept.en_name }}) | آکادمی زبان تُرنج{% endblock %}
-{% block content %}
-<section class="bg-toranj-navy text-white py-12 lg:py-16 border-b border-white/10">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex flex-wrap items-center justify-between gap-4 mb-6 text-[13px] text-gray-300">
-            <a href="{% url 'core:home' %}" class="inline-flex items-center gap-1.5 hover:text-toranj-orange font-bold">
-                <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                <span>بازگشت به صفحه اصلی آکادمی تُرنج</span>
-            </a>
-            <div class="flex flex-wrap gap-2">
-                {% for d in all_departments %}
-                    <a href="/languages/{{ d.slug }}/" class="px-3 py-1 rounded-lg border {% if d.slug == dept.slug %}bg-toranj-orange text-toranj-textMain border-toranj-orange font-extrabold{% else %}border-white/15 hover:bg-white/10{% endif %}">
-                        <span>{{ d.flag_emoji }} {{ d.fa_name }}</span>
-                    </a>
-                {% endfor %}
-            </div>
-        </div>
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-            <div class="lg:col-span-8 space-y-4">
-                <div class="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/15 text-[13px] font-bold">
-                    <span class="text-2xl">{{ dept.flag_emoji }}</span>
-                    <span dir="ltr">{{ dept.en_name }} • {{ dept.country_label }}</span>
-                </div>
-                <h1 class="text-[28px] sm:text-[38px] font-black leading-tight">دپارتمان تخصصی {{ dept.fa_name }} ({{ dept.en_name }})</h1>
-                <p class="text-[16px] text-toranj-orange font-bold">{{ dept.tagline }}</p>
-                <p class="text-[14px] sm:text-[15px] text-gray-200 leading-relaxed max-w-3xl">{{ dept.description }}</p>
-                <div class="pt-3 flex flex-wrap gap-3">
-                    <a href="{% url 'accounts:register' %}" class="btn-primary-orange px-6">ثبت‌نام و تعیین سطح {{ dept.fa_name }}</a>
-                    <a href="#dept-courses" class="px-5 h-[46px] rounded-xl bg-white/10 hover:bg-white/15 border border-white/20 font-bold text-[13px] inline-flex items-center">مشاهده دوره‌های موجود</a>
-                </div>
-            </div>
-            <div class="lg:col-span-4">
-                <div class="p-6 rounded-3xl bg-white/5 border border-white/15 text-center space-y-3">
-                    <div class="text-6xl">{{ dept.flag_emoji }}</div>
-                    <h2 class="text-[22px] font-black text-white" dir="ltr">{{ dept.en_name }}</h2>
-                    <p class="text-[14px] font-bold text-toranj-orange">{{ dept.fa_name }}</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-<section class="py-12 lg:py-16 bg-toranj-bg">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
-        <div>
-            <h2 class="text-[22px] sm:text-[26px] font-black text-toranj-textMain">سطوح آموزشی استاندارد {{ dept.fa_name }}</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mt-6">
-                {% for lvl in dept.levels %}
-                <div class="toranj-card space-y-2">
-                    <span class="px-2.5 py-1 rounded-lg bg-toranj-navy text-toranj-orange font-mono text-[12px] font-extrabold inline-block" dir="ltr">{{ lvl.code }}</span>
-                    <h3 class="text-[16px] font-extrabold text-toranj-textMain pt-1">{{ lvl.title }}</h3>
-                    <p class="text-[13px] text-toranj-textMuted leading-relaxed">{{ lvl.desc }}</p>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
-        <div id="dept-courses" class="space-y-4">
-            <h2 class="text-[22px] font-black text-toranj-textMain">دوره‌های فعال {{ dept.fa_name }} در پایگاه داده</h2>
-            {% if department_courses %}
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {% for course in department_courses %}
-                    <article class="toranj-card flex flex-col justify-between space-y-4">
-                        <div>
-                            <h3 class="text-[18px] font-extrabold text-toranj-textMain">{{ course.title }}</h3>
-                            <p class="text-[13px] text-toranj-textMuted mt-1">{{ course.description }}</p>
-                        </div>
-                        <div class="pt-3 border-t border-toranj-border flex items-center justify-between">
-                            <span class="font-bold text-toranj-navy">{{ course.tuition_fee }} تومان</span>
-                            <a href="{% url 'courses:catalog' %}?q={{ course.title|urlencode }}" class="btn-primary-orange px-4 !h-[38px] !text-[12px]">مشاهده و ثبت‌نام</a>
-                        </div>
-                    </article>
-                    {% endfor %}
-                </div>
-            {% else %}
-                <div class="toranj-card text-center py-8 space-y-3">
-                    <p class="text-[15px] font-extrabold text-toranj-textMain">در حال حاضر دوره منتشرشده‌ای برای «{{ dept.fa_name }}» در دیتابیس ثبت نشده است.</p>
-                    <a href="{% url 'accounts:register' %}" class="btn-primary-orange px-6">ثبت‌نام اولیه زبان‌آموز</a>
-                </div>
-            {% endif %}
-        </div>
-    </div>
-</section>
-{% endblock %}"""
+        for c in qs[:12]:
+            title = getattr(c, 'title', getattr(c, 'name', str(c)))
+            desc = getattr(c, 'description', '')
+            level = getattr(c, 'level', '')
+            lang = str(getattr(c, 'language', '')).lower()
 
-    for key in ['english', 'german', 'french', 'turkish']:
-        (lang_dir / f'{key}.html').write_text(lang_html, encoding='utf-8')
+            if language_slug:
+                lang_keywords = {
+                    'english': ['en', 'eng', 'english', 'انگلیسی'],
+                    'german': ['de', 'ger', 'german', 'آلمانی'],
+                    'french': ['fr', 'fre', 'french', 'فرانسوی', 'فرانسه'],
+                    'turkish': ['tr', 'tur', 'turkish', 'ترکی'],
+                }.get(language_slug, [])
+                combined_text = f"{title} {lang}".lower()
+                if not any(k in combined_text for k in lang_keywords):
+                    continue
 
-    guest_file = base_dir / 'templates' / 'core' / 'guest_explore.html'
-    guest_file.write_text("""{% extends 'base.html' %}
-{% block title %}گشت‌وگذار مهمان | آکادمی زبان تُرنج{% endblock %}
-{% block content %}
-<section class="py-12 lg:py-16 bg-toranj-bg">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-        <div class="toranj-card bg-toranj-navy text-white flex flex-col md:flex-row md:items-center justify-between gap-6">
-            <div>
-                <span class="px-3 py-1 rounded-full bg-white/10 text-toranj-orange text-[12px] font-bold">حالت بازدیدکننده مهمان (Guest Mode)</span>
-                <h1 class="text-[24px] sm:text-[30px] font-black mt-2">آشنایی با دپارتمان‌ها و دوره‌های آکادمی زبان تُرنج</h1>
-                <p class="text-[13px] text-gray-300 mt-1">شما بدون نیاز به ثبت‌نام در حال مشاهده بخش‌های عمومی هستید. برای ثبت‌نام در کلاس یا مشاهده کارنامه، وارد حساب زبان‌آموز شوید.</p>
-            </div>
-            <div class="flex gap-3 shrink-0">
-                <a href="{% url 'accounts:register' %}" class="btn-primary-orange px-5">ثبت‌نام زبان‌آموز</a>
-                <a href="{% url 'core:student_portal_login' %}" class="px-4 py-2.5 rounded-xl border border-white/25 text-white font-bold text-[13px] flex items-center">ورود دانشجو</a>
-            </div>
-        </div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {% for lang in languages %}
-            <a href="/languages/{{ lang.slug }}/" class="toranj-card toranj-card-hover flex items-center justify-between">
-                <div>
-                    <h2 class="text-[16px] font-extrabold text-toranj-textMain">{{ lang.fa_name }}</h2>
-                    <span class="text-[12px] text-toranj-textMuted" dir="ltr">{{ lang.en_name }}</span>
-                </div>
-                <span class="text-3xl">{{ lang.flag_emoji }}</span>
-            </a>
-            {% endfor %}
-        </div>
-    </div>
-</section>
-{% endblock %}""", encoding='utf-8')
-
-    role_login_file = base_dir / 'templates' / 'accounts' / 'role_login.html'
-    role_login_file.write_text("""{% extends 'accounts/base_auth.html' %}
-{% block title %}{{ portal.title }} | آکادمی زبان تُرنج{% endblock %}
-{% block auth_content %}
-<div class="text-center mb-6">
-    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-toranj-navy/10 text-toranj-navy text-[12px] font-extrabold mb-3">
-        <span>{{ portal.badge }}</span>
-    </span>
-    <h1 class="text-[22px] sm:text-[24px] font-extrabold text-toranj-textMain">{{ portal.title }}</h1>
-    <p class="text-[13px] text-toranj-textMuted mt-1">{{ portal.subtitle }}</p>
-</div>
-{% if form.non_field_errors %}
-    <div class="mb-4 p-3.5 rounded-xl bg-toranj-error/10 border border-toranj-error/30 text-toranj-error text-[13px]">
-        {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
-    </div>
-{% endif %}
-<form method="post" class="auth-form space-y-4" novalidate>
-    {% csrf_token %}
-    <div>
-        <label class="block text-[13px] font-bold text-toranj-textMain mb-1.5">{{ form.identifier.label }}</label>
-        {{ form.identifier }}
-    </div>
-    <div>
-        <label class="block text-[13px] font-bold text-toranj-textMain mb-1.5">رمز عبور</label>
-        {{ form.password }}
-    </div>
-    <button type="submit" class="w-full btn-primary-orange">ورود امن به پنل</button>
-</form>
-<div class="mt-6 pt-4 border-t border-toranj-border text-center text-[13px] text-toranj-textMuted">
-    {% if portal.allow_registration %}
-        زبان‌آموز جدید هستید؟ <a href="{% url 'accounts:register' %}" class="font-extrabold text-toranj-navy hover:text-toranj-orange">ثبت‌نام زبان‌آموز جدید</a>
-    {% else %}
-        حساب کاربری اساتید صرفاً توسط مدیریت آکادمی زبان تُرنج صادر می‌شود.
-    {% endif %}
-</div>
-{% endblock %}""", encoding='utf-8')
+            courses_list.append({
+                'title': title,
+                'description': desc,
+                'level': level,
+                'language_label': getattr(c, 'get_language_display', lambda: lang)() if lang else 'دوره آموزشی',
+            })
+    except Exception:
+        pass
+    return courses_list
 
 
-try:
-    _ensure_subtemplates_and_static_dirs()
-except Exception:
-    pass
+def _get_real_teachers():
+    """واکشی ایمن اساتید واقعی ثبت‌شده در دیتابیس"""
+    teachers_list = []
+    try:
+        User = get_user_model()
+        qs = User.objects.all()
+        for u in qs:
+            role = str(getattr(u, 'role', '')).lower()
+            is_teacher = getattr(u, 'is_teacher', False) or role in ['teacher', 'instructor', 'استاد']
+            if is_teacher:
+                full_name = u.get_full_name().strip() if hasattr(u, 'get_full_name') else ''
+                teachers_list.append({
+                    'display_name': full_name or u.username,
+                    'role_label': 'عضو هیئت علمی و مدرس تُرَنج',
+                })
+    except Exception:
+        pass
+    return teachers_list[:8]
 
 
-class HomePageView(TemplateView):
-    template_name = 'core/home.html'
+def _get_real_stats(courses_count, teachers_count):
+    """محاسبه آمار واقعی از دیتابیس"""
+    students_count = 0
+    try:
+        StudentProfile = apps.get_model('academics', 'StudentProfile')
+        students_count = StudentProfile.objects.count()
+    except Exception:
+        pass
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        published_courses = Course.objects.filter(
-            publication_status='published', is_deleted=False
-        ).select_related('category').prefetch_related('classes')[:6]
-        categories = CourseCategory.objects.filter(is_active=True)
-        teachers = User.objects.filter(role=User.Role.TEACHER, is_active=True)[:6]
-
-        context['languages'] = list(LANGUAGE_DEPARTMENTS.values())
-        context['featured_courses'] = published_courses
-        context['categories'] = categories
-        context['teachers'] = teachers
-        return context
-
-
-class LanguageDepartmentLandingView(TemplateView):
-    language_key = 'english'
-
-    def get_template_names(self):
-        _ensure_subtemplates_and_static_dirs()
-        dept = LANGUAGE_DEPARTMENTS[self.language_key]
-        return [dept['template_name']]
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        dept = LANGUAGE_DEPARTMENTS[self.language_key]
-        context['dept'] = dept
-        context['all_departments'] = list(LANGUAGE_DEPARTMENTS.values())
-
-        q_filter = Q()
-        for kw in dept['search_keywords']:
-            q_filter |= Q(title__icontains=kw) | Q(description__icontains=kw) | Q(category__name__icontains=kw)
-
-        courses_qs = Course.objects.filter(
-            publication_status='published', is_deleted=False
-        ).filter(q_filter).select_related('category').distinct()
-        context['department_courses'] = courses_qs
-        return context
+    return {
+        'has_real_stats': True,
+        'departments_count': 4,
+        'courses_count': courses_count,
+        'teachers_count': teachers_count,
+        'students_count': students_count,
+    }
 
 
-class GuestExploreView(TemplateView):
-    template_name = 'core/guest_explore.html'
+def home_view(request):
+    featured_courses = _get_real_courses()
+    teachers = _get_real_teachers()
+    stats = _get_real_stats(len(featured_courses), len(teachers))
 
-    def get_context_data(self, **kwargs):
-        _ensure_subtemplates_and_static_dirs()
-        context = super().get_context_data(**kwargs)
-        context['languages'] = list(LANGUAGE_DEPARTMENTS.values())
-        context['published_courses'] = Course.objects.filter(
-            publication_status='published', is_deleted=False
-        ).select_related('category')[:12]
-        context['teachers'] = User.objects.filter(role=User.Role.TEACHER, is_active=True)[:8]
-        return context
+    context = {
+        'departments': list(DEPARTMENTS_DATA.values()),
+        'featured_courses': featured_courses,
+        'teachers': teachers,
+        'stats': stats,
+    }
+    return render(request, 'core/home.html', context)
 
 
-class RolePortalLoginView(UserLoginView):
-    portal_type = 'student'
-    template_name = 'accounts/role_login.html'
+def department_detail_view(request, slug):
+    dept = DEPARTMENTS_DATA.get(slug.lower())
+    if not dept:
+        raise Http404("دپارتمان مورد نظر یافت نشد.")
 
-    def get_portal_meta(self):
-        meta_map = {
-            'student': {
-                'title': 'ورود دانشجویان به سامانه تُرنج',
-                'subtitle': 'با کد کاربری آکادمی (TRJ-26XXXX) یا شماره موبایل تأییدشده وارد شوید',
-                'badge': 'پرتال زبان‌آموزان (Student Portal)',
-                'allowed_roles': [User.Role.STUDENT],
-                'allow_registration': True,
-            },
-            'teacher': {
-                'title': 'ورود اساتید آکادمی زبان تُرنج',
-                'subtitle': 'ویژه اساتید رسمی دارای حساب کاربری صادرشده توسط آموزشگاه',
-                'badge': 'پرتال اساتید (Teacher Portal)',
-                'allowed_roles': [User.Role.TEACHER],
-                'allow_registration': False,
-            },
-            'management': {
-                'title': 'ورود کادر نظارت و مدیریت تُرنج',
-                'subtitle': 'ویژه مدیران و سوپروایزرهای آموزشی',
-                'badge': 'پرتال مدیریت (Management Portal)',
-                'allowed_roles': [User.Role.ADMIN, User.Role.SUPERVISOR],
-                'allow_registration': False,
-            },
-        }
-        return meta_map.get(self.portal_type, meta_map['student'])
+    department_courses = _get_real_courses(language_slug=slug.lower())
+    teachers = _get_real_teachers()
 
-    def get(self, request):
-        _ensure_subtemplates_and_static_dirs()
-        return render(request, self.template_name, {
-            'form': ToranjLoginForm(),
-            'portal': self.get_portal_meta(),
-            'portal_type': self.portal_type,
-        })
+    context = {
+        'dept': dept,
+        'department_courses': department_courses,
+        'teachers': teachers,
+    }
+    return render(request, 'core/department_detail.html', context)
 
-    def post(self, request):
-        _ensure_subtemplates_and_static_dirs()
-        portal_meta = self.get_portal_meta()
-        form = ToranjLoginForm(request=request, data=request.POST)
-        if form.is_valid():
-            user = form.get_user()
-            if user.role not in portal_meta['allowed_roles']:
-                form.add_error(
-                    None,
-                    f"دسترسی غیرمجاز: این درگاه فقط مخصوص «{portal_meta['badge']}» است."
-                )
-                return render(request, self.template_name, {
-                    'form': form,
-                    'portal': portal_meta,
-                    'portal_type': self.portal_type,
-                }, status=403)
-        return super().post(request)
+
+# نام‌های جایگزین برای حفظ سازگاری کامل با URLهای قبلی پروژه
+home = home_view
+index = home_view
+language_landing = department_detail_view

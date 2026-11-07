@@ -1,110 +1,98 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}آکادمی زبان تُرنج | آموزش بین‌المللی انگلیسی، آلمانی، فرانسوی و ترکی{% endblock %}
+{% block title %}آموزشگاه زبان تُرَنج | تجربه تسلط بر زبان‌های بین‌المللی{% endblock %}
 
 {% block content %}
 
-<!-- ۱. بخش HERO پریمیوم و بین‌المللی -->
-<section class="relative bg-gradient-to-b from-toranj-navy to-[#091E36] text-white overflow-hidden py-16 lg:py-24 border-b border-white/10">
+<!-- ۱. بخش Hero سینمایی و پریمیوم -->
+<section class="relative bg-toranj-navy text-white overflow-hidden pt-12 pb-20 lg:py-24">
+    <!-- المان‌های ظریف پس‌زمینه -->
+    <div class="absolute inset-0 pointer-events-none overflow-hidden">
+        <div class="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-toranj-orange/15 blur-3xl"></div>
+        <div class="absolute bottom-0 left-1/4 w-[28rem] h-[28rem] rounded-full bg-blue-400/10 blur-3xl"></div>
+    </div>
+
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
 
-            <div class="lg:col-span-7 space-y-6">
-                <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/15 text-toranj-orange text-[12px] sm:text-[13px] font-bold">
-                    <i data-lucide="sparkles" class="w-4 h-4"></i>
-                    <span>استاندارد بین‌المللی CEFR اروپا • کارنامه تحلیلی هوشمند</span>
+            <!-- ستون متن و فراخوان‌ها -->
+            <div class="lg:col-span-7 space-y-6 text-right reveal active">
+                <div class="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-white/10 border border-white/15 text-xs sm:text-sm font-semibold text-toranj-orange">
+                    <span class="w-2 h-2 rounded-full bg-toranj-orange animate-pulse"></span>
+                    <span>استاندارد بین‌المللی آموزش زبان بر پایه CEFR اروپا</span>
                 </div>
 
-                <h1 class="text-[30px] sm:text-[42px] lg:text-[48px] font-black leading-[1.22] tracking-tight">
-                    مرجع تخصصی آموزش زبان‌های جهانی در
-                    <span class="text-toranj-orange">آکادمی زبان تُرنج</span>
+                <h1 class="text-3xl sm:text-5xl lg:text-[52px] font-black leading-[1.25] tracking-tight">
+                    مرزهای ارتباط جهانی را در
+                    <span class="text-toranj-orange">آموزشگاه زبان تُرَنج</span>
+                    تجربه کنید
                 </h1>
 
-                <p class="text-[15px] sm:text-[17px] text-gray-200 leading-relaxed max-w-2xl">
-                    مسیر یادگیری خود را در چهار دپارتمان تخصصی انگلیسی، آلمانی، فرانسوی و ترکی استانبولی با پایش مستمر ۶ مهارت زبانی و کادر علمی مجرب آغاز کنید.
+                <p class="text-base sm:text-lg text-slate-200 leading-relaxed max-w-2xl font-normal">
+                    آموزش ساختارمند و هدفمند زبان‌های <strong class="text-white">انگلیسی، آلمانی، فرانسوی و ترکی استانبولی</strong> با تمرکز بر مکالمه کاربردی، آمادگی آزمون‌های بین‌المللی و پیگیری هوشمند پیشرفت تحصیلی هر زبان‌آموز.
                 </p>
 
-                <div class="flex flex-wrap items-center gap-3.5 pt-3">
-                    <a href="{% url 'accounts:register' %}" class="btn-primary-orange px-7 !h-[52px] !text-[15px] shadow-xl">
-                        <i data-lucide="user-plus" class="w-5 h-5"></i>
-                        <span>ثبت‌نام آنلاین زبان‌آموز</span>
+                <!-- دو دکمه فراخوان اصلی (Explore Courses & Free Placement Test) -->
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-3">
+                    <a href="#courses-section" class="inline-flex items-center justify-center gap-2.5 px-7 py-4 rounded-2xl bg-toranj-orange text-white font-extrabold text-sm sm:text-base hover:bg-toranj-orangeHover transition-all shadow-orange-glow">
+                        <span>مشاهده دوره‌های آموزشی</span>
+                        <svg class="w-5 h-5 rtl:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                        </svg>
                     </a>
-                    <a href="#languages-section" class="px-6 h-[52px] rounded-xl bg-white/10 hover:bg-white/15 border border-white/20 text-white font-bold text-[14px] inline-flex items-center gap-2 transition-colors">
-                        <i data-lucide="globe-2" class="w-4 h-4 text-toranj-orange"></i>
-                        <span>مشاهده ۴ دپارتمان زبان</span>
+                    <a href="#placement-test" class="inline-flex items-center justify-center gap-2.5 px-7 py-4 rounded-2xl bg-white/10 hover:bg-white/20 text-white border border-white/25 font-bold text-sm sm:text-base transition-all">
+                        <span>تعیین سطح رایگان</span>
                     </a>
                 </div>
 
-                <!-- نوار آمار اعتبار آکادمی -->
-                <div class="pt-8 border-t border-white/10 grid grid-cols-3 gap-6 max-w-lg">
-                    <div>
-                        <span class="text-[24px] sm:text-[28px] font-black text-toranj-orange block">۴ زبان</span>
-                        <span class="text-[12px] text-gray-300">دپارتمان تخصصی بین‌المللی</span>
-                    </div>
-                    <div>
-                        <span class="text-[24px] sm:text-[28px] font-black text-white block">۶ مهارت</span>
-                        <span class="text-[12px] text-gray-300">تحلیل مستند پیشرفت ترمیک</span>
-                    </div>
-                    <div>
-                        <span class="text-[24px] sm:text-[28px] font-black text-toranj-orange block">A1–C2</span>
-                        <span class="text-[12px] text-gray-300">سطح‌بندی استاندارد کمبریج و گوته</span>
-                    </div>
+                <!-- نوار دسترسی سریع به ۴ دپارتمان در Hero -->
+                <div class="pt-6 border-t border-white/10 grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    <a href="/departments/english/" class="flex items-center gap-2.5 p-2.5 rounded-xl bg-white/5 hover:bg-white/15 border border-white/10 transition-all">
+                        <span class="text-lg">🇬🇧</span>
+                        <div class="text-right">
+                            <div class="text-xs font-bold text-white">انگلیسی</div>
+                            <div class="text-[10px] text-slate-300 ltr-text">UK Standard</div>
+                        </div>
+                    </a>
+                    <a href="/departments/german/" class="flex items-center gap-2.5 p-2.5 rounded-xl bg-white/5 hover:bg-white/15 border border-white/10 transition-all">
+                        <span class="text-lg">🇩🇪</span>
+                        <div class="text-right">
+                            <div class="text-xs font-bold text-white">آلمانی</div>
+                            <div class="text-[10px] text-slate-300 ltr-text">Goethe / ÖSD</div>
+                        </div>
+                    </a>
+                    <a href="/departments/french/" class="flex items-center gap-2.5 p-2.5 rounded-xl bg-white/5 hover:bg-white/15 border border-white/10 transition-all">
+                        <span class="text-lg">🇫🇷</span>
+                        <div class="text-right">
+                            <div class="text-xs font-bold text-white">فرانسوی</div>
+                            <div class="text-[10px] text-slate-300 ltr-text">DELF / DALF</div>
+                        </div>
+                    </a>
+                    <a href="/departments/turkish/" class="flex items-center gap-2.5 p-2.5 rounded-xl bg-white/5 hover:bg-white/15 border border-white/10 transition-all">
+                        <span class="text-lg">🇹🇷</span>
+                        <div class="text-right">
+                            <div class="text-xs font-bold text-white">ترکی استانبولی</div>
+                            <div class="text-[10px] text-slate-300 ltr-text">Istanbul TÖMER</div>
+                        </div>
+                    </a>
                 </div>
             </div>
 
-            <!-- ویترین دپارتمان‌های چهارگانه در هیرو -->
-            <div class="lg:col-span-5">
-                <div class="bg-white/5 backdrop-blur-md border border-white/15 rounded-3xl p-6 sm:p-8 space-y-6 shadow-2xl">
-                    <div class="flex items-center justify-between pb-5 border-b border-white/10">
-                        <div class="flex items-center gap-3.5">
-                            <img src="{% static 'images/toranj-logo.png' %}"
-                                 alt="لوگوی رسمی آکادمی زبان تُرنج"
-                                 class="toranj-official-logo !h-[58px]" />
+            <!-- ستون تصویر و کارت بصری آکادمی -->
+            <div class="lg:col-span-5 reveal active">
+                <div class="relative mx-auto max-w-md lg:max-w-none">
+                    <div class="relative rounded-3xl overflow-hidden border-2 border-white/15 shadow-2xl bg-toranj-navyDark aspect-[4/3]">
+                        <img src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1000&q=80" alt="زبان‌آموزان آموزشگاه زبان ترنج" class="w-full h-full object-cover opacity-90">
+                        <div class="absolute inset-0 bg-gradient-to-t from-toranj-navyDark via-transparent to-transparent"></div>
+                        <div class="absolute bottom-4 right-4 left-4 p-4 rounded-2xl bg-toranj-navy/90 backdrop-blur-md border border-white/15 flex items-center justify-between">
                             <div>
-                                <h2 class="text-[17px] font-extrabold text-white">دپارتمان‌های رسمی تُرنج</h2>
-                                <p class="text-[12px] text-gray-300 mt-0.5">انتخاب سریع زبان و مشاهده سرفصل‌ها</p>
+                                <p class="text-xs text-toranj-orange font-bold">چارچوب استاندارد اروپایی</p>
+                                <p class="text-sm font-extrabold text-white mt-0.5">کلاس‌های حضوری و آنلاین تعاملی</p>
                             </div>
+                            <span class="px-3 py-1.5 rounded-xl bg-toranj-orange text-white font-black text-xs ltr-text">A1 → C2</span>
                         </div>
                     </div>
-
-                    <div class="grid grid-cols-2 gap-3.5 text-[13px]">
-                        <a href="{% url 'core:language_english' %}" class="p-4 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/10 flex items-center justify-between transition-all">
-                            <div>
-                                <span class="font-black text-white text-[15px] block" dir="ltr">English</span>
-                                <span class="text-[12px] text-gray-300">زبان انگلیسی</span>
-                            </div>
-                            <span class="text-3xl" aria-label="United Kingdom Flag">🇬🇧</span>
-                        </a>
-                        <a href="{% url 'core:language_german' %}" class="p-4 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/10 flex items-center justify-between transition-all">
-                            <div>
-                                <span class="font-black text-white text-[15px] block" dir="ltr">Deutsch</span>
-                                <span class="text-[12px] text-gray-300">زبان آلمانی</span>
-                            </div>
-                            <span class="text-3xl" aria-label="Germany Flag">🇩🇪</span>
-                        </a>
-                        <a href="{% url 'core:language_french' %}" class="p-4 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/10 flex items-center justify-between transition-all">
-                            <div>
-                                <span class="font-black text-white text-[15px] block" dir="ltr">Français</span>
-                                <span class="text-[12px] text-gray-300">زبان فرانسوی</span>
-                            </div>
-                            <span class="text-3xl" aria-label="France Flag">🇫🇷</span>
-                        </a>
-                        <a href="{% url 'core:language_turkish' %}" class="p-4 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/10 flex items-center justify-between transition-all">
-                            <div>
-                                <span class="font-black text-white text-[15px] block" dir="ltr">Türkçe</span>
-                                <span class="text-[12px] text-gray-300">ترکی استانبولی</span>
-                            </div>
-                            <span class="text-3xl" aria-label="Turkey Flag">🇹🇷</span>
-                        </a>
-                    </div>
-
-                    <div class="pt-2 flex items-center justify-between text-[12px] text-gray-300">
-                        <span>دسترسی سریع دانشجو، استاد و مهمان از منوی بالای صفحه</span>
-                        <button type="button" onclick="openTopLeftPortalMenu()" class="text-toranj-orange font-extrabold hover:underline">
-                            باز کردن منوی ورود ↑
-                        </button>
-                    </div>
                 </div>
             </div>
 
@@ -112,198 +100,323 @@
     </div>
 </section>
 
-<!-- ۲. چهار کارت تخصصی دپارتمان‌های زبان با پرچم‌های استاندارد -->
-<section id="languages-section" class="py-16 lg:py-22 bg-toranj-bg">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-12">
-            <div>
-                <span class="text-[12px] font-extrabold text-toranj-orange uppercase tracking-wider">INTERNATIONAL DEPARTMENTS</span>
-                <h2 class="text-[26px] sm:text-[34px] font-black text-toranj-textMain mt-1">دپارتمان‌های چهارگانه زبان در آکادمی تُرنج</h2>
-                <p class="text-[14px] text-toranj-textMuted mt-1">برای مشاهده سطوح آموزشی، دوره‌های فعال و ثبت‌نام، روی زبان مورد نظر کلیک کنید.</p>
+<!-- ۲. نوار پورتال ۳گانه دسترسی سریع (Student, Teacher, Guest) -->
+<section class="relative z-20 -mt-8 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="bg-white rounded-2xl shadow-premium border border-slate-200/80 p-5 sm:p-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+        <a href="{{ login_url|default:'/accounts/login/' }}?role=student" class="flex items-center justify-between p-4 rounded-xl bg-toranj-bg hover:bg-toranj-orangeSoft/60 border border-slate-200/60 hover:border-toranj-orange transition-all group">
+            <div class="flex items-center gap-3.5">
+                <div class="w-11 h-11 rounded-xl bg-toranj-navy text-white flex items-center justify-center font-bold group-hover:bg-toranj-orange transition-colors">🎓</div>
+                <div>
+                    <h2 class="text-sm font-extrabold text-toranj-navy">پورتال زبان‌آموزان</h2>
+                    <p class="text-xs text-toranj-textMuted mt-0.5">کارنامه، تکالیف و تحلیل هوشمند پیشرفت</p>
+                </div>
             </div>
-            <a href="{% url 'courses:catalog' %}" class="btn-outline px-5 self-start sm:self-auto">
-                <span>کاتالوگ تمام دوره‌ها</span>
-                <i data-lucide="arrow-left" class="w-4 h-4"></i>
-            </a>
-        </div>
+            <span class="text-toranj-navy group-hover:text-toranj-orange font-bold text-sm">←</span>
+        </a>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <!-- 1. English (UK Flag) -->
-            <article class="toranj-card toranj-card-hover flex flex-col justify-between space-y-6">
+        <a href="{{ login_url|default:'/accounts/login/' }}?role=teacher" class="flex items-center justify-between p-4 rounded-xl bg-toranj-bg hover:bg-slate-100 border border-slate-200/60 hover:border-toranj-navy transition-all group">
+            <div class="flex items-center gap-3.5">
+                <div class="w-11 h-11 rounded-xl bg-toranj-navy/10 text-toranj-navy flex items-center justify-center font-bold group-hover:bg-toranj-navy group-hover:text-white transition-colors">👨‍🏫</div>
                 <div>
-                    <div class="flex items-center justify-between mb-4">
-                        <span class="text-4xl" role="img" aria-label="United Kingdom Flag">🇬🇧</span>
-                        <span class="px-2.5 py-1 rounded-lg bg-toranj-navy/10 text-toranj-navy font-mono text-[12px] font-extrabold" dir="ltr">English • UK</span>
-                    </div>
-                    <h3 class="text-[21px] font-extrabold text-toranj-textMain">زبان انگلیسی</h3>
-                    <p class="text-[13px] font-bold text-toranj-orange mt-0.5" dir="ltr">Cambridge & IELTS Standard</p>
-                    <p class="text-[13px] text-toranj-textMuted mt-3 leading-relaxed">
-                        دوره‌های مکالمه‌محور بزرگسالان، نوجوانان و کودکان و آمادگی تخصصی آزمون IELTS با استاندارد بریتانیا.
-                    </p>
+                    <h2 class="text-sm font-extrabold text-toranj-navy">پورتال اساتید</h2>
+                    <p class="text-xs text-toranj-textMuted mt-0.5">مدیریت کلاس‌ها، حضور و غیاب و ثبت نمرات</p>
                 </div>
-                <a href="{% url 'core:language_english' %}" class="btn-primary-navy w-full !h-[44px] !text-[13px]">
-                    <span>ورود به دپارتمان انگلیسی</span>
-                    <i data-lucide="arrow-left" class="w-4 h-4"></i>
-                </a>
-            </article>
+            </div>
+            <span class="text-toranj-navy font-bold text-sm">←</span>
+        </a>
 
-            <!-- 2. German -->
-            <article class="toranj-card toranj-card-hover flex flex-col justify-between space-y-6">
+        <a href="#departments-showcase" class="flex items-center justify-between p-4 rounded-xl bg-toranj-bg hover:bg-slate-100 border border-slate-200/60 transition-all group">
+            <div class="flex items-center gap-3.5">
+                <div class="w-11 h-11 rounded-xl bg-toranj-orange/15 text-toranj-orange flex items-center justify-center font-bold">🌐</div>
                 <div>
-                    <div class="flex items-center justify-between mb-4">
-                        <span class="text-4xl" role="img" aria-label="Germany Flag">🇩🇪</span>
-                        <span class="px-2.5 py-1 rounded-lg bg-toranj-navy/10 text-toranj-navy font-mono text-[12px] font-extrabold" dir="ltr">Deutsch • DE</span>
-                    </div>
-                    <h3 class="text-[21px] font-extrabold text-toranj-textMain">زبان آلمانی</h3>
-                    <p class="text-[13px] font-bold text-toranj-orange mt-0.5" dir="ltr">Goethe & ÖSD Standard</p>
-                    <p class="text-[13px] text-toranj-textMuted mt-3 leading-relaxed">
-                        دوره‌های رسمی A1 تا C1 منطبق با استانداردهای انستیتو گوته و ÖSD ویژه مهاجرت تحصیلی و کاری.
-                    </p>
+                    <h2 class="text-sm font-extrabold text-toranj-navy">دسترسی مهمان</h2>
+                    <p class="text-xs text-toranj-textMuted mt-0.5">بررسی آزاد دپارتمان‌ها و سرفصل‌های آموزشی</p>
                 </div>
-                <a href="{% url 'core:language_german' %}" class="btn-primary-navy w-full !h-[44px] !text-[13px]">
-                    <span>ورود به دپارتمان آلمانی</span>
-                    <i data-lucide="arrow-left" class="w-4 h-4"></i>
-                </a>
-            </article>
-
-            <!-- 3. French -->
-            <article class="toranj-card toranj-card-hover flex flex-col justify-between space-y-6">
-                <div>
-                    <div class="flex items-center justify-between mb-4">
-                        <span class="text-4xl" role="img" aria-label="France Flag">🇫🇷</span>
-                        <span class="px-2.5 py-1 rounded-lg bg-toranj-navy/10 text-toranj-navy font-mono text-[12px] font-extrabold" dir="ltr">Français • FR</span>
-                    </div>
-                    <h3 class="text-[21px] font-extrabold text-toranj-textMain">زبان فرانسوی</h3>
-                    <p class="text-[13px] font-bold text-toranj-orange mt-0.5" dir="ltr">DELF / DALF & TCF</p>
-                    <p class="text-[13px] text-toranj-textMuted mt-3 leading-relaxed">
-                        آموزش مکالمه، گرامر و آواشناسی فرانسوی به همراه دوره‌های آمادگی آزمون‌های بین‌المللی DELF و TCF.
-                    </p>
-                </div>
-                <a href="{% url 'core:language_french' %}" class="btn-primary-navy w-full !h-[44px] !text-[13px]">
-                    <span>ورود به دپارتمان فرانسوی</span>
-                    <i data-lucide="arrow-left" class="w-4 h-4"></i>
-                </a>
-            </article>
-
-            <!-- 4. Turkish -->
-            <article class="toranj-card toranj-card-hover flex flex-col justify-between space-y-6">
-                <div>
-                    <div class="flex items-center justify-between mb-4">
-                        <span class="text-4xl" role="img" aria-label="Turkey Flag">🇹🇷</span>
-                        <span class="px-2.5 py-1 rounded-lg bg-toranj-navy/10 text-toranj-navy font-mono text-[12px] font-extrabold" dir="ltr">Türkçe • TR</span>
-                    </div>
-                    <h3 class="text-[21px] font-extrabold text-toranj-textMain">زبان ترکی استانبولی</h3>
-                    <p class="text-[13px] font-bold text-toranj-orange mt-0.5" dir="ltr">Ankara TÖMER Standard</p>
-                    <p class="text-[13px] text-toranj-textMuted mt-3 leading-relaxed">
-                        آموزش مکالمه روان ترکی استانبولی و آمادگی مدرک رسمی TÖMER جهت تحصیل و تجارت در ترکیه.
-                    </p>
-                </div>
-                <a href="{% url 'core:language_turkish' %}" class="btn-primary-navy w-full !h-[44px] !text-[13px]">
-                    <span>ورود به دپارتمان ترکی</span>
-                    <i data-lucide="arrow-left" class="w-4 h-4"></i>
-                </a>
-            </article>
-        </div>
+            </div>
+            <span class="text-toranj-orange font-bold text-sm">↓</span>
+        </a>
     </div>
 </section>
 
-<!-- ۳. دوره‌های آموزشی فعال در سامانه (از دیتابیس واقعی) -->
-<section class="py-16 bg-white border-y border-toranj-border">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
-            <div>
-                <h2 class="text-[24px] sm:text-[30px] font-black text-toranj-textMain">دوره‌های در حال ثبت‌نام</h2>
-                <p class="text-[14px] text-toranj-textMuted mt-1">لیست دوره‌های منتشرشده در سامانه آموزشی آکادمی زبان تُرنج</p>
-            </div>
-            <a href="{% url 'courses:catalog' %}" class="btn-primary-orange px-5 !h-[42px] !text-[13px]">مشاهده کاتالوگ کامل</a>
-        </div>
+<!-- ۳. ویترین ۴ دپارتمان تخصصی زبان (Language Departments Showcase) -->
+<section id="departments-showcase" class="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center max-w-3xl mx-auto mb-14 reveal">
+        <span class="text-xs font-extrabold text-toranj-orange uppercase tracking-widest ltr-text">LANGUAGE DEPARTMENTS</span>
+        <h2 class="text-2xl sm:text-4xl font-black text-toranj-navy mt-2">چهار دپارتمان تخصصی زبان در تُرَنج</h2>
+        <p class="text-sm sm:text-base text-toranj-textMuted mt-3 leading-relaxed">
+            هر دپارتمان دارای سرفصل‌های استاندارد بین‌المللی، اساتید مجرب همان زبان و مسیر آموزشی مشخص از سطح پایه تا پیشرفته است.
+        </p>
+    </div>
 
-        {% if featured_courses %}
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {% for course in featured_courses %}
-                <article class="toranj-card toranj-card-hover flex flex-col justify-between space-y-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {% for dept in departments %}
+        <article class="bg-white rounded-3xl overflow-hidden shadow-premium hover:shadow-premium-hover border border-slate-200/80 transition-all duration-300 flex flex-col group reveal">
+            <!-- تصویر و هدر کارت دپارتمان -->
+            <div class="relative h-60 overflow-hidden bg-toranj-navy">
+                <img src="{{ dept.image }}" alt="{{ dept.title_fa }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                <div class="absolute inset-0 bg-gradient-to-t from-toranj-navyDark/90 via-toranj-navyDark/30 to-transparent"></div>
+
+                <!-- پرچم و بج کشور -->
+                <div class="absolute top-4 right-4 flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/95 backdrop-blur-md text-toranj-navy shadow-md">
+                    <span class="text-lg" aria-hidden="true">{{ dept.flag_emoji }}</span>
+                    <span class="text-xs font-extrabold ltr-text">{{ dept.code_label }}</span>
+                </div>
+
+                <div class="absolute bottom-4 right-5 left-5 flex items-end justify-between text-white">
                     <div>
-                        <span class="px-3 py-1 rounded-full text-[12px] font-bold bg-toranj-navy/10 text-toranj-navy">{{ course.category.name }}</span>
-                        <h3 class="text-[18px] font-extrabold text-toranj-textMain mt-3">{{ course.title }}</h3>
-                        <p class="text-[13px] text-toranj-textMuted mt-2 leading-relaxed">{{ course.description|truncatewords:22 }}</p>
+                        <span class="text-xs font-semibold text-toranj-orange ltr-text block">{{ dept.title_en }}</span>
+                        <h3 class="text-xl sm:text-2xl font-black mt-0.5">{{ dept.title_fa }}</h3>
                     </div>
-                    <div class="pt-4 border-t border-toranj-border flex items-center justify-between text-[13px]">
-                        <span class="font-extrabold text-toranj-navy">{{ course.tuition_fee }} تومان</span>
-                        <a href="{% url 'courses:catalog' %}?q={{ course.title|urlencode }}" class="font-bold text-toranj-orange hover:underline">مشاهده و ثبت‌نام ←</a>
-                    </div>
-                </article>
-                {% endfor %}
+                </div>
             </div>
-        {% else %}
-            <div class="toranj-card bg-toranj-inputBg text-center py-8 text-[14px] text-toranj-textMuted">
-                در حال حاضر دوره منتشرشده‌ای در دیتابیس ثبت نشده است. به محض انتشار دوره توسط مدیریت، در این بخش نمایش داده می‌شود.
-            </div>
-        {% endif %}
-    </div>
-</section>
 
-<!-- ۴. مزیت‌های رقابتی آکادمی زبان تُرنج -->
-<section id="about-toranj" class="py-16 bg-toranj-bg">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center max-w-3xl mx-auto mb-12">
-            <h2 class="text-[26px] sm:text-[32px] font-black text-toranj-textMain">تفاوت تجربه آموزشی در آکادمی زبان تُرنج</h2>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div class="toranj-card space-y-2.5">
-                <div class="w-11 h-11 rounded-xl bg-toranj-navy text-toranj-orange flex items-center justify-center">
-                    <i data-lucide="bar-chart-3" class="w-5 h-5"></i>
-                </div>
-                <h3 class="text-[16px] font-extrabold text-toranj-navy">کارنامه تحلیلی ۶ مهارت</h3>
-                <p class="text-[13px] text-toranj-textMuted leading-relaxed">رصد دقیق Speaking، Listening، Reading، Writing، Grammar و Vocabulary در هر نیم‌سال.</p>
-            </div>
-            <div class="toranj-card space-y-2.5">
-                <div class="w-11 h-11 rounded-xl bg-toranj-navy text-toranj-orange flex items-center justify-center">
-                    <i data-lucide="shield-check" class="w-5 h-5"></i>
-                </div>
-                <h3 class="text-[16px] font-extrabold text-toranj-navy">کد اختصاصی زبان‌آموز (TRJ)</h3>
-                <p class="text-[13px] text-toranj-textMuted leading-relaxed">تخصیص کد دائمی زبان‌آموزی پس از تأیید آموزشگاه و حفظ مادام‌العمر سوابق آموزشی.</p>
-            </div>
-            <div class="toranj-card space-y-2.5">
-                <div class="w-11 h-11 rounded-xl bg-toranj-navy text-toranj-orange flex items-center justify-center">
-                    <i data-lucide="calendar-check" class="w-5 h-5"></i>
-                </div>
-                <h3 class="text-[16px] font-extrabold text-toranj-navy">زمان‌بندی هوشمند</h3>
-                <p class="text-[13px] text-toranj-textMuted leading-relaxed">جلوگیری خودکار از تداخل ساعت کلاس‌ها برای زبان‌آموزان و اساتید در سمت سرور.</p>
-            </div>
-            <div class="toranj-card space-y-2.5">
-                <div class="w-11 h-11 rounded-xl bg-toranj-navy text-toranj-orange flex items-center justify-center">
-                    <i data-lucide="sparkles" class="w-5 h-5"></i>
-                </div>
-                <h3 class="text-[16px] font-extrabold text-toranj-navy">پیشنهادهای هوشمند آموزشی</h3>
-                <p class="text-[13px] text-toranj-textMuted leading-relaxed">ارائه تمرین‌های هدفمند مستند به نمرات و ارزیابی‌های ثبت‌شده در پرونده.</p>
-            </div>
-        </div>
-    </div>
-</section>
+            <!-- بدنه کارت دپارتمان -->
+            <div class="p-6 sm:p-7 flex-grow flex flex-col justify-between space-y-6">
+                <div class="space-y-4">
+                    <p class="text-sm text-toranj-textMain leading-relaxed">
+                        {{ dept.short_desc }}
+                    </p>
 
-<!-- ۵. معرفی اساتید -->
-<section id="teachers-section" class="py-16 bg-white border-t border-toranj-border">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 class="text-[24px] sm:text-[30px] font-black text-toranj-textMain mb-8">کادر علمی و اساتید آکادمی تُرنج</h2>
-        {% if teachers %}
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {% for t in teachers %}
-                <div class="toranj-card flex items-center gap-4">
-                    <div class="w-14 h-14 rounded-2xl bg-toranj-navy text-toranj-orange font-extrabold text-xl flex items-center justify-center shrink-0">
-                        {{ t.first_name|slice:":1" }}
-                    </div>
+                    <!-- سطوح مهارت CEFR -->
                     <div>
-                        <h3 class="text-[16px] font-extrabold text-toranj-textMain">استاد {{ t.full_name }}</h3>
-                        <p class="text-[13px] text-toranj-textMuted">مدرس رسمی آکادمی زبان تُرنج</p>
+                        <span class="text-xs font-bold text-toranj-textMuted block mb-2">سطوح ارائه‌شده (استاندارد CEFR):</span>
+                        <div class="flex flex-wrap gap-1.5 ltr-text">
+                            {% for lvl in dept.levels %}
+                            <span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-toranj-bg text-toranj-navy border border-slate-200">{{ lvl }}</span>
+                            {% endfor %}
+                        </div>
                     </div>
                 </div>
-                {% endfor %}
+
+                <div class="pt-4 border-t border-slate-100 flex items-center justify-between">
+                    <span class="text-xs font-semibold text-toranj-textMuted">{{ dept.exam_focus }}</span>
+                    <a href="/departments/{{ dept.slug }}/" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-toranj-navy text-white text-xs sm:text-sm font-bold group-hover:bg-toranj-orange transition-colors">
+                        <span>ورود به دپارتمان</span>
+                        <span>←</span>
+                    </a>
+                </div>
             </div>
-        {% else %}
-            <div class="toranj-card bg-toranj-inputBg text-center py-8 text-[13px] text-toranj-textMuted">
-                اطلاعات اساتید پس از تخصیص نقش «استاد» در پنل مدیریت سامانه به صورت خودکار در این بخش نمایش داده می‌شود.
+        </article>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- ۴. آمار واقعی آکادمی (فقط در صورت وجود داده واقعی در دیتابیس) -->
+{% if stats.has_real_stats %}
+<section class="py-12 bg-toranj-navy text-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+            <div class="p-4 rounded-2xl bg-white/5 border border-white/10">
+                <div class="text-3xl font-black text-toranj-orange ltr-text">{{ stats.departments_count }}</div>
+                <div class="text-xs sm:text-sm text-slate-300 mt-1 font-medium">دپارتمان تخصصی زبان</div>
             </div>
-        {% endif %}
+            {% if stats.courses_count > 0 %}
+            <div class="p-4 rounded-2xl bg-white/5 border border-white/10">
+                <div class="text-3xl font-black text-toranj-orange ltr-text">{{ stats.courses_count }}</div>
+                <div class="text-xs sm:text-sm text-slate-300 mt-1 font-medium">دوره آموزشی فعال در سامانه</div>
+            </div>
+            {% endif %}
+            {% if stats.teachers_count > 0 %}
+            <div class="p-4 rounded-2xl bg-white/5 border border-white/10">
+                <div class="text-3xl font-black text-toranj-orange ltr-text">{{ stats.teachers_count }}</div>
+                <div class="text-xs sm:text-sm text-slate-300 mt-1 font-medium">استاد ثبت‌شده در سامانه</div>
+            </div>
+            {% endif %}
+            {% if stats.students_count > 0 %}
+            <div class="p-4 rounded-2xl bg-white/5 border border-white/10">
+                <div class="text-3xl font-black text-toranj-orange ltr-text">{{ stats.students_count }}</div>
+                <div class="text-xs sm:text-sm text-slate-300 mt-1 font-medium">پرونده تحصیلی زبان‌آموز</div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- ۵. چرا آموزشگاه زبان تُرَنج؟ و متدولوژی آموزشی -->
+<section id="about-toranj" class="py-20 bg-white border-y border-slate-200/70">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+            <div class="lg:col-span-5 space-y-5 reveal">
+                <span class="text-xs font-extrabold text-toranj-orange uppercase tracking-widest ltr-text">WHY CHOOSE TORANJ</span>
+                <h2 class="text-2xl sm:text-4xl font-black text-toranj-navy leading-tight">
+                    چرا زبان‌آموزان، تُرَنج را برای یادگیری انتخاب می‌کنند؟
+                </h2>
+                <p class="text-sm sm:text-base text-toranj-textMuted leading-relaxed">
+                    در آموزشگاه زبان تُرَنج، آموزش محدود به حفظ قواعد نیست؛ بلکه هر زبان‌آموز در یک اکوسیستم هوشمند و تعاملی، هر چهار مهارت اصلی (Speaking, Listening, Reading, Writing) را به‌صورت متوازن پرورش می‌دهد.
+                </p>
+                <div class="p-5 rounded-2xl bg-toranj-bg border-r-4 border-toranj-orange space-y-2">
+                    <h3 class="text-sm font-extrabold text-toranj-navy">متدولوژی آموزشی ما (Our Teaching Methodology)</h3>
+                    <p class="text-xs sm:text-sm text-toranj-textMain leading-relaxed">
+                        ترکیب رویکرد ارتباطی (Communicative Language Teaching) با ارزیابی مستمر در پورتال اختصاصی زبان‌آموزان، به شما کمک می‌کند نقاط ضعف خود را در هر ترم به کمک تحلیل‌های دقیق برطرف سازید.
+                    </p>
+                </div>
+            </div>
+
+            <div class="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-6 reveal">
+                <div class="p-6 rounded-2xl bg-toranj-bg border border-slate-200/70 space-y-3">
+                    <div class="w-12 h-12 rounded-2xl bg-toranj-navy text-toranj-orange flex items-center justify-center text-xl font-bold">01</div>
+                    <h3 class="text-base font-extrabold text-toranj-navy">برنامه‌ریزی منطبق بر استاندارد CEFR</h3>
+                    <p class="text-xs sm:text-sm text-toranj-textMuted leading-relaxed">سرفصل‌های آموزشی کاملاً منطبق بر سطوح شش‌گانه اروپا (A1 تا C2) و منابع معتبر بین‌المللی طراحی شده‌اند.</p>
+                </div>
+                <div class="p-6 rounded-2xl bg-toranj-bg border border-slate-200/70 space-y-3">
+                    <div class="w-12 h-12 rounded-2xl bg-toranj-navy text-toranj-orange flex items-center justify-center text-xl font-bold">02</div>
+                    <h3 class="text-base font-extrabold text-toranj-navy">پروفايل یکپارچه و هوشمند زبان‌آموز</h3>
+                    <p class="text-xs sm:text-sm text-toranj-textMuted leading-relaxed">ثبت دقیق نمرات، حضور و غیاب، روند پیشرفت و توصیه‌های آموزشی شخصی‌سازی‌شده در پنل اختصاصی هر زبان‌آموز.</p>
+                </div>
+                <div class="p-6 rounded-2xl bg-toranj-bg border border-slate-200/70 space-y-3">
+                    <div class="w-12 h-12 rounded-2xl bg-toranj-navy text-toranj-orange flex items-center justify-center text-xl font-bold">03</div>
+                    <h3 class="text-base font-extrabold text-toranj-navy">تمرکز بر مکالمه و موقعیت‌های واقعی</h3>
+                    <p class="text-xs sm:text-sm text-toranj-textMuted leading-relaxed">از جلسه اول، کلاس‌ها بر پایه گفت‌وگو، تعامل گروهی و شبیه‌سازی موقعیت‌های واقعی تحصیلی، کاری و سفر اداره می‌شوند.</p>
+                </div>
+                <div class="p-6 rounded-2xl bg-toranj-bg border border-slate-200/70 space-y-3">
+                    <div class="w-12 h-12 rounded-2xl bg-toranj-navy text-toranj-orange flex items-center justify-center text-xl font-bold">04</div>
+                    <h3 class="text-base font-extrabold text-toranj-navy">پشتیبانی درسی و ربات تلگرام اختصاصی</h3>
+                    <p class="text-xs sm:text-sm text-toranj-textMuted leading-relaxed">ارتباط مستمر با استاد و پشتیبانی آموزشی سریع برای پاسخ به سوالات زبان‌آموزان در طول هفته.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ۶. دوره‌های آموزشی فعال در دیتابیس (Featured Courses) -->
+<section id="courses-section" class="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-12 gap-4 reveal">
+        <div>
+            <span class="text-xs font-extrabold text-toranj-orange uppercase tracking-widest ltr-text">ACTIVE COURSES</span>
+            <h2 class="text-2xl sm:text-3xl font-black text-toranj-navy mt-1">دوره‌های آموزشی ثبت‌شده در سامانه</h2>
+        </div>
+        <a href="#departments-showcase" class="text-sm font-bold text-toranj-navy hover:text-toranj-orange transition-colors">
+            مشاهده سرفصل هر دپارتمان ←
+        </a>
+    </div>
+
+    {% if featured_courses %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for course in featured_courses %}
+        <div class="bg-white rounded-2xl p-6 shadow-premium border border-slate-200/80 flex flex-col justify-between hover:border-toranj-orange transition-all reveal">
+            <div class="space-y-3">
+                <div class="flex items-center justify-between">
+                    <span class="px-3 py-1 rounded-lg bg-toranj-navy/10 text-toranj-navy text-xs font-bold">{{ course.language_label|default:"دوره تخصصی" }}</span>
+                    {% if course.level %}
+                    <span class="px-2.5 py-1 rounded-lg bg-toranj-orangeSoft text-toranj-orange text-xs font-extrabold ltr-text">{{ course.level }}</span>
+                    {% endif %}
+                </div>
+                <h3 class="text-lg font-extrabold text-toranj-navy">{{ course.title }}</h3>
+                {% if course.description %}
+                <p class="text-xs sm:text-sm text-toranj-textMuted line-clamp-3 leading-relaxed">{{ course.description }}</p>
+                {% endif %}
+            </div>
+            <div class="pt-5 mt-5 border-t border-slate-100 flex items-center justify-between">
+                <span class="text-xs text-toranj-textMuted">وضعیت: <strong class="text-emerald-600">فعال</strong></span>
+                <a href="{{ login_url|default:'/accounts/login/' }}?role=student" class="px-4 py-2 rounded-xl bg-toranj-navy text-white text-xs font-bold hover:bg-toranj-orange transition-colors">
+                    ثبت‌نام در دوره
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <!-- حالت خالی شیک در صورت نبود دوره ثبت‌شده در دیتابیس -->
+    <div class="bg-white rounded-3xl p-8 sm:p-10 border border-slate-200/80 shadow-sm text-center max-w-2xl mx-auto space-y-4 reveal">
+        <div class="w-14 h-14 rounded-2xl bg-toranj-orangeSoft text-toranj-orange flex items-center justify-center mx-auto text-2xl">📚</div>
+        <h3 class="text-lg font-extrabold text-toranj-navy">لیست کلاس‌های ترم جدید در حال به‌روزرسانی در سامانه است</h3>
+        <p class="text-xs sm:text-sm text-toranj-textMuted leading-relaxed">
+            برای مشاهده جزئیات سطوح آموزشی (A1 تا C2) و ثبت درخواست شرکت در کلاس‌ها، وارد صفحه دپارتمان زبان مورد نظر خود شوید یا تعیین سطح رایگان را انجام دهید.
+        </p>
+        <div class="pt-2 flex flex-wrap justify-center gap-3">
+            <a href="/departments/english/" class="px-4 py-2 rounded-xl bg-toranj-bg text-toranj-navy text-xs font-bold hover:bg-toranj-navy hover:text-white transition-colors">🇬🇧 دپارتمان انگلیسی</a>
+            <a href="/departments/german/" class="px-4 py-2 rounded-xl bg-toranj-bg text-toranj-navy text-xs font-bold hover:bg-toranj-navy hover:text-white transition-colors">🇩🇪 دپارتمان آلمانی</a>
+            <a href="/departments/french/" class="px-4 py-2 rounded-xl bg-toranj-bg text-toranj-navy text-xs font-bold hover:bg-toranj-navy hover:text-white transition-colors">🇫🇷 دپارتمان فرانسوی</a>
+            <a href="/departments/turkish/" class="px-4 py-2 rounded-xl bg-toranj-bg text-toranj-navy text-xs font-bold hover:bg-toranj-navy hover:text-white transition-colors">🇹🇷 دپارتمان ترکی</a>
+        </div>
+    </div>
+    {% endif %}
+</section>
+
+<!-- ۷. اساتید ثبت‌شده در دیتابیس (Meet Our Teachers - فقط داده واقعی) -->
+{% if teachers %}
+<section class="py-16 bg-white border-t border-slate-200/70">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center max-w-2xl mx-auto mb-12 reveal">
+            <span class="text-xs font-extrabold text-toranj-orange uppercase tracking-widest ltr-text">FACULTY MEMBERS</span>
+            <h2 class="text-2xl sm:text-3xl font-black text-toranj-navy mt-1">اساتید آموزشگاه زبان تُرَنج</h2>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {% for teacher in teachers %}
+            <div class="p-6 rounded-2xl bg-toranj-bg border border-slate-200/70 text-center space-y-3 reveal">
+                <div class="w-16 h-16 rounded-2xl bg-toranj-navy text-white font-black text-xl flex items-center justify-center mx-auto">
+                    {{ teacher.display_name|slice:":1" }}
+                </div>
+                <h3 class="text-base font-extrabold text-toranj-navy">{{ teacher.display_name }}</h3>
+                <p class="text-xs text-toranj-textMuted">{{ teacher.role_label }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- ۸. بخش تعیین سطح رایگان (Free Placement Test CTA) -->
+<section id="placement-test" class="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="rounded-3xl bg-gradient-to-l from-toranj-navy via-toranj-navy to-toranj-navyLight text-white p-8 sm:p-12 shadow-premium relative overflow-hidden reveal">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
+            <div class="lg:col-span-8 space-y-4">
+                <span class="px-3 py-1 rounded-full bg-toranj-orange text-white text-xs font-extrabold">مشاوره و ارزیابی دقیق</span>
+                <h2 class="text-2xl sm:text-3xl font-black">سطح دقیق زبان خود را نمی‌دانید؟</h2>
+                <p class="text-sm sm:text-base text-slate-200 leading-relaxed max-w-2xl">
+                    پیش از ثبت‌نام در دوره‌های انگلیسی، آلمانی، فرانسوی یا ترکی استانبولی، از طریق پورتال زبان‌آموزان وارد شوید تا سطح دقیق شما بر اساس استاندارد CEFR مشخص شود.
+                </p>
+            </div>
+            <div class="lg:col-span-4 flex flex-col sm:flex-row lg:flex-col gap-3">
+                <a href="{{ login_url|default:'/accounts/login/' }}?role=student" class="w-full py-4 px-6 rounded-2xl bg-toranj-orange hover:bg-toranj-orangeHover text-white font-extrabold text-sm text-center shadow-orange-glow transition-all">
+                    شروع تعیین سطح و ورود به پورتال
+                </a>
+                <a href="#departments-showcase" class="w-full py-3.5 px-6 rounded-2xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs text-center border border-white/20 transition-all">
+                    بررسی سطوح A1 تا C2 در دپارتمان‌ها
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ۹. سوالات متداول (FAQ) -->
+<section id="faq-section" class="py-16 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-12 reveal">
+        <span class="text-xs font-extrabold text-toranj-orange uppercase tracking-widest ltr-text">FAQ</span>
+        <h2 class="text-2xl sm:text-3xl font-black text-toranj-navy mt-1">سوالات متداول زبان‌آموزان</h2>
+    </div>
+
+    <div class="space-y-4 reveal">
+        <details class="group bg-white rounded-2xl border border-slate-200/80 p-5 open:shadow-md transition-all">
+            <summary class="flex items-center justify-between cursor-pointer font-extrabold text-sm sm:text-base text-toranj-navy list-none">
+                <span>چگونه می‌توانم در دوره‌های آموزشگاه زبان تُرَنج ثبت‌نام کنم؟</span>
+                <span class="text-toranj-orange group-open:rotate-45 transition-transform text-xl font-bold">+</span>
+            </summary>
+            <p class="text-xs sm:text-sm text-toranj-textMuted mt-3 leading-relaxed pt-3 border-t border-slate-100">
+                ابتدا دپارتمان زبان مورد نظر خود (انگلیسی، آلمانی، فرانسوی یا ترکی استانبولی) را انتخاب کنید و سپس از طریق دکمه «ورود زبان‌آموز» در بالای صفحه وارد سامانه شوید تا تعیین سطح و انتخاب کلاس برای شما انجام شود.
+            </p>
+        </details>
+
+        <details class="group bg-white rounded-2xl border border-slate-200/80 p-5 open:shadow-md transition-all">
+            <summary class="flex items-center justify-between cursor-pointer font-extrabold text-sm sm:text-base text-toranj-navy list-none">
+                <span>سطح‌بندی کلاس‌ها بر چه اساسی انجام می‌شود؟</span>
+                <span class="text-toranj-orange group-open:rotate-45 transition-transform text-xl font-bold">+</span>
+            </summary>
+            <p class="text-xs sm:text-sm text-toranj-textMuted mt-3 leading-relaxed pt-3 border-t border-slate-100">
+                تمامی دپارتمان‌های آکادمی تُرَنج بر اساس استاندارد مرجع مشترک اروپایی (CEFR) از سطح مبتدی (A1 و A2)، متوسط (B1 و B2) تا پیشرفته (C1 و C2) برنامه‌ریزی شده‌اند.
+            </p>
+        </details>
+
+        <details class="group bg-white rounded-2xl border border-slate-200/80 p-5 open:shadow-md transition-all">
+            <summary class="flex items-center justify-between cursor-pointer font-extrabold text-sm sm:text-base text-toranj-navy list-none">
+                <span>زبان‌آموزان و اساتید چگونه به پنل اختصاصی خود دسترسی دارند؟</span>
+                <span class="text-toranj-orange group-open:rotate-45 transition-transform text-xl font-bold">+</span>
+            </summary>
+            <p class="text-xs sm:text-sm text-toranj-textMuted mt-3 leading-relaxed pt-3 border-t border-slate-100">
+                در هدر بالای سایت، سه مسیر مجزا برای «ورود زبان‌آموز»، «پورتال اساتید» و «دسترسی مهمان» تعبیه شده است تا هر کاربر مستقیماً به داشبورد تخصصی خود هدایت شود.
+            </p>
+        </details>
     </div>
 </section>
 

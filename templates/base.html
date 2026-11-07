@@ -4,12 +4,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}آکادمی زبان تُرنج | TORANJ LANGUAGE ACADEMY{% endblock %}</title>
+    <title>{% block title %}آموزشگاه زبان تُرَنج | Toranj Language Academy{% endblock %}</title>
+    <meta name="description" content="{% block meta_description %}آموزشگاه بین‌المللی زبان تُرَنج؛ آموزش تخصصی زبان‌های انگلیسی، آلمانی، فرانسوی و ترکی استانبولی با استاندارد CEFR اروپا.{% endblock %}">
 
+    <!-- فونت وزیرمتن و فونت لاتین Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
+    <!-- Tailwind CSS CDN با تنظیمات دقیق برند ترنج -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -18,382 +21,369 @@
                     colors: {
                         toranj: {
                             navy: '#0D2B4E',
-                            navyLight: '#163C66',
+                            navyDark: '#081C33',
+                            navyLight: '#163E6C',
                             orange: '#FF8A00',
-                            orangeHover: '#E67C00',
+                            orangeHover: '#E67A00',
+                            orangeSoft: '#FFF4E5',
                             bg: '#F4F7FB',
                             surface: '#FFFFFF',
                             textMain: '#1F2937',
                             textMuted: '#6B7280',
-                            border: '#E5EAF1',
-                            inputBg: '#F9FAFC',
-                            success: '#16A34A',
-                            error: '#DC2626',
-                            info: '#2563EB',
-                            warning: '#D97706',
                         }
                     },
                     fontFamily: {
-                        sans: ['Vazirmatn', 'system-ui', 'sans-serif'],
+                        sans: ['Vazirmatn', 'Inter', 'sans-serif'],
+                        latin: ['Inter', 'Vazirmatn', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'premium': '0 20px 40px -15px rgba(13, 43, 78, 0.08)',
+                        'premium-hover': '0 25px 50px -12px rgba(13, 43, 78, 0.16)',
+                        'orange-glow': '0 10px 25px -5px rgba(255, 138, 0, 0.35)',
                     }
                 }
             }
         }
     </script>
-    <script src="https://unpkg.com/lucide@latest"></script>
 
     <style>
+        :root {
+            --toranj-navy: #0D2B4E;
+            --toranj-orange: #FF8A00;
+            --toranj-bg: #F4F7FB;
+            --toranj-white: #FFFFFF;
+            --toranj-text: #1F2937;
+            --toranj-muted: #6B7280;
+        }
         body {
             font-family: 'Vazirmatn', sans-serif;
-            background-color: #F4F7FB;
-            color: #1F2937;
+            background-color: var(--toranj-bg);
+            color: var(--toranj-text);
             overflow-x: hidden;
         }
-        .toranj-card {
-            background-color: #FFFFFF;
-            border: 1px solid #E5EAF1;
-            border-radius: 20px;
-            padding: 26px;
-            box-shadow: 0 8px 30px -6px rgba(13, 43, 78, 0.06);
-            transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
+        .ltr-text {
+            direction: ltr;
+            unicode-bidi: embed;
+            font-family: 'Inter', 'Vazirmatn', sans-serif;
         }
-        .toranj-card-hover:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 18px 36px -8px rgba(13, 43, 78, 0.12);
-            border-color: #CBD5E1;
+        /* انیمیشن‌های ظریف اسکرول با احترام به تنظیمات کاهش حرکت سیستم */
+        .reveal {
+            opacity: 0;
+            transform: translateY(22px);
+            transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1), transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        .btn-primary-orange {
-            background-color: #FF8A00;
-            color: #1F2937;
-            height: 46px;
-            border-radius: 12px;
-            font-weight: 800;
-            font-size: 14px;
-            transition: all 160ms ease;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
         }
-        .btn-primary-orange:hover { background-color: #E67C00; }
-        .btn-primary-navy {
-            background-color: #0D2B4E;
-            color: #FFFFFF;
-            height: 46px;
-            border-radius: 12px;
-            font-weight: 700;
-            font-size: 14px;
-            transition: all 160ms ease;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-        }
-        .btn-primary-navy:hover { background-color: #163C66; }
-        .btn-outline {
-            background-color: #FFFFFF;
-            color: #0D2B4E;
-            border: 1.5px solid #E5EAF1;
-            height: 44px;
-            border-radius: 12px;
-            font-weight: 700;
-            font-size: 13px;
-            transition: all 160ms ease;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.45rem;
-        }
-        .btn-outline:hover { border-color: #0D2B4E; background-color: #F9FAFC; }
-        .toranj-official-logo {
-            height: 54px;
-            width: auto;
-            object-fit: contain;
-            display: block;
-            flex-shrink: 0;
-            border-radius: 12px;
-            background-color: #FFFFFF;
-            padding: 4px 6px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
-        }
-        @media (min-width: 1024px) {
-            .toranj-official-logo {
-                height: 66px;
+        @media (prefers-reduced-motion: reduce) {
+            .reveal {
+                opacity: 1 !important;
+                transform: none !important;
+                transition: none !important;
+            }
+            html {
+                scroll-behavior: auto !important;
             }
         }
     </style>
+    {% block extra_head %}{% endblock %}
 </head>
-<body class="min-h-screen flex flex-col bg-toranj-bg text-toranj-textMain antialiased">
+<body class="min-h-screen flex flex-col bg-toranj-bg text-toranj-textMain antialiased selection:bg-toranj-orange selection:text-white">
 
-    <!-- هدر سرمه‌ای پریمیوم آکادمی زبان تُرنج -->
-    <header class="sticky top-0 z-50 bg-toranj-navy/95 backdrop-blur-md text-white border-b border-white/10 shadow-lg">
+    <!-- نوار ناوبری اصلی (Header) -->
+    <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200/80 transition-all duration-300">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="min-h-[80px] lg:min-h-[92px] py-2 flex items-center justify-between gap-4">
+            <div class="flex items-center justify-between h-20">
 
-                <!-- سمت راست هدر: لوگوی رسمی و نام آکادمی -->
-                <a href="{% url 'core:home' %}"
-                   class="flex items-center gap-3.5 group focus:outline-none rounded-xl py-1"
-                   aria-label="صفحه اصلی آکادمی زبان تُرنج">
-                    <img src="{% static 'images/toranj-logo.png' %}"
-                         alt="لوگوی رسمی آکادمی زبان تُرنج"
-                         class="toranj-official-logo" />
-                    <div class="flex flex-col justify-center">
-                        <span class="font-black text-[18px] sm:text-[21px] text-white tracking-tight leading-snug group-hover:text-toranj-orange transition-colors">
-                            آکادمی زبان تُرنج
-                        </span>
-                        <span class="text-[10px] sm:text-[11px] font-semibold text-gray-300 tracking-widest uppercase" dir="ltr">
-                            TORANJ LANGUAGE ACADEMY
-                        </span>
-                    </div>
-                </a>
-
-                <!-- وسط هدر: منوی ناوبری اصلی -->
-                <nav class="hidden lg:flex items-center gap-7 text-[14px] font-semibold text-gray-200" aria-label="ناوبری اصلی">
-                    <a href="{% url 'core:home' %}" class="hover:text-toranj-orange transition-colors py-2">صفحه اصلی</a>
-
-                    <!-- منوی آبشاری دپارتمان‌های زبان -->
-                    <div class="relative group">
-                        <button type="button" class="flex items-center gap-1.5 hover:text-toranj-orange transition-colors py-2 focus:outline-none">
-                            <span>دپارتمان‌های زبان</span>
-                            <i data-lucide="chevron-down" class="w-4 h-4 opacity-80 group-hover:rotate-180 transition-transform"></i>
-                        </button>
-                        <div class="invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-200 absolute right-0 mt-1 w-64 bg-white text-toranj-textMain rounded-2xl shadow-2xl border border-toranj-border p-2.5 z-50">
-                            <a href="{% url 'core:language_english' %}" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl hover:bg-toranj-bg text-[13px] font-bold transition-colors">
-                                <span>زبان انگلیسی (English)</span>
-                                <span class="text-lg">🇬🇧</span>
-                            </a>
-                            <a href="{% url 'core:language_german' %}" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl hover:bg-toranj-bg text-[13px] font-bold transition-colors">
-                                <span>زبان آلمانی (Deutsch)</span>
-                                <span class="text-lg">🇩🇪</span>
-                            </a>
-                            <a href="{% url 'core:language_french' %}" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl hover:bg-toranj-bg text-[13px] font-bold transition-colors">
-                                <span>زبان فرانسوی (Français)</span>
-                                <span class="text-lg">🇫🇷</span>
-                            </a>
-                            <a href="{% url 'core:language_turkish' %}" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl hover:bg-toranj-bg text-[13px] font-bold transition-colors">
-                                <span>زبان ترکی استانبولی (Türkçe)</span>
-                                <span class="text-lg">🇹🇷</span>
-                            </a>
-                            <div class="border-t border-toranj-border my-1.5"></div>
-                            <a href="{% url 'courses:catalog' %}" class="flex items-center justify-between px-3.5 py-2 rounded-xl bg-toranj-inputBg hover:bg-toranj-navy hover:text-white text-[12px] font-extrabold text-toranj-navy transition-colors">
-                                <span>کاتالوگ کامل دوره‌ها</span>
-                                <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
-                            </a>
+                <!-- سمت راست: لوگوی رسمی و نام برند -->
+                <div class="flex items-center gap-8">
+                    <a href="/" class="flex items-center gap-3.5 group focus:outline-none">
+                        <div class="w-12 h-12 rounded-2xl bg-toranj-navy/5 border border-slate-200/80 flex items-center justify-center p-1.5 overflow-hidden group-hover:border-toranj-orange transition-colors">
+                            <img src="{% static 'images/toranj-logo.png' %}" alt="Toranj Language Academy Logo" class="w-full h-full object-contain" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <span class="hidden w-full h-full items-center justify-center bg-toranj-navy text-toranj-orange font-black text-xl rounded-xl">T</span>
                         </div>
-                    </div>
+                        <div class="flex flex-col">
+                            <span class="text-lg sm:text-xl font-extrabold text-toranj-navy tracking-tight group-hover:text-toranj-orange transition-colors">آموزشگاه زبان تُرَنج</span>
+                            <span class="text-[11px] font-medium text-toranj-textMuted ltr-text tracking-wider uppercase">Toranj Language Academy</span>
+                        </div>
+                    </a>
 
-                    <a href="{% url 'courses:catalog' %}" class="hover:text-toranj-orange transition-colors py-2">دوره‌های آموزشی</a>
-                    <a href="{% url 'core:home' %}#about-toranj" class="hover:text-toranj-orange transition-colors py-2">چرا تُرنج؟</a>
-                    <a href="{% url 'core:home' %}#teachers-section" class="hover:text-toranj-orange transition-colors py-2">اساتید</a>
-                    <a href="{% url 'core:home' %}#contact-section" class="hover:text-toranj-orange transition-colors py-2">تماس با ما</a>
-                </nav>
+                    <!-- منوی اصلی دسکتاپ -->
+                    <nav class="hidden lg:flex items-center gap-1 mr-4" aria-label="ناوبری اصلی">
+                        <a href="/" class="px-3.5 py-2 rounded-xl text-sm font-semibold text-toranj-textMain hover:text-toranj-navy hover:bg-slate-100/80 transition-all">صفحه اصلی</a>
 
-                <!-- سمت چپ هدر (بالا سمت چپ): منوی یکپارچه و لوکس «ورود به سامانه تُرنج» -->
-                <div class="hidden lg:flex items-center gap-3">
-                    {% if user.is_authenticated %}
-                        <a href="{% url 'dashboards:redirect' %}" class="btn-primary-orange px-5 !h-[44px] shadow-md">
-                            <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
-                            <span>پنل کاربری ({{ user.first_name }})</span>
-                        </a>
-                    {% else %}
-                        <div class="relative group" id="portalDropdownContainer">
-                            <button type="button"
-                                    onclick="togglePortalMenu(event)"
-                                    class="h-[46px] px-5 rounded-xl bg-gradient-to-l from-toranj-orange to-amber-500 hover:from-toranj-orangeHover hover:to-amber-600 text-toranj-textMain font-extrabold text-[14px] shadow-md flex items-center gap-2.5 transition-all focus:outline-none">
-                                <i data-lucide="shield-check" class="w-4 h-4 text-toranj-navy"></i>
-                                <span>ورود به سامانه تُرنج</span>
-                                <i data-lucide="chevron-down" class="w-4 h-4 text-toranj-navy group-hover:rotate-180 transition-transform"></i>
+                        <!-- منوی آبشاری دپارتمان‌های زبان -->
+                        <div class="relative group">
+                            <button type="button" class="px-3.5 py-2 rounded-xl text-sm font-semibold text-toranj-textMain hover:text-toranj-navy hover:bg-slate-100/80 transition-all inline-flex items-center gap-1.5">
+                                <span>دپارتمان‌های زبان</span>
+                                <svg class="w-4 h-4 text-toranj-textMuted group-hover:rotate-180 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                </svg>
                             </button>
-
-                            <!-- منوی آبشاری بالا سمت چپ (دانشجو / استاد / مهمان) -->
-                            <div id="portalDropdownMenu"
-                                 class="invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-200 absolute left-0 mt-2.5 w-[350px] bg-white text-toranj-textMain rounded-2xl shadow-2xl border border-toranj-border p-3.5 z-50 space-y-2.5">
-
-                                <div class="px-2 py-1 border-b border-toranj-border flex items-center justify-between">
-                                    <span class="text-[12px] font-extrabold text-toranj-navy">انتخاب درگاه ورود به سامانه</span>
-                                    <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-toranj-navy/10 text-toranj-navy">TORANJ PORTAL</span>
-                                </div>
-
-                                <!-- ۱. درگاه دانشجو -->
-                                <div class="p-3 rounded-xl bg-toranj-inputBg border border-toranj-border hover:border-toranj-navy/30 transition-all space-y-2.5">
-                                    <div class="flex items-center justify-between">
-                                        <div class="flex items-center gap-2.5">
-                                            <div class="w-9 h-9 rounded-xl bg-toranj-navy text-toranj-orange flex items-center justify-center shrink-0">
-                                                <i data-lucide="graduation-cap" class="w-5 h-5"></i>
-                                            </div>
-                                            <div>
-                                                <span class="text-[13px] font-extrabold text-toranj-textMain block">بخش دانشجویان و زبان‌آموزان</span>
-                                                <span class="text-[11px] text-toranj-textMuted">ورود با کد TRJ یا ثبت‌نام آنلاین</span>
-                                            </div>
-                                        </div>
-                                        <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-toranj-orange/20 text-toranj-textMain">Student</span>
-                                    </div>
-                                    <div class="grid grid-cols-2 gap-2 pt-1">
-                                        <a href="{% url 'core:student_portal_login' %}" class="h-[36px] rounded-lg bg-toranj-navy hover:bg-toranj-navyLight text-white font-bold text-[12px] flex items-center justify-center gap-1.5 transition-colors">
-                                            <i data-lucide="log-in" class="w-3.5 h-3.5"></i>
-                                            <span>ورود دانشجویان</span>
-                                        </a>
-                                        <a href="{% url 'accounts:register' %}" class="h-[36px] rounded-lg bg-toranj-orange hover:bg-toranj-orangeHover text-toranj-textMain font-extrabold text-[12px] flex items-center justify-center gap-1.5 transition-colors">
-                                            <i data-lucide="user-plus" class="w-3.5 h-3.5"></i>
-                                            <span>ثبت‌نام جدید</span>
-                                        </a>
-                                    </div>
-                                </div>
-
-                                <!-- ۲. درگاه استاد -->
-                                <a href="{% url 'core:teacher_portal_login' %}"
-                                   class="p-3 rounded-xl bg-white hover:bg-toranj-inputBg border border-toranj-border hover:border-toranj-navy/40 flex items-center justify-between transition-all group/item">
-                                    <div class="flex items-center gap-2.5">
-                                        <div class="w-9 h-9 rounded-xl bg-toranj-navyLight text-toranj-orange flex items-center justify-center shrink-0">
-                                            <i data-lucide="presentation" class="w-4 h-4"></i>
-                                        </div>
+                            <div class="invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-200 absolute right-0 mt-2 w-72 bg-white rounded-2xl shadow-premium-hover border border-slate-100 p-2 z-50">
+                                <a href="/departments/english/" class="flex items-center justify-between p-3 rounded-xl hover:bg-toranj-bg transition-colors group/item">
+                                    <div class="flex items-center gap-3">
+                                        <span class="text-xl" aria-hidden="true">🇬🇧</span>
                                         <div>
-                                            <span class="text-[13px] font-extrabold text-toranj-textMain group-hover/item:text-toranj-navy block">بخش اختصاصی اساتید</span>
-                                            <span class="text-[11px] text-toranj-textMuted">پنل تدریس، ثبت نمره و کارنامه</span>
+                                            <div class="text-sm font-bold text-toranj-navy group-hover/item:text-toranj-orange transition-colors">دپارتمان انگلیسی</div>
+                                            <div class="text-xs text-toranj-textMuted ltr-text">British & Academic English</div>
                                         </div>
                                     </div>
-                                    <i data-lucide="arrow-left" class="w-4 h-4 text-toranj-textMuted group-hover/item:text-toranj-navy"></i>
+                                    <span class="text-xs font-semibold text-toranj-navy bg-slate-100 px-2 py-0.5 rounded-md ltr-text">A1–C2</span>
                                 </a>
-
-                                <!-- ۳. درگاه مهمان -->
-                                <a href="{% url 'core:guest_explore' %}"
-                                   class="p-3 rounded-xl bg-white hover:bg-toranj-inputBg border border-toranj-border flex items-center justify-between transition-all group/item">
-                                    <div class="flex items-center gap-2.5">
-                                        <div class="w-9 h-9 rounded-xl bg-gray-100 text-toranj-navy flex items-center justify-center shrink-0">
-                                            <i data-lucide="compass" class="w-4 h-4 text-toranj-orange"></i>
-                                        </div>
+                                <a href="/departments/german/" class="flex items-center justify-between p-3 rounded-xl hover:bg-toranj-bg transition-colors group/item">
+                                    <div class="flex items-center gap-3">
+                                        <span class="text-xl" aria-hidden="true">🇩🇪</span>
                                         <div>
-                                            <span class="text-[13px] font-extrabold text-toranj-textMain block">بازدید به عنوان مهمان</span>
-                                            <span class="text-[11px] text-toranj-textMuted">مشاهده آزادانه دوره‌ها و دپارتمان‌ها</span>
+                                            <div class="text-sm font-bold text-toranj-navy group-hover/item:text-toranj-orange transition-colors">دپارتمان آلمانی</div>
+                                            <div class="text-xs text-toranj-textMuted ltr-text">Goethe & TestDaF Prep</div>
                                         </div>
                                     </div>
-                                    <i data-lucide="arrow-left" class="w-4 h-4 text-toranj-textMuted group-hover/item:text-toranj-navy"></i>
+                                    <span class="text-xs font-semibold text-toranj-navy bg-slate-100 px-2 py-0.5 rounded-md ltr-text">A1–C1</span>
                                 </a>
-
+                                <a href="/departments/french/" class="flex items-center justify-between p-3 rounded-xl hover:bg-toranj-bg transition-colors group/item">
+                                    <div class="flex items-center gap-3">
+                                        <span class="text-xl" aria-hidden="true">🇫🇷</span>
+                                        <div>
+                                            <div class="text-sm font-bold text-toranj-navy group-hover/item:text-toranj-orange transition-colors">دپارتمان فرانسوی</div>
+                                            <div class="text-xs text-toranj-textMuted ltr-text">DELF / DALF & Culture</div>
+                                        </div>
+                                    </div>
+                                    <span class="text-xs font-semibold text-toranj-navy bg-slate-100 px-2 py-0.5 rounded-md ltr-text">A1–C1</span>
+                                </a>
+                                <a href="/departments/turkish/" class="flex items-center justify-between p-3 rounded-xl hover:bg-toranj-bg transition-colors group/item">
+                                    <div class="flex items-center gap-3">
+                                        <span class="text-xl" aria-hidden="true">🇹🇷</span>
+                                        <div>
+                                            <div class="text-sm font-bold text-toranj-navy group-hover/item:text-toranj-orange transition-colors">دپارتمان ترکی استانبولی</div>
+                                            <div class="text-xs text-toranj-textMuted ltr-text">Istanbul Turkish & TÖMER</div>
+                                        </div>
+                                    </div>
+                                    <span class="text-xs font-semibold text-toranj-navy bg-slate-100 px-2 py-0.5 rounded-md ltr-text">A1–C1</span>
+                                </a>
                             </div>
                         </div>
+
+                        <a href="/#courses-section" class="px-3.5 py-2 rounded-xl text-sm font-semibold text-toranj-textMain hover:text-toranj-navy hover:bg-slate-100/80 transition-all">دوره‌های آموزشی</a>
+                        <a href="/#about-toranj" class="px-3.5 py-2 rounded-xl text-sm font-semibold text-toranj-textMain hover:text-toranj-navy hover:bg-slate-100/80 transition-all">درباره تُرَنج</a>
+                        <a href="/#contact-footer" class="px-3.5 py-2 rounded-xl text-sm font-semibold text-toranj-textMain hover:text-toranj-navy hover:bg-slate-100/80 transition-all">تماس با ما</a>
+                    </nav>
+                </div>
+
+                <!-- سمت چپ: پورتال ۳گانه ورود (زبان‌آموز، استاد، مهمان) -->
+                <div class="hidden md:flex items-center gap-2.5">
+                    {% if user.is_authenticated %}
+                        <a href="{{ dashboard_url|default:'/dashboards/' }}" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold bg-toranj-navy text-white hover:bg-toranj-navyLight transition-all shadow-sm">
+                            <span>پنل کاربری ({{ user.username }})</span>
+                        </a>
+                    {% else %}
+                        <!-- پورتال ۱: دسترسی مهمان -->
+                        <a href="/#departments-showcase" class="px-3 py-2 rounded-xl text-xs font-semibold text-toranj-textMuted hover:text-toranj-navy hover:bg-slate-100 transition-colors" title="مشاهده آزاد بخش‌ها به عنوان مهمان">
+                            دسترسی مهمان
+                        </a>
+
+                        <!-- پورتال ۲: ورود اساتید -->
+                        <a href="{{ login_url|default:'/accounts/login/' }}?role=teacher" class="px-3.5 py-2 rounded-xl text-xs font-bold text-toranj-navy border border-toranj-navy/20 hover:border-toranj-navy hover:bg-toranj-navy/5 transition-all">
+                            پورتال اساتید
+                        </a>
+
+                        <!-- پورتال ۳: ورود زبان‌آموزان -->
+                        <a href="{{ login_url|default:'/accounts/login/' }}?role=student" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-toranj-orange text-white hover:bg-toranj-orangeHover transition-all shadow-orange-glow">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+                            </svg>
+                            <span>ورود زبان‌آموز</span>
+                        </a>
                     {% endif %}
                 </div>
 
                 <!-- دکمه منوی موبایل -->
-                <button type="button"
-                        onclick="toggleMobileMenu()"
-                        class="lg:hidden p-2.5 rounded-xl border border-white/20 text-white hover:bg-white/10 focus:outline-none"
-                        aria-label="باز کردن منوی موبایل">
-                    <i data-lucide="menu" class="w-6 h-6"></i>
-                </button>
+                <div class="flex lg:hidden">
+                    <button id="mobile-menu-btn" type="button" class="p-2.5 rounded-xl text-toranj-navy hover:bg-slate-100 focus:outline-none" aria-label="باز کردن منو" aria-expanded="false">
+                        <svg id="menu-icon-open" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                        </svg>
+                        <svg id="menu-icon-close" class="w-6 h-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+
             </div>
         </div>
 
-        <!-- منوی کشویی موبایل (شامل درگاه‌های ورود و ۴ زبان) -->
-        <div id="mobileNavMenu" class="hidden lg:hidden bg-toranj-navyLight border-t border-white/10 px-4 pt-4 pb-6 space-y-4">
-            <div class="p-3.5 rounded-2xl bg-white/5 border border-white/10 space-y-2.5">
-                <span class="text-[12px] font-extrabold text-toranj-orange block">ورود به سامانه تُرنج:</span>
+        <!-- منوی کشویی موبایل (Mobile-First Drawer) -->
+        <div id="mobile-menu" class="hidden lg:hidden bg-white border-b border-slate-200 px-4 pt-3 pb-6 space-y-4 shadow-xl">
+            <div class="space-y-1">
+                <a href="/" class="block px-3.5 py-2.5 rounded-xl text-base font-bold text-toranj-navy hover:bg-toranj-bg">صفحه اصلی</a>
+                <a href="/#courses-section" class="block px-3.5 py-2.5 rounded-xl text-base font-semibold text-toranj-textMain hover:bg-toranj-bg">دوره‌های آموزشی</a>
+                <a href="/#about-toranj" class="block px-3.5 py-2.5 rounded-xl text-base font-semibold text-toranj-textMain hover:bg-toranj-bg">درباره تُرَنج</a>
+                <a href="/#contact-footer" class="block px-3.5 py-2.5 rounded-xl text-base font-semibold text-toranj-textMain hover:bg-toranj-bg">تماس با ما</a>
+            </div>
+
+            <div class="pt-2 border-t border-slate-100">
+                <p class="px-3.5 text-xs font-bold text-toranj-textMuted uppercase tracking-wider mb-2">دپارتمان‌های تخصصی زبان</p>
                 <div class="grid grid-cols-2 gap-2">
-                    <a href="{% url 'core:student_portal_login' %}" class="py-2.5 rounded-xl bg-white text-toranj-navy text-center font-extrabold text-[12px]">ورود دانشجویان</a>
-                    <a href="{% url 'accounts:register' %}" class="py-2.5 rounded-xl bg-toranj-orange text-toranj-textMain text-center font-extrabold text-[12px]">ثبت‌نام زبان‌آموز</a>
-                    <a href="{% url 'core:teacher_portal_login' %}" class="py-2 rounded-xl bg-white/10 text-white text-center font-bold text-[12px]">پرتال اساتید</a>
-                    <a href="{% url 'core:guest_explore' %}" class="py-2 rounded-xl bg-white/10 text-gray-200 text-center font-bold text-[12px]">ورود مهمان</a>
+                    <a href="/departments/english/" class="flex items-center gap-2 p-2.5 rounded-xl bg-toranj-bg hover:bg-slate-200/70 transition-colors">
+                        <span>🇬🇧</span>
+                        <span class="text-xs font-bold text-toranj-navy">انگلیسی</span>
+                    </a>
+                    <a href="/departments/german/" class="flex items-center gap-2 p-2.5 rounded-xl bg-toranj-bg hover:bg-slate-200/70 transition-colors">
+                        <span>🇩🇪</span>
+                        <span class="text-xs font-bold text-toranj-navy">آلمانی</span>
+                    </a>
+                    <a href="/departments/french/" class="flex items-center gap-2 p-2.5 rounded-xl bg-toranj-bg hover:bg-slate-200/70 transition-colors">
+                        <span>🇫🇷</span>
+                        <span class="text-xs font-bold text-toranj-navy">فرانسوی</span>
+                    </a>
+                    <a href="/departments/turkish/" class="flex items-center gap-2 p-2.5 rounded-xl bg-toranj-bg hover:bg-slate-200/70 transition-colors">
+                        <span>🇹🇷</span>
+                        <span class="text-xs font-bold text-toranj-navy">ترکی استانبولی</span>
+                    </a>
                 </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-2 text-[13px] font-bold">
-                <a href="{% url 'core:language_english' %}" class="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 flex items-center justify-between">
-                    <span>انگلیسی</span><span>🇬🇧</span>
-                </a>
-                <a href="{% url 'core:language_german' %}" class="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 flex items-center justify-between">
-                    <span>آلمانی</span><span>🇩🇪</span>
-                </a>
-                <a href="{% url 'core:language_french' %}" class="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 flex items-center justify-between">
-                    <span>فرانسوی</span><span>🇫🇷</span>
-                </a>
-                <a href="{% url 'core:language_turkish' %}" class="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 flex items-center justify-between">
-                    <span>ترکی استانبولی</span><span>🇹🇷</span>
-                </a>
+            <!-- پورتال ۳گانه در موبایل -->
+            <div class="pt-3 border-t border-slate-100 space-y-2.5">
+                <p class="px-1 text-xs font-bold text-toranj-textMuted">پورتال‌های ورود به سامانه:</p>
+                {% if user.is_authenticated %}
+                    <a href="{{ dashboard_url|default:'/dashboards/' }}" class="w-full flex items-center justify-center py-3 px-4 rounded-xl bg-toranj-navy text-white font-bold text-sm">
+                        ورود به پنل کاربری ({{ user.username }})
+                    </a>
+                {% else %}
+                    <div class="grid grid-cols-1 gap-2">
+                        <a href="{{ login_url|default:'/accounts/login/' }}?role=student" class="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-toranj-orange text-white font-bold text-sm shadow-orange-glow">
+                            <span>ورود زبان‌آموز (Student Portal)</span>
+                        </a>
+                        <div class="grid grid-cols-2 gap-2">
+                            <a href="{{ login_url|default:'/accounts/login/' }}?role=teacher" class="flex items-center justify-center py-2.5 px-3 rounded-xl border border-toranj-navy text-toranj-navy font-bold text-xs">
+                                ورود اساتید
+                            </a>
+                            <a href="/#departments-showcase" class="flex items-center justify-center py-2.5 px-3 rounded-xl bg-slate-100 text-toranj-textMain font-semibold text-xs">
+                                دسترسی مهمان
+                            </a>
+                        </div>
+                    </div>
+                {% endif %}
             </div>
         </div>
     </header>
 
-    <main class="flex-1">
+    <!-- محتوای اصلی صفحات -->
+    <main class="flex-grow">
         {% block content %}{% endblock %}
     </main>
 
-    <!-- فوتر رسمی آکادمی زبان تُرنج -->
-    <footer id="contact-section" class="bg-toranj-navy text-white border-t border-white/10 mt-16">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 pb-10 border-b border-white/10">
-                <div class="lg:col-span-4 space-y-4">
-                    <a href="{% url 'core:home' %}" class="flex items-center gap-3">
-                        <img src="{% static 'images/toranj-logo.png' %}"
-                             alt="لوگوی رسمی آکادمی زبان تُرنج"
-                             class="toranj-official-logo !h-[52px]" />
-                        <div>
-                            <span class="font-extrabold text-[18px] text-white block">آکادمی زبان تُرنج</span>
-                            <span class="text-[11px] text-gray-300 tracking-widest uppercase" dir="ltr">TORANJ LANGUAGE ACADEMY</span>
+    <!-- فوتر حرفه‌ای (Professional Footer) -->
+    <footer id="contact-footer" class="bg-toranj-navyDark text-white pt-16 pb-10 border-t-4 border-toranj-orange">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 pb-12 border-b border-white/10">
+
+                <!-- ستون ۱: معرفی برند -->
+                <div class="space-y-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-11 h-11 rounded-xl bg-white p-1.5 flex items-center justify-center">
+                            <img src="{% static 'images/toranj-logo.png' %}" alt="Toranj Logo" class="w-full h-full object-contain" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <span class="hidden text-toranj-navy font-black text-lg">T</span>
                         </div>
-                    </a>
-                    <p class="text-[13px] text-gray-300 leading-relaxed">
-                        پلتفرم جامع آموزش زبان‌های خارجه با استاندارد CEFR اروپا، سیستم تحلیل هوشمند پیشرفت تحصیلی و برگزاری کلاس‌های حضوری و آنلاین.
+                        <div>
+                            <h3 class="text-lg font-extrabold text-white">آموزشگاه زبان تُرَنج</h3>
+                            <p class="text-xs text-slate-400 ltr-text">Toranj Language Academy</p>
+                        </div>
+                    </div>
+                    <p class="text-sm text-slate-300 leading-relaxed">
+                        مرجع تخصصی آموزش زبان‌های بین‌المللی بر پایه استاندارد چارچوب اروپایی (CEFR) با بهره‌گیری از متدولوژی تعاملی و پلتفرم هوشمند آموزشی.
                     </p>
                 </div>
 
-                <div class="lg:col-span-3 space-y-2.5 text-[13px]">
-                    <h3 class="font-extrabold text-[15px] text-toranj-orange mb-3">دپارتمان‌های تخصصی زبان</h3>
-                    <a href="{% url 'core:language_english' %}" class="block text-gray-300 hover:text-white">🇬🇧 زبان انگلیسی (English)</a>
-                    <a href="{% url 'core:language_german' %}" class="block text-gray-300 hover:text-white">🇩🇪 زبان آلمانی (Deutsch)</a>
-                    <a href="{% url 'core:language_french' %}" class="block text-gray-300 hover:text-white">🇫🇷 زبان فرانسوی (Français)</a>
-                    <a href="{% url 'core:language_turkish' %}" class="block text-gray-300 hover:text-white">🇹🇷 زبان ترکی استانبولی (Türkçe)</a>
+                <!-- ستون ۲: دپارتمان‌های آموزشی -->
+                <div>
+                    <h4 class="text-sm font-extrabold text-toranj-orange uppercase tracking-wider mb-4">دپارتمان‌های زبان</h4>
+                    <ul class="space-y-2.5 text-sm text-slate-300">
+                        <li><a href="/departments/english/" class="hover:text-toranj-orange transition-colors flex items-center gap-2"><span>🇬🇧</span><span>دپارتمان زبان انگلیسی (UK)</span></a></li>
+                        <li><a href="/departments/german/" class="hover:text-toranj-orange transition-colors flex items-center gap-2"><span>🇩🇪</span><span>دپارتمان زبان آلمانی</span></a></li>
+                        <li><a href="/departments/french/" class="hover:text-toranj-orange transition-colors flex items-center gap-2"><span>🇫🇷</span><span>دپارتمان زبان فرانسوی</span></a></li>
+                        <li><a href="/departments/turkish/" class="hover:text-toranj-orange transition-colors flex items-center gap-2"><span>🇹🇷</span><span>دپارتمان ترکی استانبولی</span></a></li>
+                    </ul>
                 </div>
 
-                <div class="lg:col-span-2 space-y-2.5 text-[13px]">
-                    <h3 class="font-extrabold text-[15px] text-toranj-orange mb-3">درگاه‌های سامانه</h3>
-                    <a href="{% url 'core:student_portal_login' %}" class="block text-gray-300 hover:text-white">ورود دانشجویان</a>
-                    <a href="{% url 'accounts:register' %}" class="block text-gray-300 hover:text-white">ثبت‌نام زبان‌آموز جدید</a>
-                    <a href="{% url 'core:teacher_portal_login' %}" class="block text-gray-300 hover:text-white">ورود اساتید</a>
-                    <a href="{% url 'core:guest_explore' %}" class="block text-gray-300 hover:text-white">بازدید مهمان</a>
+                <!-- ستون ۳: دسترسی سریع و پورتال‌ها -->
+                <div>
+                    <h4 class="text-sm font-extrabold text-toranj-orange uppercase tracking-wider mb-4">دسترسی سریع</h4>
+                    <ul class="space-y-2.5 text-sm text-slate-300">
+                        <li><a href="{{ login_url|default:'/accounts/login/' }}?role=student" class="hover:text-white transition-colors">پورتال زبان‌آموزان</a></li>
+                        <li><a href="{{ login_url|default:'/accounts/login/' }}?role=teacher" class="hover:text-white transition-colors">پورتال اساتید</a></li>
+                        <li><a href="/#placement-test" class="hover:text-white transition-colors">تعیین سطح و مشاوره</a></li>
+                        <li><a href="/#courses-section" class="hover:text-white transition-colors">تقویم و لیست دوره‌ها</a></li>
+                        <li><a href="/#faq-section" class="hover:text-white transition-colors">سوالات متداول</a></li>
+                    </ul>
                 </div>
 
-                <div class="lg:col-span-3 space-y-2.5 text-[13px] text-gray-300">
-                    <h3 class="font-extrabold text-[15px] text-toranj-orange mb-3">ارتباط با آموزشگاه</h3>
-                    <p>ایران، تهران — آکادمی زبان تُرنج</p>
-                    <p>شنبه تا پنجشنبه • ۸:۰۰ الی ۲۱:۳۰</p>
+                <!-- ستون ۴: ارتباط با آکادمی -->
+                <div>
+                    <h4 class="text-sm font-extrabold text-toranj-orange uppercase tracking-wider mb-4">ارتباط با آکادمی</h4>
+                    <ul class="space-y-3 text-sm text-slate-300">
+                        <li class="flex items-start gap-2.5">
+                            <span class="text-toranj-orange mt-0.5">📍</span>
+                            <span>آموزشگاه زبان تُرَنج — پذیرش حضوری و آنلاین در سراسر کشور</span>
+                        </li>
+                        <li class="flex items-center gap-2.5">
+                            <span class="text-toranj-orange">🤖</span>
+                            <span class="ltr-text text-xs bg-white/10 px-2.5 py-1 rounded-lg">@Toranj_Academy_bot</span>
+                        </li>
+                        <li class="pt-2">
+                            <a href="{{ login_url|default:'/accounts/login/' }}" class="inline-flex items-center justify-center w-full py-2.5 px-4 rounded-xl bg-toranj-orange text-white font-bold text-xs hover:bg-toranj-orangeHover transition-all">
+                                ورود به سامانه آموزشی تُرَنج
+                            </a>
+                        </li>
+                    </ul>
                 </div>
+
             </div>
 
-            <div class="pt-6 text-center sm:text-right text-[12px] text-gray-400">
-                <p>© تمامی حقوق برای آکادمی زبان تُرنج (TORANJ LMS) محفوظ است.</p>
+            <div class="pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 gap-4">
+                <p>© تمامی حقوق برای <strong class="text-white">آموزشگاه زبان تُرَنج (Toranj Language Academy)</strong> محفوظ است.</p>
+                <p class="ltr-text">CEFR Standard Accredited Curriculum • A1 to C2</p>
             </div>
         </div>
     </footer>
 
+    <!-- اسکریپت‌های سبک و بهینه برای منوی موبایل و انیمیشن‌های اسکرول -->
     <script>
-        lucide.createIcons();
-        function toggleMobileMenu() {
-            const menu = document.getElementById('mobileNavMenu');
-            menu?.classList.toggle('hidden');
-        }
-        function togglePortalMenu(e) {
-            e?.stopPropagation();
-            const menu = document.getElementById('portalDropdownMenu');
-            if (menu) {
-                menu.classList.toggle('invisible');
-                menu.classList.toggle('opacity-0');
+        document.addEventListener('DOMContentLoaded', function () {
+            const btn = document.getElementById('mobile-menu-btn');
+            const menu = document.getElementById('mobile-menu');
+            const iconOpen = document.getElementById('menu-icon-open');
+            const iconClose = document.getElementById('menu-icon-close');
+
+            if (btn && menu) {
+                btn.addEventListener('click', function () {
+                    const isHidden = menu.classList.contains('hidden');
+                    menu.classList.toggle('hidden');
+                    iconOpen.classList.toggle('hidden', isHidden);
+                    iconClose.classList.toggle('hidden', !isHidden);
+                    btn.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
+                });
             }
-        }
-        function openTopLeftPortalMenu() {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            const menu = document.getElementById('portalDropdownMenu');
-            if (menu) {
-                menu.classList.remove('invisible', 'opacity-0');
-            }
-        }
-        document.addEventListener('click', function(event) {
-            const container = document.getElementById('portalDropdownContainer');
-            const menu = document.getElementById('portalDropdownMenu');
-            if (container && menu && !container.contains(event.target)) {
-                menu.classList.add('invisible', 'opacity-0');
+
+            // Reveal on scroll animation
+            const reveals = document.querySelectorAll('.reveal');
+            if ('IntersectionObserver' in window) {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('active');
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                }, { threshold: 0.12 });
+                reveals.forEach(el => observer.observe(el));
+            } else {
+                reveals.forEach(el => el.classList.add('active'));
             }
         });
     </script>
+    {% block extra_scripts %}{% endblock %}
 </body>
 </html>

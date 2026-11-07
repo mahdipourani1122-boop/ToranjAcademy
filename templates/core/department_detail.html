@@ -1,0 +1,161 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ dept.title_fa }} | آموزشگاه زبان تُرَنج{% endblock %}
+
+{% block content %}
+
+<!-- ۱. بخش Hero اختصاصی هر دپارتمان -->
+<section class="relative bg-toranj-navy text-white py-16 lg:py-24 overflow-hidden border-b-4 border-toranj-orange">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+
+            <div class="lg:col-span-7 space-y-5">
+                <div class="inline-flex items-center gap-3 px-4 py-1.5 rounded-full bg-white/10 border border-white/15">
+                    <span class="text-xl">{{ dept.flag_emoji }}</span>
+                    <span class="text-xs font-extrabold text-toranj-orange ltr-text uppercase tracking-wider">{{ dept.title_en }}</span>
+                </div>
+
+                <h1 class="text-3xl sm:text-5xl font-black leading-tight">
+                    {{ dept.hero_heading }}
+                </h1>
+
+                <p class="text-base sm:text-lg text-slate-200 leading-relaxed">
+                    {{ dept.full_intro }}
+                </p>
+
+                <div class="flex flex-wrap items-center gap-3 pt-2">
+                    <a href="#dept-courses" class="px-6 py-3.5 rounded-2xl bg-toranj-orange hover:bg-toranj-orangeHover text-white font-extrabold text-sm shadow-orange-glow transition-all">
+                        مشاهده دوره‌های {{ dept.name_short }}
+                    </a>
+                    <a href="{{ login_url|default:'/accounts/login/' }}?role=student" class="px-6 py-3.5 rounded-2xl bg-white/10 hover:bg-white/20 text-white border border-white/20 font-bold text-sm transition-all">
+                        تعیین سطح و ثبت‌نام
+                    </a>
+                </div>
+            </div>
+
+            <div class="lg:col-span-5">
+                <div class="rounded-3xl overflow-hidden border-2 border-white/15 shadow-2xl bg-toranj-navyDark relative aspect-[4/3]">
+                    <img src="{{ dept.image }}" alt="{{ dept.title_fa }}" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-gradient-to-t from-toranj-navyDark/90 via-transparent to-transparent"></div>
+                    <div class="absolute bottom-4 right-4 left-4 p-4 rounded-2xl bg-toranj-navy/90 backdrop-blur-md border border-white/15 flex items-center justify-between">
+                        <div>
+                            <span class="text-xs text-toranj-orange font-bold block">محوریت آموزشی دپارتمان</span>
+                            <span class="text-sm font-extrabold text-white">{{ dept.exam_focus }}</span>
+                        </div>
+                        <span class="text-2xl">{{ dept.flag_emoji }}</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- ۲. سطوح استاندارد CEFR در این دپارتمان -->
+<section class="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="mb-10">
+        <span class="text-xs font-extrabold text-toranj-orange uppercase tracking-widest ltr-text">CEFR PROFICIENCY LEVELS</span>
+        <h2 class="text-2xl sm:text-3xl font-black text-toranj-navy mt-1">نقشه راه و سطوح آموزشی {{ dept.title_fa }}</h2>
+        <p class="text-sm text-toranj-textMuted mt-2">تمامی دوره‌های این دپارتمان بر اساس استاندارد بین‌المللی CEFR اروپا تفکیک شده‌اند:</p>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for level in dept.cefr_details %}
+        <div class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm hover:border-toranj-orange transition-all flex flex-col justify-between">
+            <div class="space-y-3">
+                <div class="flex items-center justify-between">
+                    <span class="px-3.5 py-1.5 rounded-xl bg-toranj-navy text-toranj-orange font-black text-base ltr-text">{{ level.code }}</span>
+                    <span class="text-xs font-bold text-toranj-textMuted ltr-text">{{ level.title_en }}</span>
+                </div>
+                <h3 class="text-base font-extrabold text-toranj-navy">{{ level.title_fa }}</h3>
+                <p class="text-xs sm:text-sm text-toranj-textMuted leading-relaxed">{{ level.desc }}</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- ۳. اهداف یادگیری و متدولوژی دپارتمان -->
+<section class="py-16 bg-white border-y border-slate-200/80">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-10">
+        <div class="space-y-4">
+            <span class="text-xs font-extrabold text-toranj-orange uppercase tracking-widest ltr-text">TEACHING METHODOLOGY</span>
+            <h2 class="text-2xl font-black text-toranj-navy">متدولوژی تدریس در {{ dept.title_fa }}</h2>
+            <p class="text-sm sm:text-base text-toranj-textMain leading-relaxed">{{ dept.methodology }}</p>
+        </div>
+
+        <div class="space-y-4">
+            <span class="text-xs font-extrabold text-toranj-orange uppercase tracking-widest ltr-text">LEARNING OBJECTIVES & BENEFITS</span>
+            <h2 class="text-2xl font-black text-toranj-navy">مزایا و دستاوردهای زبان‌آموزان</h2>
+            <ul class="space-y-3">
+                {% for benefit in dept.benefits %}
+                <li class="flex items-start gap-3 text-sm text-toranj-textMain">
+                    <span class="w-5 h-5 rounded-full bg-toranj-orangeSoft text-toranj-orange font-bold flex items-center justify-center text-xs mt-0.5">✓</span>
+                    <span>{{ benefit }}</span>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</section>
+
+<!-- ۴. دوره‌های فعال این دپارتمان در دیتابیس واقعی -->
+<section id="dept-courses" class="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="mb-8">
+        <span class="text-xs font-extrabold text-toranj-orange uppercase tracking-widest ltr-text">AVAILABLE COURSES</span>
+        <h2 class="text-2xl sm:text-3xl font-black text-toranj-navy mt-1">دوره‌های فعال {{ dept.title_fa }}</h2>
+    </div>
+
+    {% if department_courses %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for course in department_courses %}
+        <div class="bg-white rounded-2xl p-6 shadow-premium border border-slate-200/80 flex flex-col justify-between">
+            <div class="space-y-3">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-toranj-navy bg-toranj-bg px-3 py-1 rounded-lg">{{ dept.title_fa }}</span>
+                    {% if course.level %}
+                    <span class="text-xs font-extrabold text-toranj-orange bg-toranj-orangeSoft px-2.5 py-1 rounded-lg ltr-text">{{ course.level }}</span>
+                    {% endif %}
+                </div>
+                <h3 class="text-lg font-extrabold text-toranj-navy">{{ course.title }}</h3>
+                {% if course.description %}
+                <p class="text-xs sm:text-sm text-toranj-textMuted leading-relaxed">{{ course.description }}</p>
+                {% endif %}
+            </div>
+            <div class="pt-5 mt-5 border-t border-slate-100 flex items-center justify-between">
+                <a href="{{ login_url|default:'/accounts/login/' }}?role=student" class="w-full py-2.5 px-4 rounded-xl bg-toranj-navy hover:bg-toranj-orange text-white text-xs font-bold text-center transition-colors">
+                    ثبت‌نام و انتخاب کلاس
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="bg-white rounded-2xl p-8 border border-slate-200/80 text-center space-y-3">
+        <p class="text-base font-extrabold text-toranj-navy">در حال حاضر کلاس جدیدی برای {{ dept.title_fa }} در وضعیت باز قرار ندارد.</p>
+        <p class="text-xs sm:text-sm text-toranj-textMuted">برای رزرو ترم آینده و تعیین سطح اولیه، از طریق پورتال زبان‌آموزان درخواست خود را ثبت نمایید.</p>
+        <div class="pt-2">
+            <a href="{{ login_url|default:'/accounts/login/' }}?role=student" class="inline-flex px-6 py-2.5 rounded-xl bg-toranj-orange text-white text-xs font-bold">ورود به پورتال زبان‌آموز</a>
+        </div>
+    </div>
+    {% endif %}
+</section>
+
+<!-- ۵. سوالات متداول اختصاصی دپارتمان -->
+<section class="py-12 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <h2 class="text-xl sm:text-2xl font-black text-toranj-navy mb-6 text-center">سوالات متداول {{ dept.title_fa }}</h2>
+    <div class="space-y-3">
+        {% for item in dept.faqs %}
+        <details class="group bg-white rounded-2xl border border-slate-200/80 p-5">
+            <summary class="flex items-center justify-between cursor-pointer font-bold text-sm sm:text-base text-toranj-navy list-none">
+                <span>{{ item.q }}</span>
+                <span class="text-toranj-orange group-open:rotate-45 transition-transform text-xl font-bold">+</span>
+            </summary>
+            <p class="text-xs sm:text-sm text-toranj-textMuted mt-3 pt-3 border-t border-slate-100 leading-relaxed">{{ item.a }}</p>
+        </details>
+        {% endfor %}
+    </div>
+</section>
+
+{% endblock %}
