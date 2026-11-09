@@ -1,0 +1,176 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مدیریت کل و تنظیمات حضور و غیاب | آموزشگاه زبان تُرَنج</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Vazirmatn:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        toranj: { navy: '#0D2B4E', orange: '#FF8A00', bg: '#F4F7FB', textMain: '#1F2937', textMuted: '#6B7280' }
+                    },
+                    fontFamily: { sans: ['Vazirmatn', 'Inter', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <style>body { font-family: 'Vazirmatn', sans-serif; background-color: #F4F7FB; } .ltr-text { direction: ltr; unicode-bidi: embed; }</style>
+</head>
+<body class="min-h-screen bg-toranj-bg text-toranj-textMain p-4 sm:p-8">
+    <div class="max-w-7xl mx-auto space-y-6">
+        <div class="flex flex-wrap items-center justify-between gap-4 bg-toranj-navy text-white px-6 py-5 rounded-3xl shadow-md">
+            <div>
+                <span class="text-xs font-bold text-toranj-orange uppercase ltr-text">TORANJ CENTRAL ATTENDANCE ADMINISTRATION</span>
+                <h1 class="text-xl sm:text-2xl font-black mt-1">مرکز نظارت، قوانین و ممیزی حضور و غیاب آموزشگاه تُرَنج</h1>
+            </div>
+            <div class="flex items-center gap-2.5">
+                <a href="?export=csv" class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold">📥 خروجی Excel / CSV</a>
+                <button type="button" onclick="window.print()" class="px-4 py-2.5 rounded-xl bg-toranj-orange text-white text-xs font-extrabold">🖨️ چاپ / PDF گزارش</button>
+            </div>
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="p-4 rounded-2xl border text-xs sm:text-sm font-bold {% if message.tags == 'error' %}bg-rose-50 border-rose-200 text-rose-800{% else %}bg-emerald-50 border-emerald-200 text-emerald-800{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- آمار کل آموزشگاه -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3 text-center text-xs">
+            <div class="p-4 rounded-2xl bg-white border border-slate-200">کل جلسات<strong class="block text-lg font-black text-toranj-navy mt-1 ltr-text">{{ global_stats.sessions_total }}</strong></div>
+            <div class="p-4 rounded-2xl bg-amber-50 border border-amber-200">در انتظار تایید<strong class="block text-lg font-black text-amber-700 mt-1 ltr-text">{{ global_stats.pending }}</strong></div>
+            <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200">حاضر رسمی<strong class="block text-lg font-black text-emerald-700 mt-1 ltr-text">{{ global_stats.present }}</strong></div>
+            <div class="p-4 rounded-2xl bg-orange-50 border border-orange-200">تأخیر<strong class="block text-lg font-black text-orange-700 mt-1 ltr-text">{{ global_stats.late }}</strong></div>
+            <div class="p-4 rounded-2xl bg-rose-50 border border-rose-200">غایب<strong class="block text-lg font-black text-rose-700 mt-1 ltr-text">{{ global_stats.absent }}</strong></div>
+            <div class="p-4 rounded-2xl bg-blue-50 border border-blue-200">غیبت موجه<strong class="block text-lg font-black text-blue-700 mt-1 ltr-text">{{ global_stats.excused }}</strong></div>
+            <div class="p-4 rounded-2xl bg-slate-200">ردشده<strong class="block text-lg font-black text-slate-800 mt-1 ltr-text">{{ global_stats.rejected }}</strong></div>
+        </div>
+
+        <!-- بخش ۴: تنظیمات قوانین حضور و غیاب و مهلت تایید استاد -->
+        <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 space-y-4">
+            <h2 class="text-lg font-black text-toranj-navy border-b border-slate-100 pb-3">تنظیمات قوانین حضور و غیاب و مهلت تایید استاد (Administrative Settings)</h2>
+            <form method="post" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+                {% csrf_token %}
+                <input type="hidden" name="form_action" value="update_policy">
+                <div>
+                    <label class="block font-bold text-toranj-navy mb-1">باز شدن پنجره (دقیقه قبل از شروع):</label>
+                    <input type="number" name="open_before_minutes" value="{{ policy.open_before_minutes }}" class="w-full rounded-xl border border-slate-300 px-3 py-2 ltr-text">
+                </div>
+                <div>
+                    <label class="block font-bold text-toranj-navy mb-1">بسته شدن پنجره (دقیقه پس از شروع):</label>
+                    <input type="number" name="close_after_minutes" value="{{ policy.close_after_minutes }}" class="w-full rounded-xl border border-slate-300 px-3 py-2 ltr-text">
+                </div>
+                <div>
+                    <label class="block font-bold text-toranj-navy mb-1">مهلت تایید نهایی استاد (ساعت):</label>
+                    <input type="number" name="teacher_approval_deadline_hours" value="{{ policy.teacher_approval_deadline_hours }}" class="w-full rounded-xl border border-slate-300 px-3 py-2 ltr-text">
+                </div>
+                <div>
+                    <label class="block font-bold text-toranj-navy mb-1">آستانه ثبت تأخیر (دقیقه):</label>
+                    <input type="number" name="late_threshold_minutes" value="{{ policy.late_threshold_minutes }}" class="w-full rounded-xl border border-slate-300 px-3 py-2 ltr-text">
+                </div>
+                <div>
+                    <label class="block font-bold text-toranj-navy mb-1">سیاست رد درخواست توسط استاد:</label>
+                    <select name="rejection_policy" class="w-full rounded-xl border border-slate-300 px-3 py-2 bg-white">
+                        <option value="ABSENT" {% if policy.rejection_policy == 'ABSENT' %}selected{% endif %}>تبدیل به غیبت رسمی (ABSENT)</option>
+                        <option value="REJECTED" {% if policy.rejection_policy == 'REJECTED' %}selected{% endif %}>نگهداری با برچسب ردشده (REJECTED)</option>
+                    </select>
+                </div>
+                <div class="flex items-center gap-2 pt-5">
+                    <input type="checkbox" name="require_online_code" {% if policy.require_online_code %}checked{% endif %}>
+                    <span class="font-bold">الزام کد امنیتی در کلاس‌های آنلاین</span>
+                </div>
+                <div class="flex items-center gap-2 pt-5">
+                    <input type="checkbox" name="allow_late_requests" {% if policy.allow_late_requests %}checked{% endif %}>
+                    <span class="font-bold">مجاز بودن ارسال درخواست با تأخیر</span>
+                </div>
+                <div class="flex items-end">
+                    <button type="submit" class="w-full py-2.5 px-4 rounded-xl bg-toranj-navy hover:bg-toranj-orange text-white font-extrabold transition-colors">
+                        ذخیره قوانین حضور و غیاب آموزشگاه
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- جدول نظارت و بازنویسی مدیریتی (Admin Override with Mandatory Reason) -->
+        <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 space-y-4">
+            <h2 class="text-lg font-black text-toranj-navy">بررسی رکوردها و بازنویسی مدیریتی (همراه با ثبت دلیل اجباری)</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full text-right border-collapse text-xs">
+                    <thead>
+                        <tr class="border-b border-slate-200 bg-toranj-bg font-extrabold text-toranj-textMuted">
+                            <th class="py-3 px-4">دوره و جلسه</th>
+                            <th class="py-3 px-4">زبان‌آموز</th>
+                            <th class="py-3 px-4">وضعیت فعلی</th>
+                            <th class="py-3 px-4">تغییر وضعیت مدیریتی (Override)</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        {% for e in entries %}
+                        <tr>
+                            <td class="py-3 px-4 font-bold text-toranj-navy">{{ e.session.course_title }} — {{ e.session.title }}</td>
+                            <td class="py-3 px-4">{{ e.student }}</td>
+                            <td class="py-3 px-4"><span class="px-2.5 py-1 rounded-lg bg-slate-100 font-bold">{{ e.status_label_fa }}</span></td>
+                            <td class="py-3 px-4">
+                                <form method="post" class="flex flex-wrap items-center gap-2">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="form_action" value="admin_override">
+                                    <input type="hidden" name="session_id" value="{{ e.session_id }}">
+                                    <input type="hidden" name="student_id" value="{{ e.student_id }}">
+                                    <select name="new_status" class="rounded-lg border border-slate-300 px-2 py-1 bg-white font-bold">
+                                        <option value="PRESENT">حاضر (PRESENT)</option>
+                                        <option value="LATE">تأخیر (LATE)</option>
+                                        <option value="EXCUSED">غیبت موجه (EXCUSED)</option>
+                                        <option value="ABSENT">غایب (ABSENT)</option>
+                                        <option value="REJECTED">ردشده (REJECTED)</option>
+                                    </select>
+                                    <input type="text" name="mandatory_reason" required placeholder="دلیل تغییر مدیریتی (الزامی)..." class="rounded-lg border border-slate-300 px-2.5 py-1 w-52">
+                                    <button type="submit" class="px-3 py-1 rounded-lg bg-toranj-orange text-white font-bold">اعمال و ثبت در ممیزی</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- تاریخچه تغییرناپذیر ممیزی امنیتی (Immutable Audit Trail) -->
+        <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 space-y-4">
+            <h2 class="text-lg font-black text-toranj-navy">تاریخچه تغییرناپذیر ممیزی امنیتی (Immutable Audit Trail)</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full text-right border-collapse text-xs">
+                    <thead>
+                        <tr class="border-b border-slate-200 bg-toranj-bg font-extrabold text-toranj-textMuted">
+                            <th class="py-3 px-3">زمان دقیق</th>
+                            <th class="py-3 px-3">عملیات</th>
+                            <th class="py-3 px-3">انجام‌دهنده (Actor)</th>
+                            <th class="py-3 px-3">زبان‌آموز</th>
+                            <th class="py-3 px-3">تغییر وضعیت</th>
+                            <th class="py-3 px-3">دلیل / توضیح</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        {% for log in audit_logs %}
+                        <tr>
+                            <td class="py-2.5 px-3 ltr-text">{{ log.created_at|date:"Y-m-d H:i:s" }}</td>
+                            <td class="py-2.5 px-3 font-bold text-toranj-navy ltr-text">{{ log.action }}</td>
+                            <td class="py-2.5 px-3">{{ log.actor|default:"سیستم خودکار" }} ({{ log.actor_role }})</td>
+                            <td class="py-2.5 px-3">{{ log.student|default:"—" }}</td>
+                            <td class="py-2.5 px-3 ltr-text font-bold">{{ log.previous_status }} → {{ log.new_status }}</td>
+                            <td class="py-2.5 px-3 text-toranj-textMuted">{{ log.reason }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
