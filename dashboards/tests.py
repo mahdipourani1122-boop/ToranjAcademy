@@ -10,7 +10,6 @@ from dashboards.models import (
     AttendanceSession,
     AttendanceEntry,
     AttendanceAuditLog,
-    AttendanceNotification,
 )
 from dashboards.attendance_service import (
     submit_student_attendance_request,
@@ -53,6 +52,9 @@ class ToranjTwoStageAttendanceAndDashboardsTests(TestCase):
         self.admin_user = self._create_user('09120000001', 'مدیر', 'آموزشگاه', role='admin', is_staff=True, is_superuser=True)
 
         self.policy = AttendancePolicy.get_effective_policy()
+        self.policy.unresolved_pending_policy = 'ABSENT'
+        self.policy.save()
+
         self.session_physical = AttendanceSession.objects.create(
             course_id=101,
             course_title='انگلیسی پیشرفته C1',
