@@ -1,25 +1,11 @@
 from django.urls import path
-from .views import (
-    DashboardRedirectView,
-    StudentDashboardView,
-    TeacherDashboardView,
-    SupervisorDashboardView,
-    AdminDashboardView,
-    AdminUpdateUserRoleView,
-)
+from . import views
 
 app_name = 'dashboards'
 
 urlpatterns = [
-    path('', DashboardRedirectView.as_view(), name='redirect'),
-    path('student/', StudentDashboardView.as_view(), name='student'),
-    path('student', StudentDashboardView.as_view()),
-    path('teacher/', TeacherDashboardView.as_view(), name='teacher'),
-    path('teacher', TeacherDashboardView.as_view()),
-    path('supervisor/', SupervisorDashboardView.as_view(), name='supervisor'),
-    path('supervisor', SupervisorDashboardView.as_view()),
-    path('admin/', AdminDashboardView.as_view(), name='admin'),
-    path('admin', AdminDashboardView.as_view()),
-    # عملیات امن تغییر نقش کاربران توسط مدیر کل
-    path('admin/users/<uuid:user_id>/update-role/', AdminUpdateUserRoleView.as_view(), name='update_user_role'),
+    path('', views.dashboard_router_view, name='dashboard_home'),
+    path('student/', views.student_dashboard_view, name='student_dashboard'),
+    path('student/courses/<int:course_id>/', views.student_course_detail_view, name='student_course_detail'),
+    path('student/resources/<int:resource_id>/download/', views.protected_resource_download_view, name='resource_download'),
 ]

@@ -1,0 +1,1154 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>پورتال آموزشی زبان‌آموز | {{ student_full_name }} — آموزشگاه زبان تُرَنج</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        toranj: {
+                            navy: '#0D2B4E',
+                            navyDark: '#081C33',
+                            navyLight: '#163E6C',
+                            orange: '#FF8A00',
+                            orangeHover: '#E67A00',
+                            orangeSoft: '#FFF4E5',
+                            bg: '#F4F7FB',
+                            surface: '#FFFFFF',
+                            textMain: '#1F2937',
+                            textMuted: '#6B7280',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Vazirmatn', 'Inter', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'card': '0 12px 32px -10px rgba(13, 43, 78, 0.07)',
+                        'card-hover': '0 20px 40px -12px rgba(13, 43, 78, 0.14)',
+                        'orange-btn': '0 8px 20px -4px rgba(255, 138, 0, 0.38)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background-color: #F4F7FB;
+            color: #1F2937;
+        }
+        .ltr-text {
+            direction: ltr;
+            unicode-bidi: embed;
+            font-family: 'Inter', 'Vazirmatn', sans-serif;
+        }
+        .tab-panel {
+            display: none;
+            animation: fadeInPanel 0.28s ease-out;
+        }
+        .tab-panel.active {
+            display: block;
+        }
+        @keyframes fadeInPanel {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .tab-panel { animation: none !important; }
+        }
+        .nav-item.active {
+            background-color: #FF8A00;
+            color: #FFFFFF;
+            box-shadow: 0 8px 20px -4px rgba(255, 138, 0, 0.38);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col lg:flex-row bg-toranj-bg text-toranj-textMain antialiased">
+
+    <!-- هدر موبایل (Mobile-First Top Bar) -->
+    <div class="lg:hidden sticky top-0 z-40 bg-toranj-navy text-white px-4 py-3.5 flex items-center justify-between shadow-md">
+        <div class="flex items-center gap-3">
+            <button id="mobile-sidebar-toggle" type="button" class="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white focus:outline-none" aria-label="باز کردن منوی پنل">
+                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                </svg>
+            </button>
+            <div>
+                <span class="text-sm font-extrabold block">آموزشگاه زبان تُرَنج</span>
+                <span class="text-[11px] text-toranj-orange font-semibold">{{ student_full_name }}</span>
+            </div>
+        </div>
+        <span class="px-2.5 py-1 rounded-lg bg-white/10 text-xs font-bold ltr-text">{{ academy_student_id }}</span>
+    </div>
+
+    <!-- پس‌زمینه تیره موبایل هنگام باز شدن سایدبار -->
+    <div id="sidebar-backdrop" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-40 hidden lg:hidden"></div>
+
+    <!-- سایدبار پریمیوم زبان‌آموز (Sidebar) -->
+    <aside id="student-sidebar" class="fixed lg:sticky top-0 right-0 z-50 w-72 h-screen bg-toranj-navy text-white flex flex-col justify-between transition-transform duration-300 translate-x-full lg:translate-x-0 overflow-y-auto shrink-0 border-l border-white/10">
+        <div class="p-5 space-y-6">
+            <!-- برند و لوگو -->
+            <div class="flex items-center justify-between border-b border-white/10 pb-4">
+                <a href="/" class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-white p-1 flex items-center justify-center shrink-0">
+                        <img src="{% static 'images/toranj-logo.png' %}" alt="Toranj" class="w-full h-full object-contain" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <span class="hidden text-toranj-navy font-black text-lg">T</span>
+                    </div>
+                    <div>
+                        <h1 class="text-base font-black text-white">پورتال زبان‌آموز تُرَنج</h1>
+                        <p class="text-[11px] text-slate-300 ltr-text">Toranj Student LMS</p>
+                    </div>
+                </a>
+                <button id="mobile-sidebar-close" type="button" class="lg:hidden p-1.5 rounded-lg text-slate-300 hover:text-white">✕</button>
+            </div>
+
+            <!-- کارت خلاصه هویت زبان‌آموز در سایدبار -->
+            <div class="p-4 rounded-2xl bg-white/5 border border-white/10 flex items-center gap-3.5">
+                {% if avatar_url %}
+                    <img src="{{ avatar_url }}" alt="{{ student_full_name }}" class="w-12 h-12 rounded-2xl object-cover border-2 border-toranj-orange shrink-0">
+                {% else %}
+                    <div class="w-12 h-12 rounded-2xl bg-toranj-orange text-white font-black text-lg flex items-center justify-center shrink-0">
+                        {{ student_full_name|slice:":1" }}
+                    </div>
+                {% endif %}
+                <div class="min-w-0">
+                    <p class="text-sm font-extrabold text-white truncate">{{ student_full_name }}</p>
+                    <p class="text-xs text-toranj-orange font-bold ltr-text mt-0.5">{{ academy_student_id }}</p>
+                    <span class="inline-block mt-1 px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 text-[10px] font-bold">
+                        {{ enrollment_status_label }}
+                    </span>
+                </div>
+            </div>
+
+            <!-- منوی ناوبری ۱۲ بخش داشبورد -->
+            <nav class="space-y-1" aria-label="منوی داشبورد زبان‌آموز">
+                <button type="button" data-tab="overview" class="nav-item w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-slate-200 hover:bg-white/10 transition-all">
+                    <span class="flex items-center gap-3"><span>🏠</span><span>پیشخوان آموزشی</span></span>
+                </button>
+                <button type="button" data-tab="courses" class="nav-item w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-slate-200 hover:bg-white/10 transition-all">
+                    <span class="flex items-center gap-3"><span>📚</span><span>دوره‌های من</span></span>
+                    <span class="px-2 py-0.5 rounded-md bg-white/10 text-[11px] ltr-text">{{ enrollments|length }}</span>
+                </button>
+                <button type="button" data-tab="report-card" class="nav-item w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-slate-200 hover:bg-white/10 transition-all">
+                    <span class="flex items-center gap-3"><span>🎓</span><span>کارنامه تحصیلی</span></span>
+                </button>
+                <button type="button" data-tab="skills" class="nav-item w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-slate-200 hover:bg-white/10 transition-all">
+                    <span class="flex items-center gap-3"><span>📊</span><span>تحلیل ۶ مهارت زبانی</span></span>
+                </button>
+                <button type="button" data-tab="attendance" class="nav-item w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-slate-200 hover:bg-white/10 transition-all">
+                    <span class="flex items-center gap-3"><span>📅</span><span>حضور و غیاب</span></span>
+                </button>
+                <button type="button" data-tab="assignments" class="nav-item w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-slate-200 hover:bg-white/10 transition-all">
+                    <span class="flex items-center gap-3"><span>📝</span><span>تکالیف و آزمون‌ها</span></span>
+                    {% if pending_assignments_count > 0 %}
+                        <span class="px-2 py-0.5 rounded-md bg-toranj-orange text-white text-[11px] ltr-text">{{ pending_assignments_count }}</span>
+                    {% endif %}
+                </button>
+                <button type="button" data-tab="schedule" class="nav-item w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-slate-200 hover:bg-white/10 transition-all">
+                    <span class="flex items-center gap-3"><span>🕒</span><span>برنامه هفتگی کلاس‌ها</span></span>
+                </button>
+                <button type="button" data-tab="online-class" class="nav-item w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-slate-200 hover:bg-white/10 transition-all">
+                    <span class="flex items-center gap-3"><span>💻</span><span>کلاس آنلاین</span></span>
+                </button>
+                <button type="button" data-tab="resources" class="nav-item w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-slate-200 hover:bg-white/10 transition-all">
+                    <span class="flex items-center gap-3"><span>📂</span><span>منابع آموزشی</span></span>
+                </button>
+                <button type="button" data-tab="subscription" class="nav-item w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-slate-200 hover:bg-white/10 transition-all">
+                    <span class="flex items-center gap-3"><span>💳</span><span>وضعیت اشتراک و دسترسی</span></span>
+                </button>
+                <button type="button" data-tab="notifications" class="nav-item w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-slate-200 hover:bg-white/10 transition-all">
+                    <span class="flex items-center gap-3"><span>🔔</span><span>مرکز اعلان‌ها</span></span>
+                    {% if notifications %}
+                        <span class="px-2 py-0.5 rounded-md bg-white/15 text-[11px] ltr-text">{{ notifications|length }}</span>
+                    {% endif %}
+                </button>
+                <button type="button" data-tab="profile" class="nav-item w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-slate-200 hover:bg-white/10 transition-all">
+                    <span class="flex items-center gap-3"><span>⚙️</span><span>پروفایل و تنظیمات امنیتی</span></span>
+                </button>
+            </nav>
+        </div>
+
+        <!-- دکمه بازگشت به سایت و خروج امن -->
+        <div class="p-5 border-t border-white/10 space-y-2">
+            <a href="/" class="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-white/5 hover:bg-white/15 text-xs font-bold text-slate-200 transition-colors">
+                <span>🌐 بازگشت به صفحه اصلی سایت</span>
+            </a>
+            <form action="/accounts/logout/" method="post">
+                {% csrf_token %}
+                <button type="submit" class="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 text-xs font-bold transition-colors">
+                    <span>خروج امن از حساب کاربری</span>
+                </button>
+            </form>
+        </div>
+    </aside>
+
+    <!-- بخش اصلی محتوای داشبورد -->
+    <main class="flex-1 min-w-0 p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full space-y-6">
+
+        <!-- نمایش پیام‌های سیستم (Success / Error Alerts) -->
+        {% if messages %}
+            <div class="space-y-2">
+                {% for message in messages %}
+                    <div class="p-4 rounded-2xl border text-xs sm:text-sm font-bold flex items-center justify-between {% if message.tags == 'error' %}bg-rose-50 border-rose-200 text-rose-800{% else %}bg-emerald-50 border-emerald-200 text-emerald-800{% endif %}">
+                        <span>{{ message }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <!-- هدر خوش‌آمدگویی شخصی‌سازی‌شده -->
+        <section class="bg-gradient-to-l from-toranj-navy via-toranj-navy to-toranj-navyLight text-white rounded-3xl p-6 sm:p-8 shadow-card relative overflow-hidden">
+            <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div class="space-y-2">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/15 text-xs font-bold text-toranj-orange">
+                        <span>ترم تحصیلی: {{ current_term }}</span>
+                        <span>•</span>
+                        <span class="ltr-text">ID: {{ academy_student_id }}</span>
+                    </div>
+                    <h2 class="text-2xl sm:text-3xl font-black">
+                        خوش آمدی، {{ student_full_name }} عزیز 👋
+                    </h2>
+                    <p class="text-xs sm:text-sm text-slate-200 max-w-2xl leading-relaxed">
+                        وضعیت فعلی ثبت‌نام شما: <strong class="text-toranj-orange">{{ enrollment_status_label }}</strong>. تمامی اطلاعات این پنل مستقیماً از پرونده تحصیلی رسمی شما در آموزشگاه زبان تُرَنج بارگذاری شده است.
+                    </p>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-3 shrink-0">
+                    <button type="button" onclick="switchStudentTab('online-class')" class="px-5 py-3 rounded-2xl bg-toranj-orange hover:bg-toranj-orangeHover text-white font-extrabold text-xs sm:text-sm shadow-orange-btn transition-all">
+                        💻 ورود به کلاس آنلاین
+                    </button>
+                    <button type="button" onclick="switchStudentTab('courses')" class="px-5 py-3 rounded-2xl bg-white/10 hover:bg-white/20 text-white border border-white/20 font-bold text-xs sm:text-sm transition-all">
+                        📚 مشاهده دوره‌های من
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================== -->
+        <!-- تب ۱: پیشخوان آموزشی (STUDENT DASHBOARD HOMEPAGE)          -->
+        <!-- ========================================================== -->
+        <div id="panel-overview" class="tab-panel space-y-6">
+
+            <!-- کارت‌های آماری واقعی زبان‌آموز -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-white rounded-2xl p-5 shadow-card border border-slate-200/70 flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-bold text-toranj-textMuted">دوره‌های فعال ترم</p>
+                        <p class="text-2xl font-black text-toranj-navy mt-1 ltr-text">{{ active_courses|length }}</p>
+                        <p class="text-[11px] text-emerald-600 font-semibold mt-1">کلاس‌های مجاز شما</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-2xl bg-toranj-navy/10 text-toranj-navy flex items-center justify-center text-xl">📚</div>
+                </div>
+
+                <div class="bg-white rounded-2xl p-5 shadow-card border border-slate-200/70 flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-bold text-toranj-textMuted">درصد حضور در کلاس</p>
+                        <p class="text-2xl font-black text-toranj-navy mt-1 ltr-text">
+                            {% if attendance_summary.percentage is not None %}{{ attendance_summary.percentage }}%{% else %}—{% endif %}
+                        </p>
+                        <p class="text-[11px] text-toranj-textMuted mt-1">از مجموع {{ attendance_summary.total }} جلسه ثبت‌شده</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center text-xl">📅</div>
+                </div>
+
+                <div class="bg-white rounded-2xl p-5 shadow-card border border-slate-200/70 flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-bold text-toranj-textMuted">میانگین نمرات (GPA)</p>
+                        <p class="text-2xl font-black text-toranj-navy mt-1 ltr-text">
+                            {% if gpa is not None %}{{ gpa }} <span class="text-xs font-normal">/ 100</span>{% else %}—{% endif %}
+                        </p>
+                        <p class="text-[11px] text-toranj-textMuted mt-1">بر اساس {{ grades|length }} ارزیابی ثبت‌شده</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-2xl bg-toranj-orange/15 text-toranj-orange flex items-center justify-center text-xl">🎓</div>
+                </div>
+
+                <div class="bg-white rounded-2xl p-5 shadow-card border border-slate-200/70 flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-bold text-toranj-textMuted">تکالیف در انتظار ارسال</p>
+                        <p class="text-2xl font-black text-toranj-navy mt-1 ltr-text">{{ pending_assignments_count }}</p>
+                        <p class="text-[11px] text-toranj-textMuted mt-1">پیشرفت کل: {% if overall_progress is not None %}{{ overall_progress }}%{% else %}در حال ثبت{% endif %}</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-2xl bg-blue-500/10 text-blue-600 flex items-center justify-center text-xl">📝</div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- ستون راست پیشخوان: دوره‌های فعال و جلسات پیش‌رو -->
+                <div class="lg:col-span-7 space-y-6">
+                    <div class="bg-white rounded-3xl p-6 shadow-card border border-slate-200/70 space-y-4">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-base sm:text-lg font-extrabold text-toranj-navy">دوره‌های فعال من</h3>
+                            <button type="button" onclick="switchStudentTab('courses')" class="text-xs font-bold text-toranj-orange hover:underline">مشاهده همه دوره‌ها ←</button>
+                        </div>
+
+                        {% if active_courses %}
+                            <div class="space-y-3">
+                                {% for c in active_courses %}
+                                <div class="p-4 rounded-2xl bg-toranj-bg border border-slate-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                    <div class="space-y-1">
+                                        <div class="flex items-center gap-2">
+                                            <span class="px-2.5 py-0.5 rounded-md bg-toranj-navy text-white text-[11px] font-bold">{{ c.language }}</span>
+                                            <span class="px-2.5 py-0.5 rounded-md bg-toranj-orangeSoft text-toranj-orange text-[11px] font-extrabold ltr-text">{{ c.level }}</span>
+                                        </div>
+                                        <h4 class="text-sm sm:text-base font-extrabold text-toranj-navy pt-1">{{ c.course_title }}</h4>
+                                        <p class="text-xs text-toranj-textMuted">استاد: {{ c.teacher_name }} • زمان: {{ c.schedule_text }}</p>
+                                    </div>
+                                    <a href="{% url 'dashboards:student_course_detail' c.course_id %}" class="px-4 py-2.5 rounded-xl bg-toranj-navy hover:bg-toranj-orange text-white text-xs font-bold text-center transition-colors shrink-0">
+                                        ورود به صفحه دوره ←
+                                    </a>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="p-6 rounded-2xl bg-toranj-bg text-center space-y-2">
+                                <p class="text-sm font-bold text-toranj-navy">در حال حاضر دوره فعالی برای حساب شما ثبت نشده است.</p>
+                                <p class="text-xs text-toranj-textMuted">در صورت ثبت‌نام، پس از تایید واحد آموزش دوره در این بخش فعال خواهد شد.</p>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- کلاس‌های پیش‌رو و برنامه کلاسی -->
+                    <div class="bg-white rounded-3xl p-6 shadow-card border border-slate-200/70 space-y-4">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-base sm:text-lg font-extrabold text-toranj-navy">کلاس‌های برنامه‌ریزی‌شده</h3>
+                            <button type="button" onclick="switchStudentTab('schedule')" class="text-xs font-bold text-toranj-orange hover:underline">برنامه هفتگی کامل ←</button>
+                        </div>
+
+                        {% if sessions %}
+                            <div class="space-y-2.5">
+                                {% for s in sessions|slice:":4" %}
+                                <div class="p-3.5 rounded-2xl bg-toranj-bg border border-slate-200/60 flex items-center justify-between text-xs sm:text-sm">
+                                    <div>
+                                        <p class="font-bold text-toranj-navy">{{ s.title }} ({{ s.course_title }})</p>
+                                        <p class="text-xs text-toranj-textMuted mt-0.5">استاد: {{ s.teacher_name }} • {{ s.room }}</p>
+                                    </div>
+                                    <span class="px-3 py-1 rounded-lg bg-white border border-slate-200 text-toranj-navy font-bold text-xs">{{ s.date_time }}</span>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <p class="text-xs sm:text-sm text-toranj-textMuted bg-toranj-bg p-4 rounded-2xl">
+                                هنوز جلسه کلاسی جدیدی در تقویم دوره‌های شما ثبت نشده است.
+                            </p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- ستون چپ پیشخوان: آخرین نمرات و اعلان‌ها -->
+                <div class="lg:col-span-5 space-y-6">
+                    <div class="bg-white rounded-3xl p-6 shadow-card border border-slate-200/70 space-y-4">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-base sm:text-lg font-extrabold text-toranj-navy">آخرین نمرات ثبت‌شده</h3>
+                            <button type="button" onclick="switchStudentTab('report-card')" class="text-xs font-bold text-toranj-orange hover:underline">مشاهده کارنامه ←</button>
+                        </div>
+                        {% if grades %}
+                            <div class="space-y-2.5">
+                                {% for g in grades|slice:":4" %}
+                                <div class="p-3.5 rounded-2xl bg-toranj-bg flex items-center justify-between">
+                                    <div>
+                                        <p class="text-xs sm:text-sm font-bold text-toranj-navy">{{ g.title }}</p>
+                                        <p class="text-[11px] text-toranj-textMuted">{{ g.course_title }}</p>
+                                    </div>
+                                    <span class="px-3 py-1 rounded-xl bg-toranj-navy text-toranj-orange font-black text-xs ltr-text">
+                                        {% if g.score is not None %}{{ g.score }} / {{ g.max_score }}{% else %}ثبت‌نشده{% endif %}
+                                    </span>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <p class="text-xs sm:text-sm text-toranj-textMuted bg-toranj-bg p-4 rounded-2xl">
+                                تا این لحظه نمره‌ای در کارنامه شما ثبت نشده است.
+                            </p>
+                        {% endif %}
+                    </div>
+
+                    <div class="bg-white rounded-3xl p-6 shadow-card border border-slate-200/70 space-y-4">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-base sm:text-lg font-extrabold text-toranj-navy">آخرین اعلان‌ها</h3>
+                            <button type="button" onclick="switchStudentTab('notifications')" class="text-xs font-bold text-toranj-orange hover:underline">همه اعلان‌ها ←</button>
+                        </div>
+                        {% if notifications %}
+                            <div class="space-y-2.5">
+                                {% for n in notifications|slice:":3" %}
+                                <div class="p-3.5 rounded-2xl bg-toranj-bg border-r-4 border-toranj-orange space-y-1">
+                                    <p class="text-xs font-extrabold text-toranj-navy">{{ n.title }}</p>
+                                    <p class="text-xs text-toranj-textMuted">{{ n.message }}</p>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <p class="text-xs sm:text-sm text-toranj-textMuted bg-toranj-bg p-4 rounded-2xl">
+                                اعلان جدیدی برای نمایش وجود ندارد.
+                            </p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================================== -->
+        <!-- تب ۲: دوره‌های من (MY COURSES)                             -->
+        <!-- ========================================================== -->
+        <div id="panel-courses" class="tab-panel space-y-6">
+            <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-card border border-slate-200/70 space-y-6">
+                <div class="border-b border-slate-100 pb-4">
+                    <h2 class="text-xl font-black text-toranj-navy">مدیریت دوره‌های آموزشی من</h2>
+                    <p class="text-xs sm:text-sm text-toranj-textMuted mt-1">فهرست دوره‌های فعال و گذرانده‌شده در ترم‌های تحصیلی آموزشگاه زبان تُرَنج</p>
+                </div>
+
+                {% if enrollments %}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {% for item in enrollments %}
+                        <article class="rounded-3xl bg-toranj-bg border border-slate-200/80 p-6 flex flex-col justify-between space-y-5 hover:border-toranj-orange transition-all">
+                            <div class="space-y-3">
+                                <div class="flex items-center justify-between">
+                                    <span class="px-3 py-1 rounded-lg bg-toranj-navy text-white text-xs font-bold">{{ item.language }} • سطح {{ item.level }}</span>
+                                    <span class="px-3 py-1 rounded-lg text-xs font-extrabold {% if item.is_completed %}bg-blue-100 text-blue-800{% else %}bg-emerald-100 text-emerald-800{% endif %}">
+                                        {{ item.status_label }}
+                                    </span>
+                                </div>
+                                <h3 class="text-lg font-black text-toranj-navy">{{ item.course_title }}</h3>
+                                <div class="text-xs text-toranj-textMuted space-y-1.5 pt-1">
+                                    <p>👨‍🏫 <strong>استاد دوره:</strong> {{ item.teacher_name }}</p>
+                                    <p>🗓️ <strong>ترم تحصیلی:</strong> {{ item.term }}</p>
+                                    <p>⏰ <strong>برنامه کلاسی:</strong> {{ item.schedule_text }}</p>
+                                </div>
+
+                                {% if item.progress is not None %}
+                                <div class="pt-2 space-y-1">
+                                    <div class="flex justify-between text-xs font-bold">
+                                        <span>میزان پیشرفت دوره</span>
+                                        <span class="ltr-text">{{ item.progress }}%</span>
+                                    </div>
+                                    <div class="w-full h-2.5 bg-slate-200 rounded-full overflow-hidden">
+                                        <div class="h-full bg-toranj-orange rounded-full" style="width: {{ item.progress }}%"></div>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="pt-4 border-t border-slate-200/70 flex items-center justify-between">
+                                <span class="text-[11px] text-toranj-textMuted">دسترسی اختصاصی زبان‌آموز</span>
+                                <a href="{% url 'dashboards:student_course_detail' item.course_id %}" class="px-5 py-2.5 rounded-xl bg-toranj-navy hover:bg-toranj-orange text-white text-xs font-extrabold transition-colors">
+                                    مشاهده جزئیات کامل دوره ←
+                                </a>
+                            </div>
+                        </article>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-12 space-y-3">
+                        <div class="text-4xl">📚</div>
+                        <h3 class="text-base font-extrabold text-toranj-navy">هنوز دوره‌ای برای حساب کاربری شما ثبت نشده است</h3>
+                        <p class="text-xs sm:text-sm text-toranj-textMuted max-w-md mx-auto">
+                            پس از ثبت‌نام و تایید واحد آموزش، تمامی دوره‌های فعال و قبلی شما به همراه منابع، جلسات و کارنامه در این بخش قابل مشاهده خواهند بود.
+                        </p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- ========================================================== -->
+        <!-- تب ۳: کارنامه تحصیلی دیجیتال (ACADEMIC REPORT CARD)        -->
+        <!-- ========================================================== -->
+        <div id="panel-report-card" class="tab-panel space-y-6">
+            <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-card border border-slate-200/70 space-y-6">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+                    <div>
+                        <h2 class="text-xl font-black text-toranj-navy">کارنامه دیجیتال و سوابق تحصیلی</h2>
+                        <p class="text-xs sm:text-sm text-toranj-textMuted mt-1">تمامی نمرات مستقیماً از رکوردهای رسمی ثبت‌شده توسط اساتید خوانده می‌شوند (غیرقابل ویرایش توسط زبان‌آموز).</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="px-4 py-2.5 rounded-2xl bg-toranj-navy text-white text-center">
+                            <span class="text-[10px] text-slate-300 block">معدل کل (GPA)</span>
+                            <span class="text-lg font-black text-toranj-orange ltr-text">{% if gpa is not None %}{{ gpa }}{% else %}—{% endif %}</span>
+                        </div>
+                        <div class="px-4 py-2.5 rounded-2xl bg-toranj-bg border border-slate-200 text-center">
+                            <span class="text-[10px] text-toranj-textMuted block">درصد حضور</span>
+                            <span class="text-lg font-black text-toranj-navy ltr-text">{% if attendance_summary.percentage is not None %}{{ attendance_summary.percentage }}%{% else %}—{% endif %}</span>
+                        </div>
+                    </div>
+                </div>
+
+                {% if grades %}
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-right border-collapse">
+                            <thead>
+                                <tr class="border-b border-slate-200 text-xs font-extrabold text-toranj-textMuted bg-toranj-bg">
+                                    <th class="py-3.5 px-4 rounded-r-xl">عنوان ارزیابی / آزمون</th>
+                                    <th class="py-3.5 px-4">دوره آموزشی</th>
+                                    <th class="py-3.5 px-4">ترم</th>
+                                    <th class="py-3.5 px-4">نمره کسب‌شده</th>
+                                    <th class="py-3.5 px-4 rounded-l-xl">بازخورد استاد (Teacher Feedback)</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100 text-xs sm:text-sm">
+                                {% for g in grades %}
+                                <tr class="hover:bg-slate-50/80 transition-colors">
+                                    <td class="py-4 px-4 font-extrabold text-toranj-navy">{{ g.title }}</td>
+                                    <td class="py-4 px-4 font-semibold">{{ g.course_title }}</td>
+                                    <td class="py-4 px-4 text-toranj-textMuted">{{ g.term }}</td>
+                                    <td class="py-4 px-4">
+                                        {% if g.score is not None %}
+                                            <span class="px-3 py-1 rounded-lg bg-toranj-navy text-toranj-orange font-black ltr-text">{{ g.score }} / {{ g.max_score }}</span>
+                                        {% else %}
+                                            <span class="text-toranj-textMuted">در انتظار ثبت</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="py-4 px-4 text-toranj-textMuted">{{ g.feedback|default:"بازخوردی ثبت نشده است" }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="p-8 rounded-2xl bg-toranj-bg text-center space-y-2">
+                        <p class="text-base font-extrabold text-toranj-navy">هنوز نمره یا کارنامه‌ای در دیتابیس برای شما ثبت نشده است.</p>
+                        <p class="text-xs text-toranj-textMuted">پس از برگزاری آزمون‌ها و ثبت نمرات توسط استاد، جزئیات کارنامه و بازخوردها در این جدول نمایش داده می‌شود.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- ========================================================== -->
+        <!-- تب ۴: تحلیل ۶ مهارت زبانی (SIX LANGUAGE SKILLS ANALYTICS)  -->
+        <!-- ========================================================== -->
+        <div id="panel-skills" class="tab-panel space-y-6">
+            <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-card border border-slate-200/70 space-y-6">
+                <div class="border-b border-slate-100 pb-4">
+                    <span class="text-xs font-extrabold text-toranj-orange uppercase tracking-wider ltr-text">SIX LANGUAGE SKILLS ANALYTICS</span>
+                    <h2 class="text-xl font-black text-toranj-navy mt-1">تحلیل تخصصی ۶ مهارت زبانی</h2>
+                    <p class="text-xs sm:text-sm text-toranj-textMuted mt-1">
+                        ارزیابی مستمر مهارت‌های Speaking، Listening، Grammar، Vocabulary، Writing و Reading بر اساس رکوردهای واقعی آزمون‌های شما.
+                    </p>
+                </div>
+
+                {% if has_any_skill_data %}
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                        {% for sk in skills_analytics %}
+                        <div class="p-5 rounded-2xl bg-toranj-bg border border-slate-200/80 space-y-3 flex flex-col justify-between">
+                            <div class="space-y-2">
+                                <div class="flex items-center justify-between">
+                                    <h3 class="text-sm font-extrabold text-toranj-navy">{{ sk.label_fa }}</h3>
+                                    {% if sk.average is not None %}
+                                        <span class="px-2.5 py-1 rounded-lg bg-toranj-navy text-toranj-orange font-black text-xs ltr-text">{{ sk.average }}%</span>
+                                    {% else %}
+                                        <span class="text-xs text-toranj-textMuted">بدون داده</span>
+                                    {% endif %}
+                                </div>
+
+                                {% if sk.average is not None %}
+                                    <div class="w-full h-2.5 bg-slate-200 rounded-full overflow-hidden">
+                                        <div class="h-full bg-toranj-orange rounded-full" style="width: {{ sk.average }}%"></div>
+                                    </div>
+                                    <div class="flex items-center justify-between text-[11px] text-toranj-textMuted pt-1">
+                                        <span>تعداد ارزیابی: {{ sk.assessments_count }}</span>
+                                        {% if sk.delta is not None %}
+                                            <span class="ltr-text font-bold {% if sk.delta >= 0 %}text-emerald-600{% else %}text-rose-600{% endif %}">
+                                                {% if sk.delta >= 0 %}+{% endif %}{{ sk.delta }}% تغییر
+                                            </span>
+                                        {% endif %}
+                                    </div>
+                                {% else %}
+                                    <p class="text-xs text-toranj-textMuted py-2">ارزیابی ثبت‌شده‌ای برای این مهارت وجود ندارد.</p>
+                                {% endif %}
+                            </div>
+
+                            {% if sk.latest_feedback %}
+                                <p class="text-xs text-toranj-textMain bg-white p-3 rounded-xl border border-slate-200/60">
+                                    💬 <strong>نظر استاد:</strong> {{ sk.latest_feedback }}
+                                </p>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
+                        <div class="p-5 rounded-2xl bg-emerald-50 border border-emerald-200 space-y-2">
+                            <h4 class="text-sm font-extrabold text-emerald-900">نقاط قوت ثبت‌شده (بر اساس نمرات بالای ۷۵٪)</h4>
+                            {% if skill_strengths %}
+                                <p class="text-xs text-emerald-800 font-semibold">{{ skill_strengths|join:" ، " }}</p>
+                            {% else %}
+                                <p class="text-xs text-emerald-700">برای تعیین نقاط قوت قطعی، نیاز به ثبت ارزیابی‌های بیشتر توسط استاد است.</p>
+                            {% endif %}
+                        </div>
+                        <div class="p-5 rounded-2xl bg-amber-50 border border-amber-200 space-y-2">
+                            <h4 class="text-sm font-extrabold text-amber-900">مهارت‌های نیازمند تمرین بیشتر (بر اساس رکوردهای آزمون)</h4>
+                            {% if skill_improvements %}
+                                <p class="text-xs text-amber-800 font-semibold">{{ skill_improvements|join:" ، " }}</p>
+                            {% else %}
+                                <p class="text-xs text-amber-700">هیچ نقطه ضعفی در رکوردهای فعلی شما گزارش نشده است.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% else %}
+                    <!-- پیام شفاف در صورت نبود داده واقعی آزمون برای ۶ مهارت -->
+                    <div class="p-8 sm:p-10 rounded-3xl bg-toranj-bg border border-slate-200/80 text-center space-y-4">
+                        <div class="w-14 h-14 rounded-2xl bg-toranj-navy text-toranj-orange flex items-center justify-center mx-auto text-2xl">📊</div>
+                        <h3 class="text-base sm:text-lg font-extrabold text-toranj-navy">
+                            برای محاسبه نمودار ۶ مهارت زبانی، نیاز به ثبت ارزیابی‌های بیشتر توسط استاد است
+                        </h3>
+                        <p class="text-xs sm:text-sm text-toranj-textMuted max-w-2xl mx-auto leading-relaxed">
+                            سامانه آموزشی تُرَنج از تولید نمرات فرضی خودداری می‌کند. به محض اینکه استاد دوره، نمرات مهارت‌های شش‌گانه شما (Speaking, Listening, Grammar, Vocabulary, Writing, Reading) را در سیستم ثبت نماید، نمودار پیشرفت و تحلیل نقاط قوت شما به صورت خودکار در این صفحه فعال خواهد شد.
+                        </p>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 pt-3">
+                            {% for sk in skills_analytics %}
+                            <div class="p-3 rounded-xl bg-white border border-slate-200/80 text-center">
+                                <span class="text-xs font-extrabold text-toranj-navy block ltr-text">{{ sk.label_en }}</span>
+                                <span class="text-[11px] text-toranj-textMuted mt-1 block">در انتظار ارزیابی</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- ========================================================== -->
+        <!-- تب ۵: حضور و غیاب (ATTENDANCE SYSTEM)                      -->
+        <!-- ========================================================== -->
+        <div id="panel-attendance" class="tab-panel space-y-6">
+            <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-card border border-slate-200/70 space-y-6">
+                <div class="border-b border-slate-100 pb-4">
+                    <h2 class="text-xl font-black text-toranj-navy">کارکرد حضور و غیاب کلاسی</h2>
+                    <p class="text-xs sm:text-sm text-toranj-textMuted mt-1">گزارش رسمی جلسات ثبت‌شده در سامانه حضور و غیاب آموزشگاه</p>
+                </div>
+
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 text-center">
+                    <div class="p-4 rounded-2xl bg-toranj-bg border border-slate-200/70">
+                        <span class="text-xs text-toranj-textMuted block">کل جلسات</span>
+                        <span class="text-xl font-black text-toranj-navy ltr-text mt-1 block">{{ attendance_summary.total }}</span>
+                    </div>
+                    <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200">
+                        <span class="text-xs text-emerald-800 block">حاضر</span>
+                        <span class="text-xl font-black text-emerald-700 ltr-text mt-1 block">{{ attendance_summary.present }}</span>
+                    </div>
+                    <div class="p-4 rounded-2xl bg-rose-50 border border-rose-200">
+                        <span class="text-xs text-rose-800 block">غایب</span>
+                        <span class="text-xl font-black text-rose-700 ltr-text mt-1 block">{{ attendance_summary.absent }}</span>
+                    </div>
+                    <div class="p-4 rounded-2xl bg-amber-50 border border-amber-200">
+                        <span class="text-xs text-amber-800 block">تأخیر</span>
+                        <span class="text-xl font-black text-amber-700 ltr-text mt-1 block">{{ attendance_summary.late }}</span>
+                    </div>
+                    <div class="p-4 rounded-2xl bg-blue-50 border border-blue-200">
+                        <span class="text-xs text-blue-800 block">غیبت موجه</span>
+                        <span class="text-xl font-black text-blue-700 ltr-text mt-1 block">{{ attendance_summary.excused }}</span>
+                    </div>
+                    <div class="p-4 rounded-2xl bg-toranj-navy text-white">
+                        <span class="text-xs text-slate-300 block">درصد حضور</span>
+                        <span class="text-xl font-black text-toranj-orange ltr-text mt-1 block">
+                            {% if attendance_summary.percentage is not None %}{{ attendance_summary.percentage }}%{% else %}—{% endif %}
+                        </span>
+                    </div>
+                </div>
+
+                {% if attendance_records %}
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-right border-collapse">
+                            <thead>
+                                <tr class="border-b border-slate-200 text-xs font-extrabold text-toranj-textMuted bg-toranj-bg">
+                                    <th class="py-3.5 px-4 rounded-r-xl">جلسه / دوره</th>
+                                    <th class="py-3.5 px-4">تاریخ ثبت</th>
+                                    <th class="py-3.5 px-4">وضعیت حضور</th>
+                                    <th class="py-3.5 px-4 rounded-l-xl">توضیحات استاد</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100 text-xs sm:text-sm">
+                                {% for rec in attendance_records %}
+                                <tr>
+                                    <td class="py-3.5 px-4 font-bold text-toranj-navy">{{ rec.course_title }} ({{ rec.session_title }})</td>
+                                    <td class="py-3.5 px-4 text-toranj-textMuted ltr-text">{{ rec.date|default:"—" }}</td>
+                                    <td class="py-3.5 px-4">
+                                        <span class="px-3 py-1 rounded-lg text-xs font-extrabold
+                                            {% if rec.status == 'present' %}bg-emerald-100 text-emerald-800
+                                            {% elif rec.status == 'late' %}bg-amber-100 text-amber-800
+                                            {% elif rec.status == 'excused' %}bg-blue-100 text-blue-800
+                                            {% else %}bg-rose-100 text-rose-800{% endif %}">
+                                            {{ rec.status_label }}
+                                        </span>
+                                    </td>
+                                    <td class="py-3.5 px-4 text-toranj-textMuted">{{ rec.note|default:"—" }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-xs sm:text-sm text-toranj-textMuted bg-toranj-bg p-6 rounded-2xl text-center">
+                        هنوز رکورد حضور و غیابی برای جلسات شما در دیتابیس ثبت نشده است.
+                    </p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- ========================================================== -->
+        <!-- تب ۶: تکالیف و آزمون‌ها (ASSIGNMENTS AND EXAMS)             -->
+        <!-- ========================================================== -->
+        <div id="panel-assignments" class="tab-panel space-y-6">
+            <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-card border border-slate-200/70 space-y-6">
+                <h2 class="text-xl font-black text-toranj-navy border-b border-slate-100 pb-4">تکالیف کلاسی (Assignments)</h2>
+
+                {% if assignments %}
+                    <div class="space-y-4">
+                        {% for a in assignments %}
+                        <div class="p-5 rounded-2xl bg-toranj-bg border border-slate-200/80 space-y-4">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                                <div>
+                                    <h3 class="text-base font-extrabold text-toranj-navy">{{ a.title }}</h3>
+                                    <p class="text-xs text-toranj-textMuted">دوره: {{ a.course_title }} • استاد: {{ a.teacher_name }} • مهلت: {{ a.deadline|default:"تعیین‌نشده" }}</p>
+                                </div>
+                                <span class="px-3 py-1 rounded-lg text-xs font-extrabold {% if a.is_submitted %}bg-emerald-100 text-emerald-800{% elif a.is_past_deadline %}bg-rose-100 text-rose-800{% else %}bg-amber-100 text-amber-800{% endif %}">
+                                    {{ a.submission_status }}
+                                </span>
+                            </div>
+
+                            {% if a.description %}
+                                <p class="text-xs sm:text-sm text-toranj-textMain leading-relaxed">{{ a.description }}</p>
+                            {% endif %}
+
+                            {% if a.grade is not None or a.feedback %}
+                                <div class="p-3.5 rounded-xl bg-white border border-slate-200 text-xs space-y-1">
+                                    {% if a.grade is not None %}<p><strong>نمره تکلیف:</strong> <span class="ltr-text font-extrabold text-toranj-navy">{{ a.grade }}</span></p>{% endif %}
+                                    {% if a.feedback %}<p><strong>بازخورد استاد:</strong> {{ a.feedback }}</p>{% endif %}
+                                </div>
+                            {% endif %}
+
+                            {% if not a.is_past_deadline %}
+                                <form method="post" enctype="multipart/form-data" class="pt-3 border-t border-slate-200/70 space-y-3">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="form_action" value="submit_assignment">
+                                    <input type="hidden" name="assignment_id" value="{{ a.id }}">
+                                    <div>
+                                        <label class="block text-xs font-bold text-toranj-navy mb-1">پاسخ متنی شما:</label>
+                                        <textarea name="answer_text" rows="2" class="w-full rounded-xl border border-slate-300 p-3 text-xs focus:border-toranj-orange focus:outline-none" placeholder="پاسخ تکلیف را اینجا بنویسید...">{{ a.submitted_answer }}</textarea>
+                                    </div>
+                                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                        <input type="file" name="submission_file" accept=".pdf,.doc,.docx,.zip,.jpg,.png,.mp3" class="text-xs text-toranj-textMuted">
+                                        <button type="submit" class="px-5 py-2.5 rounded-xl bg-toranj-navy hover:bg-toranj-orange text-white text-xs font-bold transition-colors">
+                                            ارسال و ثبت تکلیف
+                                        </button>
+                                    </div>
+                                </form>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-xs sm:text-sm text-toranj-textMuted bg-toranj-bg p-6 rounded-2xl text-center">
+                        در حال حاضر تکلیفی برای دوره‌های شما ثبت نشده است.
+                    </p>
+                {% endif %}
+            </div>
+
+            <!-- بخش آزمون‌ها -->
+            <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-card border border-slate-200/70 space-y-6">
+                <h2 class="text-xl font-black text-toranj-navy border-b border-slate-100 pb-4">آزمون‌های دوره (Exams)</h2>
+                {% if exams %}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {% for ex in exams %}
+                        <div class="p-5 rounded-2xl bg-toranj-bg border border-slate-200/80 space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm font-extrabold text-toranj-navy">{{ ex.title }}</span>
+                                <span class="px-2.5 py-1 rounded-lg bg-toranj-navy text-white text-xs font-bold">{{ ex.status_label }}</span>
+                            </div>
+                            <p class="text-xs text-toranj-textMuted">دوره: {{ ex.course_title }} • زمان: {{ ex.date|default:"متعاقباً اعلام می‌شود" }}</p>
+                            {% if ex.score is not None %}
+                                <p class="text-xs font-extrabold text-emerald-700 pt-1">نتیجه آزمون: <span class="ltr-text">{{ ex.score }}</span></p>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-xs sm:text-sm text-toranj-textMuted bg-toranj-bg p-6 rounded-2xl text-center">
+                        آزمون زمان‌بندی‌شده‌ای در حال حاضر برای شما ثبت نشده است.
+                    </p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- ========================================================== -->
+        <!-- تب ۷: برنامه هفتگی کلاس‌ها (CLASS SCHEDULE)                -->
+        <!-- ========================================================== -->
+        <div id="panel-schedule" class="tab-panel space-y-6">
+            <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-card border border-slate-200/70 space-y-6">
+                <div class="border-b border-slate-100 pb-4">
+                    <h2 class="text-xl font-black text-toranj-navy">برنامه هفتگی و تقویم کلاس‌ها</h2>
+                    <p class="text-xs sm:text-sm text-toranj-textMuted mt-1">زمان‌بندی جلسات حضوری و آنلاین دوره‌های ثبت‌نام‌شده شما</p>
+                </div>
+
+                {% if sessions %}
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-right border-collapse">
+                            <thead>
+                                <tr class="border-b border-slate-200 text-xs font-extrabold text-toranj-textMuted bg-toranj-bg">
+                                    <th class="py-3.5 px-4 rounded-r-xl">عنوان کلاس و دوره</th>
+                                    <th class="py-3.5 px-4">زبان</th>
+                                    <th class="py-3.5 px-4">استاد</th>
+                                    <th class="py-3.5 px-4">روز و ساعت</th>
+                                    <th class="py-3.5 px-4">محل برگزاری / لینک</th>
+                                    <th class="py-3.5 px-4 rounded-l-xl">وضعیت</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100 text-xs sm:text-sm">
+                                {% for s in sessions %}
+                                <tr>
+                                    <td class="py-4 px-4 font-extrabold text-toranj-navy">{{ s.course_title }} — {{ s.title }}</td>
+                                    <td class="py-4 px-4">{{ s.language }}</td>
+                                    <td class="py-4 px-4">{{ s.teacher_name }}</td>
+                                    <td class="py-4 px-4 font-bold ltr-text">{{ s.date_time }}</td>
+                                    <td class="py-4 px-4">{{ s.room }}</td>
+                                    <td class="py-4 px-4">
+                                        <span class="px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-800 text-xs font-bold">{{ s.status }}</span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="p-6 rounded-2xl bg-toranj-bg text-center space-y-2">
+                        <p class="text-sm font-bold text-toranj-navy">برنامه جلسات در تقویم دوره‌های شما ثبت نشده است.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- ========================================================== -->
+        <!-- تب ۸: کلاس آنلاین (ONLINE CLASSROOM)                       -->
+        <!-- ========================================================== -->
+        <div id="panel-online-class" class="tab-panel space-y-6">
+            <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-card border border-slate-200/70 space-y-6">
+                <div class="border-b border-slate-100 pb-4">
+                    <h2 class="text-xl font-black text-toranj-navy">درگاه ورود به کلاس آنلاین (Online Classroom)</h2>
+                    <p class="text-xs sm:text-sm text-toranj-textMuted mt-1">دسترسی مستقیم و اختصاصی به جلسات آنلاین دوره‌هایی که در آن‌ها ثبت‌نام کرده‌اید.</p>
+                </div>
+
+                {% if online_sessions %}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        {% for os in online_sessions %}
+                        <div class="p-6 rounded-2xl bg-toranj-bg border border-slate-200/80 flex flex-col justify-between space-y-4">
+                            <div class="space-y-1.5">
+                                <span class="px-2.5 py-1 rounded-md bg-emerald-100 text-emerald-800 text-xs font-extrabold">کلاس آنلاین فعال</span>
+                                <h3 class="text-base font-black text-toranj-navy pt-1">{{ os.course_title }} ({{ os.title }})</h3>
+                                <p class="text-xs text-toranj-textMuted">استاد: {{ os.teacher_name }} • زمان: {{ os.date_time }}</p>
+                            </div>
+                            {% if os.meeting_url %}
+                                <a href="{{ os.meeting_url }}" target="_blank" rel="noopener noreferrer" class="w-full py-3 px-4 rounded-xl bg-toranj-orange hover:bg-toranj-orangeHover text-white font-extrabold text-xs text-center shadow-orange-btn transition-all">
+                                    ورود مستقیم به جلسه آنلاین ←
+                                </a>
+                            {% else %}
+                                <span class="w-full py-2.5 px-4 rounded-xl bg-slate-200 text-toranj-textMuted font-bold text-xs text-center">
+                                    لینک جلسه پیش از شروع کلاس توسط استاد فعال می‌شود
+                                </span>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="p-8 rounded-3xl bg-toranj-bg border border-slate-200/80 text-center space-y-3">
+                        <div class="text-3xl">💻</div>
+                        <h3 class="text-base font-extrabold text-toranj-navy">در حال حاضر جلسه آنلاینی برای دوره‌های شما فعال نیست</h3>
+                        <p class="text-xs sm:text-sm text-toranj-textMuted max-w-lg mx-auto">
+                            سامانه از ایجاد لینک‌های فرضی خودداری می‌کند. به محض اینکه استاد یا واحد آموزش لینک کلاس آنلاین دوره شما را ثبت نماید، دکمه ورود در این بخش فعال خواهد شد.
+                        </p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- ========================================================== -->
+        <!-- تب ۹: منابع آموزشی (EDUCATIONAL RESOURCES)                 -->
+        <!-- ========================================================== -->
+        <div id="panel-resources" class="tab-panel space-y-6">
+            <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-card border border-slate-200/70 space-y-6">
+                <div class="border-b border-slate-100 pb-4">
+                    <h2 class="text-xl font-black text-toranj-navy">کتابخانه و منابع آموزشی دوره‌های من</h2>
+                    <p class="text-xs sm:text-sm text-toranj-textMuted mt-1">فایل‌های PDF، صوتی، ویدیویی و جزوات اختصاصی دوره‌های مجاز شما (محافظت‌شده در سرور)</p>
+                </div>
+
+                {% if resources %}
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                        {% for res in resources %}
+                        <div class="p-5 rounded-2xl bg-toranj-bg border border-slate-200/80 flex flex-col justify-between space-y-4">
+                            <div class="space-y-2">
+                                <div class="flex items-center justify-between">
+                                    <span class="px-2.5 py-1 rounded-lg bg-toranj-navy text-white text-[11px] font-bold ltr-text">{{ res.type }}</span>
+                                    <span class="text-xs font-semibold text-toranj-textMuted">{{ res.course_title }}</span>
+                                </div>
+                                <h3 class="text-sm sm:text-base font-extrabold text-toranj-navy">{{ res.title }}</h3>
+                                {% if res.description %}
+                                    <p class="text-xs text-toranj-textMuted">{{ res.description }}</p>
+                                {% endif %}
+                            </div>
+
+                            <div class="pt-3 border-t border-slate-200/70 flex items-center gap-2">
+                                {% if res.has_file %}
+                                    <a href="{% url 'dashboards:resource_download' res.id %}" class="w-full py-2.5 px-4 rounded-xl bg-toranj-navy hover:bg-toranj-orange text-white text-xs font-bold text-center transition-colors">
+                                        📥 دانلود امن فایل
+                                    </a>
+                                {% elif res.external_url %}
+                                    <a href="{{ res.external_url }}" target="_blank" rel="noopener noreferrer" class="w-full py-2.5 px-4 rounded-xl bg-toranj-orange text-white text-xs font-bold text-center">
+                                        🔗 باز کردن لینک آموزشی
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="p-8 rounded-2xl bg-toranj-bg text-center space-y-2">
+                        <p class="text-sm font-extrabold text-toranj-navy">هنوز فایل یا منبع آموزشی برای دوره‌های شما بارگذاری نشده است.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- ========================================================== -->
+        <!-- تب ۱۰: وضعیت اشتراک و دسترسی (SUBSCRIPTION & ACCESS)        -->
+        <!-- ========================================================== -->
+        <div id="panel-subscription" class="tab-panel space-y-6">
+            <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-card border border-slate-200/70 space-y-6">
+                <div class="border-b border-slate-100 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                        <h2 class="text-xl font-black text-toranj-navy">وضعیت اشتراک، شهریه و مجوز دسترسی</h2>
+                        <p class="text-xs sm:text-sm text-toranj-textMuted mt-1">
+                            بررسی و فعال‌سازی دوره‌ها در آموزشگاه زبان تُرَنج به صورت دستی توسط واحد آموزش و مالی انجام می‌گیرد.
+                        </p>
+                    </div>
+                    <span class="px-4 py-2 rounded-xl bg-toranj-navy text-toranj-orange text-xs font-extrabold">
+                        {{ subscription_status }}
+                    </span>
+                </div>
+
+                <!-- فرم ثبت مشخصات فیش پرداخت جهت بررسی دستی مدیریت -->
+                <div class="p-6 rounded-2xl bg-toranj-bg border border-slate-200/80 space-y-4">
+                    <h3 class="text-sm sm:text-base font-extrabold text-toranj-navy">ثبت مشخصات پرداخت جهت بررسی و تایید واحد مالی</h3>
+                    <p class="text-xs text-toranj-textMuted">
+                        توجه: ثبت شماره پیگیری در این فرم به منزله فعال‌سازی خودکار دوره نیست. پس از بررسی فیش توسط کادر آموزشگاه، دسترسی دوره شما فعال خواهد شد.
+                    </p>
+                    <form method="post" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        {% csrf_token %}
+                        <input type="hidden" name="form_action" value="submit_payment_claim">
+                        <div>
+                            <label class="block text-xs font-bold text-toranj-navy mb-1">شماره پیگیری / ارجاع بانکی:</label>
+                            <input type="text" name="reference_code" required class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-xs ltr-text focus:border-toranj-orange focus:outline-none" placeholder="مثال: 1403987654">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-toranj-navy mb-1">نام دوره یا توضیحات واریز:</label>
+                            <input type="text" name="course_note" class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-xs focus:border-toranj-orange focus:outline-none" placeholder="مثال: شهریه ترم پاییز زبان انگلیسی">
+                        </div>
+                        <div class="flex items-end">
+                            <button type="submit" class="w-full py-2.5 px-5 rounded-xl bg-toranj-navy hover:bg-toranj-orange text-white text-xs font-extrabold transition-colors">
+                                ثبت درخواست بررسی پرداخت
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                {% if payment_records %}
+                    <div class="space-y-3">
+                        <h4 class="text-sm font-extrabold text-toranj-navy">سوابق اشتراک و درخواست‌های ثبت‌شده</h4>
+                        {% for pr in payment_records %}
+                        <div class="p-4 rounded-2xl bg-toranj-bg border border-slate-200/70 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+                            <div>
+                                <p class="font-bold text-toranj-navy">{{ pr.title }}</p>
+                                {% if pr.reference %}<p class="text-toranj-textMuted ltr-text">Ref: {{ pr.reference }}</p>{% endif %}
+                            </div>
+                            <span class="px-3 py-1 rounded-lg bg-white border border-slate-200 font-bold text-toranj-navy">{{ pr.status_label }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- ========================================================== -->
+        <!-- تب ۱۱: مرکز اعلان‌ها (NOTIFICATIONS)                        -->
+        <!-- ========================================================== -->
+        <div id="panel-notifications" class="tab-panel space-y-6">
+            <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-card border border-slate-200/70 space-y-6">
+                <h2 class="text-xl font-black text-toranj-navy border-b border-slate-100 pb-4">مرکز اعلان‌ها و پیام‌های آموزشی</h2>
+                {% if notifications %}
+                    <div class="space-y-3">
+                        {% for n in notifications %}
+                        <div class="p-4 rounded-2xl bg-toranj-bg border-r-4 border-toranj-orange flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                            <div class="space-y-1">
+                                <span class="px-2 py-0.5 rounded-md bg-toranj-navy/10 text-toranj-navy text-[10px] font-extrabold">{{ n.category }}</span>
+                                <h3 class="text-sm font-extrabold text-toranj-navy">{{ n.title }}</h3>
+                                <p class="text-xs text-toranj-textMuted">{{ n.message }}</p>
+                            </div>
+                            {% if n.date %}
+                                <span class="text-[11px] text-toranj-textMuted ltr-text shrink-0">{{ n.date }}</span>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-xs sm:text-sm text-toranj-textMuted bg-toranj-bg p-6 rounded-2xl text-center">
+                        هیچ اعلان جدیدی در پرونده شما وجود ندارد.
+                    </p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- ========================================================== -->
+        <!-- تب ۱۲: پروفایل و تنظیمات امنیتی (STUDENT PROFILE)           -->
+        <!-- ========================================================== -->
+        <div id="panel-profile" class="tab-panel space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+                <!-- اطلاعات هویتی و ویرایش فیلدهای مجاز -->
+                <div class="lg:col-span-7 bg-white rounded-3xl p-6 sm:p-8 shadow-card border border-slate-200/70 space-y-6">
+                    <h2 class="text-xl font-black text-toranj-navy border-b border-slate-100 pb-4">مشخصات فردی و پرونده زبان‌آموز</h2>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 rounded-2xl bg-toranj-bg border border-slate-200/70 text-xs">
+                        <div>
+                            <span class="text-toranj-textMuted block">کد اختصاصی زبان‌آموزی (غیرقابل تغییر):</span>
+                            <strong class="text-toranj-navy text-sm ltr-text">{{ academy_student_id }}</strong>
+                        </div>
+                        <div>
+                            <span class="text-toranj-textMuted block">نام کاربری (Username):</span>
+                            <strong class="text-toranj-navy text-sm ltr-text">{{ request.user.username }}</strong>
+                        </div>
+                        <div>
+                            <span class="text-toranj-textMuted block">شماره تماس ثبت‌شده:</span>
+                            <strong class="text-toranj-navy text-sm ltr-text">{{ phone_number|default:"ثبت‌نشده" }}</strong>
+                        </div>
+                        <div>
+                            <span class="text-toranj-textMuted block">تاریخ عضویت در آکادمی:</span>
+                            <strong class="text-toranj-navy text-sm ltr-text">{{ request.user.date_joined|date:"Y-m-d" }}</strong>
+                        </div>
+                    </div>
+
+                    <form method="post" enctype="multipart/form-data" class="space-y-4">
+                        {% csrf_token %}
+                        <input type="hidden" name="form_action" value="update_profile">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-toranj-navy mb-1">نام:</label>
+                                <input type="text" name="first_name" value="{{ request.user.first_name }}" class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-xs focus:border-toranj-orange focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-toranj-navy mb-1">نام خانوادگی:</label>
+                                <input type="text" name="last_name" value="{{ request.user.last_name }}" class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-xs focus:border-toranj-orange focus:outline-none">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-toranj-navy mb-1">آدرس ایمیل:</label>
+                            <input type="email" name="email" value="{{ request.user.email }}" class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-xs ltr-text focus:border-toranj-orange focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-toranj-navy mb-1">بروزرسانی تصویر پروفایل (JPG/PNG):</label>
+                            <input type="file" name="avatar" accept=".jpg,.jpeg,.png" class="text-xs text-toranj-textMuted">
+                        </div>
+                        <button type="submit" class="px-6 py-3 rounded-xl bg-toranj-navy hover:bg-toranj-orange text-white text-xs font-extrabold transition-colors">
+                            ذخیره تغییرات پروفایل
+                        </button>
+                    </form>
+                </div>
+
+                <!-- تغییر رمز عبور -->
+                <div class="lg:col-span-5 bg-white rounded-3xl p-6 sm:p-8 shadow-card border border-slate-200/70 space-y-6">
+                    <h2 class="text-xl font-black text-toranj-navy border-b border-slate-100 pb-4">تغییر رمز عبور حساب کاربری</h2>
+                    <form method="post" class="space-y-4">
+                        {% csrf_token %}
+                        <input type="hidden" name="form_action" value="change_password">
+                        <div>
+                            <label class="block text-xs font-bold text-toranj-navy mb-1">رمز عبور فعلی:</label>
+                            <input type="password" name="old_password" required class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-xs ltr-text focus:border-toranj-orange focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-toranj-navy mb-1">رمز عبور جدید:</label>
+                            <input type="password" name="new_password1" required class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-xs ltr-text focus:border-toranj-orange focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-toranj-navy mb-1">تکرار رمز عبور جدید:</label>
+                            <input type="password" name="new_password2" required class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-xs ltr-text focus:border-toranj-orange focus:outline-none">
+                        </div>
+                        <button type="submit" class="w-full py-3 px-5 rounded-xl bg-toranj-orange hover:bg-toranj-orangeHover text-white text-xs font-extrabold shadow-orange-btn transition-all">
+                            بروزرسانی امن رمز عبور
+                        </button>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <!-- اسکریپت مدیریت تب‌ها و منوی موبایل -->
+    <script>
+        function switchStudentTab(tabName) {
+            const panels = document.querySelectorAll('.tab-panel');
+            const buttons = document.querySelectorAll('.nav-item');
+
+            panels.forEach(p => p.classList.remove('active'));
+            buttons.forEach(b => b.classList.remove('active'));
+
+            const targetPanel = document.getElementById('panel-' + tabName) || document.getElementById('panel-overview');
+            if (targetPanel) {
+                targetPanel.classList.add('active');
+            }
+
+            buttons.forEach(btn => {
+                if (btn.getAttribute('data-tab') === tabName) {
+                    btn.classList.add('active');
+                }
+            });
+
+            // بستن منوی موبایل پس از انتخاب تب
+            const sidebar = document.getElementById('student-sidebar');
+            const backdrop = document.getElementById('sidebar-backdrop');
+            if (window.innerWidth < 1024 && sidebar && backdrop) {
+                sidebar.classList.add('translate-x-full');
+                backdrop.classList.add('hidden');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const initialTab = "{{ active_tab|default:'overview'|escapejs }}";
+            switchStudentTab(initialTab);
+
+            document.querySelectorAll('.nav-item').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const tab = this.getAttribute('data-tab');
+                    switchStudentTab(tab);
+                    const url = new URL(window.location);
+                    url.searchParams.set('tab', tab);
+                    window.history.replaceState({}, '', url);
+                });
+            });
+
+            const toggleBtn = document.getElementById('mobile-sidebar-toggle');
+            const closeBtn = document.getElementById('mobile-sidebar-close');
+            const sidebar = document.getElementById('student-sidebar');
+            const backdrop = document.getElementById('sidebar-backdrop');
+
+            function openMobileSidebar() {
+                sidebar.classList.remove('translate-x-full');
+                backdrop.classList.remove('hidden');
+            }
+            function closeMobileSidebar() {
+                sidebar.classList.add('translate-x-full');
+                backdrop.classList.add('hidden');
+            }
+
+            if (toggleBtn) toggleBtn.addEventListener('click', openMobileSidebar);
+            if (closeBtn) closeBtn.addEventListener('click', closeMobileSidebar);
+            if (backdrop) backdrop.addEventListener('click', closeMobileSidebar);
+        });
+    </script>
+</body>
+</html>
