@@ -9,14 +9,13 @@ class ToranjStudentDashboardSecurityTests(TestCase):
     def setUp(self):
         self.client = Client()
         self.student1 = User.objects.create_user(
-            username='student_arishah',
+            phone='09121112233',
             password='StrongPassword123!',
             first_name='اریشاه',
             last_name='پورانی',
-            email='student1@toranj.ir',
         )
         self.student2 = User.objects.create_user(
-            username='other_student',
+            phone='09129998877',
             password='StrongPassword123!',
             first_name='کاربر',
             last_name='دوم',
@@ -29,25 +28,24 @@ class ToranjStudentDashboardSecurityTests(TestCase):
 
     def test_authenticated_student_dashboard_loads(self):
         """بررسی بارگذاری صحیح داشبورد برای زبان‌آموز واقعی و نمایش نام واقعی"""
-        self.client.login(username='student_arishah', password='StrongPassword123!')
+        self.client.force_login(self.student1)
         response = self.client.get(reverse('dashboards:student_dashboard'))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'اریشاه')
 
     def test_idor_protection_on_unauthorized_course_detail(self):
         """بررسی محافظت IDOR در صورت تلاش برای دسترسی به دوره غیرمجاز"""
-        self.client.login(username='student_arishah', password='StrongPassword123!')
+        self.client.force_login(self.student1)
         response = self.client.get(reverse('dashboards:student_course_detail', args=[99999]))
         self.assertEqual(response.status_code, 403)
 
     def test_profile_edit_mass_assignment_protection(self):
         """بررسی اینکه زبان‌آموز نتواند با ارسال پارامترهای اضافی نقش یا دسترسی ادمین بگیرد"""
-        self.client.login(username='student_arishah', password='StrongPassword123!')
+        self.client.force_login(self.student1)
         response = self.client.post(reverse('dashboards:student_dashboard'), {
             'form_action': 'update_profile',
             'first_name': 'اریشاه ویرایش‌شده',
             'last_name': 'پورانی',
-            'email': 'updated@toranj.ir',
             'is_superuser': 'True',
             'is_staff': 'True',
             'role': 'admin',
@@ -60,7 +58,7 @@ class ToranjStudentDashboardSecurityTests(TestCase):
 
     def test_payment_claim_does_not_auto_grant_access(self):
         """بررسی اینکه ثبت فیش پرداخت به صورت خودکار دسترسی پولی ایجاد نمی‌کند"""
-        self.client.login(username='student_arishah', password='StrongPassword123!')
+        self.client.force_login(self.student1)
         response = self.client.post(reverse('dashboards:student_dashboard'), {
             'form_action': 'submit_payment_claim',
             'reference_code': 'TRX-99887766',
