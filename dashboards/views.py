@@ -2,6 +2,7 @@
 import logging
 from functools import wraps
 from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
@@ -51,6 +52,10 @@ def student_required(view_func):
     @wraps(view_func)
     @login_required
     def _wrapped_view(request, *args, **kwargs):
+        if 'user_id' in request.GET or 'student_id' in request.GET:
+            audit_logger.warning(
+                f"Suspicious query param tampering by user={request.user.pk}"
+            )
         if not _is_student_user(request.user) and not request.user.is_superuser:
             audit_logger.warning(
                 f"Unauthorized role access attempt to student dashboard by user={request.user.pk}"
@@ -58,6 +63,25 @@ def student_required(view_func):
             return HttpResponseForbidden("دسترسی غیرمجاز: این بخش ویژه زبان‌آموزان است.")
         return view_func(request, *args, **kwargs)
     return _wrapped_view
+
+
+def _get_user_display_name(user):
+    """استخراج نام کامل یا شماره موبایل کاربر بدون خطا در مدل کاربری سفارشی"""
+    if user is None:
+        return 'کاربر'
+    full_name = ''
+    if hasattr(user, 'get_full_name'):
+        try:
+            full_name = user.get_full_name().strip()
+        except Exception:
+            pass
+    if not full_name:
+        first = getattr(user, 'first_name', '')
+        last = getattr(user, 'last_name', '')
+        full_name = f"{first} {last}".strip()
+    if not full_name:
+        full_name = getattr(user, 'full_name', '') or getattr(user, 'phone', '') or getattr(user, 'username', str(user))
+    return str(full_name)
 
 
 def _get_student_profile(user):
@@ -83,7 +107,8 @@ def _get_academy_student_id(user, profile):
                 val = getattr(obj, attr, None)
                 if val:
                     return str(val)
-    return f"TRJ-{user.date_joined.strftime('%Y')}-{user.pk:04d}"
+    year_str = user.date_joined.strftime('%Y') if hasattr(user, 'date_joined') and user.date_joined else '2026'
+    return f"TRJ-{year_str}-{user.pk:04d}"
 
 
 def _get_student_enrollments(user, profile):
@@ -119,10 +144,7 @@ def _get_student_enrollments(user, profile):
                         is_completed = getattr(item, 'is_completed', False) or status_raw in ('completed', 'passed', 'finished')
                         progress_val = getattr(item, 'progress', None)
                         teacher_obj = getattr(course, 'teacher', getattr(course, 'instructor', None))
-                        teacher_name = (
-                            teacher_obj.get_full_name() or getattr(teacher_obj, 'phone', str(teacher_obj))
-                            if hasattr(teacher_obj, 'phone') else str(teacher_obj or 'تعیین‌نشده در سامانه')
-                        )
+                        teacher_name = _get_user_display_name(teacher_obj) if teacher_obj else 'تعیین‌نشده در سامانه'
                         enrollments.append({
                             'id': item.pk,
                             'course_id': course.pk,
@@ -150,7 +172,7 @@ def _get_student_enrollments(user, profile):
                 for c in CourseModel.objects.filter(students=user):
                     authorized_course_ids.add(c.pk)
                     teacher_obj = getattr(c, 'teacher', getattr(c, 'instructor', None))
-                    teacher_name = str(teacher_obj or 'تعیین‌نشده')
+                    teacher_name = _get_user_display_name(teacher_obj) if teacher_obj else 'تعیین‌نشده'
                     enrollments.append({
                         'id': c.pk,
                         'course_id': c.pk,
@@ -283,6 +305,7 @@ def _get_student_grades_and_skills(user, profile):
                 term_txt = str(getattr(g, 'term', getattr(course_obj, 'term', 'ترم جاری')))
                 grade_type = str(getattr(g, 'assessment_type', 'ارزیابی آموزشی'))
 
+                numeric_score = None
                 normalized_100 = None
                 if score_val is not None:
                     try:
@@ -297,7 +320,7 @@ def _get_student_grades_and_skills(user, profile):
                     'course_title': getattr(course_obj, 'title', str(course_obj or 'ارزیابی عمومی')),
                     'term': term_txt,
                     'title': getattr(g, 'title', grade_type),
-                    'score': numeric_score if 'numeric_score' in locals() else None,
+                    'score': numeric_score,
                     'max_score': max_score,
                     'normalized_score': normalized_100,
                     'feedback': feedback_txt,
@@ -539,15 +562,11 @@ def _validate_uploaded_file(uploaded_file):
 
 @login_required
 def dashboard_router_view(request):
-    """مسیردهی هوشمند بر اساس نقش کاربر"""
+    """مسیردهی هوشمند بر اساس نقش کاربر (هدایت استاد به پنل استاد و زبان‌آموز به پنل زبان‌آموز)"""
     user = request.user
     role = str(getattr(user, 'role', '')).lower()
     if getattr(user, 'is_teacher', False) or role in ('teacher', 'instructor', 'استاد'):
-        for tpl in ('dashboards/teacher_dashboard.html', 'dashboards/teacher.html'):
-            try:
-                return render(request, tpl, {'user': user})
-            except Exception:
-                continue
+        return redirect('dashboards:teacher_dashboard')
     return redirect('dashboards:student_dashboard')
 
 
@@ -558,6 +577,7 @@ def student_dashboard_view(request):
     user = request.user
     profile = _get_student_profile(user)
     enrollments, authorized_course_ids = _get_student_enrollments(user, profile)
+    student_dash_url = reverse('dashboards:student_dashboard')
 
     if request.method == 'POST':
         action = request.POST.get('form_action', '').strip()
@@ -565,16 +585,21 @@ def student_dashboard_view(request):
         if action == 'update_profile':
             first_name = request.POST.get('first_name', '').strip()[:50]
             last_name = request.POST.get('last_name', '').strip()[:50]
+            email = request.POST.get('email', '').strip()[:120]
             avatar_file = request.FILES.get('avatar')
 
             is_valid_file, file_err = _validate_uploaded_file(avatar_file)
             if not is_valid_file:
                 messages.error(request, file_err)
-                return redirect('/dashboards/student/?tab=profile')
+                return redirect(f"{student_dash_url}?tab=profile")
 
             with transaction.atomic():
-                user.first_name = first_name
-                user.last_name = last_name
+                if hasattr(user, 'first_name'):
+                    user.first_name = first_name
+                if hasattr(user, 'last_name'):
+                    user.last_name = last_name
+                if email and hasattr(user, 'email'):
+                    user.email = email
                 user.save()
 
                 if avatar_file and profile is not None:
@@ -585,7 +610,7 @@ def student_dashboard_view(request):
                             break
 
                 messages.success(request, "اطلاعات پروفایل با موفقیت بروزرسانی شد.")
-            return redirect('/dashboards/student/?tab=profile')
+            return redirect(f"{student_dash_url}?tab=profile")
 
         elif action == 'change_password':
             pwd_form = PasswordChangeForm(user=user, data=request.POST)
@@ -598,7 +623,7 @@ def student_dashboard_view(request):
                 for err_list in pwd_form.errors.values():
                     for err in err_list:
                         messages.error(request, err)
-            return redirect('/dashboards/student/?tab=profile')
+            return redirect(f"{student_dash_url}?tab=profile")
 
         elif action == 'submit_assignment':
             assignment_id = request.POST.get('assignment_id')
@@ -608,14 +633,14 @@ def student_dashboard_view(request):
             is_valid_file, file_err = _validate_uploaded_file(submission_file)
             if not is_valid_file:
                 messages.error(request, file_err)
-                return redirect('/dashboards/student/?tab=assignments')
+                return redirect(f"{student_dash_url}?tab=assignments")
 
             AssignmentModel = _find_first_model([('academics', 'Assignment'), ('courses', 'Assignment')])
             SubmissionModel = _find_first_model([('academics', 'AssignmentSubmission'), ('academics', 'Submission')])
 
             if not AssignmentModel or not SubmissionModel:
                 messages.error(request, "ماژول ثبت تکالیف فعال نیست.")
-                return redirect('/dashboards/student/?tab=assignments')
+                return redirect(f"{student_dash_url}?tab=assignments")
 
             assignment_obj = get_object_or_404(AssignmentModel, pk=assignment_id)
             if getattr(assignment_obj, 'course_id', None) not in authorized_course_ids:
@@ -640,14 +665,14 @@ def student_dashboard_view(request):
 
                 SubmissionModel.objects.update_or_create(defaults=defaults, **lookup)
                 messages.success(request, "پاسخ تکلیف با موفقیت ثبت شد.")
-            return redirect('/dashboards/student/?tab=assignments')
+            return redirect(f"{student_dash_url}?tab=assignments")
 
         elif action == 'submit_payment_claim':
             reference_code = request.POST.get('reference_code', '').strip()[:100]
             course_note = request.POST.get('course_note', '').strip()[:500]
             if not reference_code:
                 messages.error(request, "شماره پیگیری را وارد کنید.")
-                return redirect('/dashboards/student/?tab=subscription')
+                return redirect(f"{student_dash_url}?tab=subscription")
 
             SubModel = _find_first_model([('academics', 'PaymentRequest'), ('academics', 'Subscription')])
             with transaction.atomic():
@@ -672,7 +697,7 @@ def student_dashboard_view(request):
                     except Exception:
                         pass
                 messages.success(request, "درخواست پرداخت با وضعیت «در انتظار بررسی» ثبت شد.")
-            return redirect('/dashboards/student/?tab=subscription')
+            return redirect(f"{student_dash_url}?tab=subscription")
 
     attendance_records, attendance_summary = _get_student_attendance(user, profile, authorized_course_ids)
     grades, gpa, skills_analytics, has_any_skill_data, strengths, improvements = _get_student_grades_and_skills(user, profile)
@@ -703,7 +728,7 @@ def student_dashboard_view(request):
 
     context = {
         'active_tab': active_tab,
-        'student_full_name': (user.get_full_name().strip() if hasattr(user, 'get_full_name') else '') or getattr(user, 'phone', str(user)),
+        'student_full_name': _get_user_display_name(user),
         'academy_student_id': _get_academy_student_id(user, profile),
         'phone_number': phone_number,
         'avatar_url': avatar_url,
@@ -755,7 +780,7 @@ def student_course_detail_view(request, course_id):
     sessions, online_sessions, resources = _get_sessions_and_resources({course_id})
 
     context = {
-        'student_full_name': (user.get_full_name().strip() if hasattr(user, 'get_full_name') else '') or getattr(user, 'phone', str(user)),
+        'student_full_name': _get_user_display_name(user),
         'academy_student_id': _get_academy_student_id(user, profile),
         'course': course_enrollment,
         'course_attendance': [r for r in attendance_records if r['course_id'] == course_id or r['course_id'] is None],
