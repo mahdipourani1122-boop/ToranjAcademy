@@ -1,0 +1,73 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>پورتال نظارت آموزشی (Supervisor) | آموزشگاه زبان تُرَنج</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Vazirmatn:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        toranj: { navy: '#0D2B4E', orange: '#FF8A00', bg: '#F4F7FB', textMain: '#1F2937', textMuted: '#6B7280' }
+                    },
+                    fontFamily: { sans: ['Vazirmatn', 'Inter', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="{% static 'css/toranj-design-system.css' %}">
+</head>
+<body class="min-h-screen bg-toranj-bg text-toranj-textMain p-4 sm:p-8">
+    <div class="max-w-7xl mx-auto space-y-6">
+        <div class="bg-toranj-navy text-white rounded-3xl p-6 sm:p-8 flex flex-wrap items-center justify-between gap-4">
+            <div>
+                <span class="text-xs font-extrabold text-toranj-orange uppercase ltr-text">ACADEMIC QUALITY SUPERVISION</span>
+                <h1 class="text-2xl font-black mt-1">پورتال نظارت و ارزیابی آموزشی — {{ supervisor_name }}</h1>
+                <p class="text-xs text-slate-300 mt-1">پایش کیفیت برگزاری کلاس‌ها، عملکرد اساتید، روند پیشرفت زبان‌آموزان و نظارت بر حضور و غیاب.</p>
+            </div>
+            <a href="/" class="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold">بازگشت به صفحه اصلی</a>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 text-center">
+            <div class="trj-card p-4"><span class="text-xs text-toranj-textMuted block">جلسات تحت نظارت</span><strong class="text-xl font-black text-toranj-navy ltr-text mt-1 block">{{ stats.monitored_sessions }}</strong></div>
+            <div class="trj-card p-4"><span class="text-xs text-toranj-textMuted block">اساتید فعال</span><strong class="text-xl font-black text-toranj-navy ltr-text mt-1 block">{{ stats.active_teachers }}</strong></div>
+            <div class="trj-card p-4"><span class="text-xs text-toranj-textMuted block">کل زبان‌آموزان</span><strong class="text-xl font-black text-toranj-navy ltr-text mt-1 block">{{ stats.total_students }}</strong></div>
+            <div class="trj-card p-4"><span class="text-xs text-amber-800 block">حضور منتظر تایید</span><strong class="text-xl font-black text-amber-600 ltr-text mt-1 block">{{ stats.pending_requests }}</strong></div>
+            <div class="trj-card p-4"><span class="text-xs text-emerald-800 block">حضور تاییدشده</span><strong class="text-xl font-black text-emerald-600 ltr-text mt-1 block">{{ stats.present_records }}</strong></div>
+            <div class="trj-card p-4"><span class="text-xs text-rose-800 block">غیبت ثبت‌شده</span><strong class="text-xl font-black text-rose-600 ltr-text mt-1 block">{{ stats.absent_records }}</strong></div>
+        </div>
+
+        <div class="trj-card p-6 space-y-4">
+            <h2 class="text-lg font-black text-toranj-navy">عملکرد اساتید در مدیریت جلسات و تایید حضور و غیاب</h2>
+            <div class="trj-table-wrap">
+                <table class="w-full text-right border-collapse text-xs sm:text-sm">
+                    <thead>
+                        <tr class="bg-toranj-bg text-toranj-textMuted font-extrabold border-b border-slate-200">
+                            <th class="py-3 px-4">نام استاد</th>
+                            <th class="py-3 px-4">تعداد جلسات</th>
+                            <th class="py-3 px-4">رکوردهای تاییدشده</th>
+                            <th class="py-3 px-4">درخواست‌های معوق (Pending)</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        {% for tm in teacher_metrics %}
+                        <tr>
+                            <td class="py-3 px-4 font-bold text-toranj-navy">{{ tm.name }}</td>
+                            <td class="py-3 px-4 ltr-text">{{ tm.sessions_count }}</td>
+                            <td class="py-3 px-4 ltr-text text-emerald-700 font-bold">{{ tm.approved_records }}</td>
+                            <td class="py-3 px-4 ltr-text {% if tm.pending_approvals > 0 %}text-amber-600 font-extrabold{% else %}text-slate-400{% endif %}">{{ tm.pending_approvals }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="4" class="py-6 text-center text-toranj-textMuted">استادی ثبت نشده است.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

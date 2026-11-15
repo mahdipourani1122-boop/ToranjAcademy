@@ -1,0 +1,165 @@
+/* Toranj Language Academy - Enterprise Design System */
+:root {
+    --toranj-navy: #0D2B4E;
+    --toranj-navy-dark: #081C33;
+    --toranj-navy-light: #163E6C;
+    --toranj-orange: #FF8A00;
+    --toranj-orange-hover: #E67A00;
+    --toranj-orange-soft: #FFF4E5;
+    --toranj-bg: #F4F7FB;
+    --toranj-white: #FFFFFF;
+    --toranj-text-main: #1F2937;
+    --toranj-text-muted: #6B7280;
+    --radius-card: 1.5rem;
+    --radius-btn: 0.875rem;
+    --shadow-soft: 0 12px 32px -10px rgba(13, 43, 78, 0.07);
+    --shadow-hover: 0 20px 40px -12px rgba(13, 43, 78, 0.15);
+    --shadow-orange: 0 8px 22px -4px rgba(255, 138, 0, 0.38);
+}
+
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+}
+
+body {
+    font-family: 'Vazirmatn', 'Inter', system-ui, -apple-system, sans-serif;
+    background-color: var(--toranj-bg);
+    color: var(--toranj-text-main);
+    overflow-x: hidden;
+    margin: 0;
+    line-height: 1.65;
+}
+
+.ltr-text {
+    direction: ltr;
+    unicode-bidi: embed;
+    font-family: 'Inter', 'Vazirmatn', sans-serif;
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+    outline: 2px solid var(--toranj-orange) !important;
+    outline-offset: 2px !important;
+}
+
+.trj-card {
+    background-color: var(--toranj-white);
+    border-radius: var(--radius-card);
+    border: 1px solid rgba(226, 232, 240, 0.85);
+    box-shadow: var(--shadow-soft);
+    transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+}
+
+.trj-card-interactive:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-hover);
+    border-color: rgba(255, 138, 0, 0.45);
+}
+
+.trj-btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background-color: var(--toranj-orange);
+    color: var(--toranj-white);
+    font-weight: 800;
+    border-radius: var(--radius-btn);
+    box-shadow: var(--shadow-orange);
+    transition: background-color 0.2s ease, transform 0.15s ease;
+}
+
+.trj-btn-primary:hover {
+    background-color: var(--toranj-orange-hover);
+    transform: translateY(-1px);
+}
+
+.trj-btn-navy {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background-color: var(--toranj-navy);
+    color: var(--toranj-white);
+    font-weight: 700;
+    border-radius: var(--radius-btn);
+    transition: background-color 0.2s ease, transform 0.15s ease;
+}
+
+.trj-btn-navy:hover {
+    background-color: var(--toranj-orange);
+}
+
+.trj-input {
+    width: 100%;
+    border-radius: 0.75rem;
+    border: 1px solid #CBD5E1;
+    background-color: #FFFFFF;
+    padding: 0.625rem 0.875rem;
+    font-size: 0.8125rem;
+    color: var(--toranj-text-main);
+    transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.trj-input:focus {
+    border-color: var(--toranj-orange);
+    box-shadow: 0 0 0 3px rgba(255, 138, 0, 0.15);
+    outline: none;
+}
+
+.reveal {
+    opacity: 0;
+    transform: translateY(18px);
+    transition: opacity 0.55s cubic-bezier(0.16, 1, 0.3, 1), transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal.active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.tab-panel {
+    display: none;
+    animation: trjFadeIn 0.24s ease-out;
+}
+.tab-panel.active {
+    display: block;
+}
+
+@keyframes trjFadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.nav-item.active {
+    background-color: var(--toranj-orange) !important;
+    color: #FFFFFF !important;
+    box-shadow: var(--shadow-orange);
+}
+
+.trj-table-wrap {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 1rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+    .reveal {
+        opacity: 1 !important;
+        transform: none !important;
+    }
+}

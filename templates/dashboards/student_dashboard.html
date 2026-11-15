@@ -621,7 +621,7 @@
         <div id="panel-attendance" class="tab-panel space-y-6">
             <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-card border border-slate-200/70 space-y-6">
                 <div class="border-b border-slate-100 pb-4">
-                    <h2 class="text-xl font-black text-toranj-navy">کارکرد حضور و غیاب کلاسی</h2>
+                    <div class="flex flex-wrap items-center justify-between gap-3"><h2 class="text-xl font-black text-toranj-navy">کارکرد حضور و غیاب کلاسی</h2><a href="/dashboard/attendance/student/" class="px-4 py-2 rounded-xl bg-toranj-orange text-white text-xs font-extrabold">✋ ثبت درخواست حضور دومرحله‌ای ←</a></div>
                     <p class="text-xs sm:text-sm text-toranj-textMuted mt-1">گزارش رسمی جلسات ثبت‌شده در سامانه حضور و غیاب آموزشگاه</p>
                 </div>
 
@@ -1020,7 +1020,7 @@
                         </div>
                         <div>
                             <span class="text-toranj-textMuted block">نام کاربری (Username):</span>
-                            <strong class="text-toranj-navy text-sm ltr-text">{{ request.user.username }}</strong>
+                            <strong class="text-toranj-navy text-sm ltr-text">{{ request.user.phone|default:request.user.username }}</strong>
                         </div>
                         <div>
                             <span class="text-toranj-textMuted block">شماره تماس ثبت‌شده:</span>

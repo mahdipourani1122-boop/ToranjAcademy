@@ -9,19 +9,20 @@ DEPARTMENTS_DATA = {
         'name_short': 'زبان انگلیسی',
         'title_fa': 'دپارتمان زبان انگلیسی',
         'title_en': 'British & International Academic English',
+        'flag_code': 'english',
         'flag_emoji': '🇬🇧',
         'code_label': 'UK • A1–C2',
         'exam_focus': 'IELTS • Cambridge • Academic English',
         'image': 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=1000&q=80',
         'short_desc': 'آموزش آکادمیک و بین‌المللی زبان انگلیسی با تمرکز بر مهارت‌های چهارگانه، مکالمه پیشرفته و آمادگی آزمون‌های IELTS و کمبریج.',
-        'hero_heading': 'تسلط آکادمیک و بین‌المللی بر زبان انگلیسی 🇬🇧',
+        'hero_heading': 'تسلط آکادمیک و بین‌المللی بر زبان انگلیسی',
         'full_intro': 'دپارتمان زبان انگلیسی آموزشگاه تُرَنج با تکیه بر استانداردهای آموزشی بریتانیا و چارچوب CEFR، زبان‌آموزان را از سطح پایه تا تسلط کامل آکادمیک و حرفه‌ای همراهی می‌کند.',
         'levels': ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'],
         'methodology': 'بهره‌گیری از متد Communicative و Task-Based Learning با تمرکز بر لهجه استاندارد، نگارش آکادمیک و شبیه‌سازی آزمون‌های بین‌المللی.',
         'benefits': [
             'آمادگی کامل برای آزمون‌های بین‌المللی IELTS و مدارک کمبریج',
             'تقویت مهارت Speaking و مکالمه روان در محیط‌های علمی و کاری',
-            'پیگیری دقیق نمرات و پیشرفت زبان‌آموز در پورتال اختصاصی تُرَنج',
+            'پیگیری دقیق نمرات و تحلیل ۶ مهارت در پورتال اختصاصی تُرَنج',
         ],
         'cefr_details': [
             {'code': 'A1', 'title_en': 'Beginner', 'title_fa': 'مبتدی پایه', 'desc': 'آشنایی با ساختارهای پایه، معرفی خود و مکالمات روزمره ساده.'},
@@ -41,12 +42,13 @@ DEPARTMENTS_DATA = {
         'name_short': 'زبان آلمانی',
         'title_fa': 'دپارتمان زبان آلمانی',
         'title_en': 'German Department • Goethe & TestDaF',
+        'flag_code': 'german',
         'flag_emoji': '🇩🇪',
         'code_label': 'DE • A1–C1',
         'exam_focus': 'Goethe-Zertifikat • ÖSD • TestDaF',
         'image': 'https://images.unsplash.com/photo-1467269204594-9661b134dd2b?auto=format&fit=crop&w=1000&q=80',
         'short_desc': 'برنامه‌ریزی دقیق و ساختارمند ویژه متقاضیان تحصیل، کار و مهاجرت به آلمان، اتریش و سوئیس با تمرکز بر آزمون‌های گوته و ÖSD.',
-        'hero_heading': 'آموزش دقیق و ساختارمند زبان آلمانی 🇩🇪',
+        'hero_heading': 'آموزش دقیق و ساختارمند زبان آلمانی',
         'full_intro': 'دپارتمان آلمانی تُرَنج با ساختاری منظم و گام‌به‌گام، زبان‌آموزان را برای کسب مدارک رسمی سفارت (Goethe، ÖSD و TestDaF) و زندگی تحصیلی و کاری در کشورهای آلمانی‌زبان آماده می‌سازد.',
         'levels': ['A1', 'A2', 'B1', 'B2', 'C1'],
         'methodology': 'آموزش سیستماتیک گرامر و واژگان کاربردی همراه با تمرین مستمر ماک‌های امتحانی گوته (Lesen, Hören, Schreiben, Sprechen).',
@@ -71,13 +73,14 @@ DEPARTMENTS_DATA = {
         'name_short': 'زبان فرانسوی',
         'title_fa': 'دپارتمان زبان فرانسوی',
         'title_en': 'French Department • DELF / DALF & TCF',
+        'flag_code': 'french',
         'flag_emoji': '🇫🇷',
         'code_label': 'FR • A1–C1',
         'exam_focus': 'DELF • DALF • TCF / TEF',
         'image': 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=1000&q=80',
         'short_desc': 'یادگیری اصولی زبان فرانسوی با تلفظ استاندارد، درک فرهنگی و آمادگی آزمون‌های بین‌المللی DELF، DALF و TCF.',
-        'hero_heading': 'ظرافت زبانی و تسلط آکادمیک در دپارتمان فرانسوی 🇫🇷',
-        'full_intro': 'در دپارتمان زبان فرانسوی آموزشگاه تُرَنج، زیبایی و ساختار دقیق زبان فرانسه با متدهای روز اروپا آموزش داده می‌شود تا زبان‌آموزان برای تحصیل در فرانسه، کانادا و سوئیس یا مطالعه ادبیات و هنر آماده شوند.',
+        'hero_heading': 'ظرافت زبانی و تسلط آکادمیک در دپارتمان فرانسوی',
+        'full_intro': 'در دپارتمان زبان فرانسوی آموزشگاه تُرَنج، زیبایی و ساختار دقیق زبان فرانسه با متدهای روز اروپا آموزش داده می‌شود تا زبان‌آموزان برای تحصیل در فرانسه، کانادا و سوئیس آماده شوند.',
         'levels': ['A1', 'A2', 'B1', 'B2', 'C1'],
         'methodology': 'تمرکز ویژه بر آواشناسی (Phonétique)، درک شنیداری سریع و نگارش ساختارمند فرانسوی مطابق استانداردهای DELF/DALF.',
         'benefits': [
@@ -101,13 +104,14 @@ DEPARTMENTS_DATA = {
         'name_short': 'ترکی استانبولی',
         'title_fa': 'دپارتمان ترکی استانبولی',
         'title_en': 'Istanbul Turkish • TÖMER Standard',
+        'flag_code': 'turkish',
         'flag_emoji': '🇹🇷',
         'code_label': 'TR • A1–C1',
         'exam_focus': 'Istanbul Turkish • TÖMER & YÖS',
         'image': 'https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?auto=format&fit=crop&w=1000&q=80',
         'short_desc': 'آموزش کاربردی و معیار زبان ترکی استانبولی ویژه مکالمه روزمره، تجارت، زندگی و دریافت مدرک معتبر TÖMER دانشگاه‌های ترکیه.',
-        'hero_heading': 'مکالمه روان و تسلط کاربردی بر ترکی استانبولی 🇹🇷',
-        'full_intro': 'دپارتمان ترکی استانبولی آموزشگاه تُرَنج بر پایه استاندارد دانشگاه استانبول (مجموعه آموزشی İstanbul) طراحی شده و زبان‌آموزان را برای مکالمه روان، محیط‌های تجاری و آزمون بین‌المللی TÖMER آماده می‌کند.',
+        'hero_heading': 'مکالمه روان و تسلط کاربردی بر ترکی استانبولی',
+        'full_intro': 'دپارتمان ترکی استانبولی آموزشگاه تُرَنج بر پایه استاندارد دانشگاه استانبول طراحی شده و زبان‌آموزان را برای مکالمه روان، محیط‌های تجاری و آزمون بین‌المللی TÖMER آماده می‌کند.',
         'levels': ['A1', 'A2', 'B1', 'B2', 'C1'],
         'methodology': 'تدریس بر اساس سیستم آموزشی دانشگاه استانبول با تمرکز بر لهجه معیار استانبولی، اصطلاحات روزمره و مهارت‌های آزمون تومر.',
         'benefits': [
@@ -130,7 +134,6 @@ DEPARTMENTS_DATA = {
 
 
 def _get_real_courses(language_slug=None):
-    """واکشی ایمن دوره‌های واقعی از دیتابیس بدون تولید داده ساختگی"""
     courses_list = []
     try:
         CourseModel = apps.get_model('courses', 'Course')
@@ -156,6 +159,7 @@ def _get_real_courses(language_slug=None):
                     continue
 
             courses_list.append({
+                'id': c.pk,
                 'title': title,
                 'description': desc,
                 'level': level,
@@ -167,18 +171,16 @@ def _get_real_courses(language_slug=None):
 
 
 def _get_real_teachers():
-    """واکشی ایمن اساتید واقعی ثبت‌شده در دیتابیس"""
     teachers_list = []
     try:
         User = get_user_model()
-        qs = User.objects.all()
-        for u in qs:
+        for u in User.objects.all():
             role = str(getattr(u, 'role', '')).lower()
             is_teacher = getattr(u, 'is_teacher', False) or role in ['teacher', 'instructor', 'استاد']
             if is_teacher:
                 full_name = u.get_full_name().strip() if hasattr(u, 'get_full_name') else ''
                 teachers_list.append({
-                    'display_name': full_name or u.username,
+                    'display_name': full_name or getattr(u, 'phone', str(u)),
                     'role_label': 'عضو هیئت علمی و مدرس تُرَنج',
                 })
     except Exception:
@@ -186,12 +188,34 @@ def _get_real_teachers():
     return teachers_list[:8]
 
 
+def _get_real_news():
+    news_items = []
+    for app_label, model_name in [('core', 'Announcement'), ('core', 'News'), ('dashboards', 'AttendanceNotification')]:
+        try:
+            Model = apps.get_model(app_label, model_name)
+            qs = Model.objects.all().order_by('-id')
+            if model_name == 'AttendanceNotification':
+                qs = qs.filter(recipient__isnull=True)
+            for item in qs[:6]:
+                news_items.append({
+                    'title': getattr(item, 'title', str(item)),
+                    'summary': getattr(item, 'summary', getattr(item, 'message', getattr(item, 'content', ''))),
+                    'category': getattr(item, 'category', 'اطلاعیه آموزشی'),
+                    'is_pinned': getattr(item, 'is_pinned', False),
+                    'created_at': getattr(item, 'created_at', getattr(item, 'published_at', None)),
+                })
+            if news_items:
+                break
+        except Exception:
+            continue
+    return news_items
+
+
 def _get_real_stats(courses_count, teachers_count):
-    """محاسبه آمار واقعی از دیتابیس"""
     students_count = 0
     try:
-        StudentProfile = apps.get_model('academics', 'StudentProfile')
-        students_count = StudentProfile.objects.count()
+        User = get_user_model()
+        students_count = User.objects.filter(role='student').count()
     except Exception:
         pass
 
@@ -207,12 +231,14 @@ def _get_real_stats(courses_count, teachers_count):
 def home_view(request):
     featured_courses = _get_real_courses()
     teachers = _get_real_teachers()
+    news_list = _get_real_news()
     stats = _get_real_stats(len(featured_courses), len(teachers))
 
     context = {
         'departments': list(DEPARTMENTS_DATA.values()),
         'featured_courses': featured_courses,
         'teachers': teachers,
+        'news_list': news_list,
         'stats': stats,
     }
     return render(request, 'core/home.html', context)
@@ -234,7 +260,22 @@ def department_detail_view(request, slug):
     return render(request, 'core/department_detail.html', context)
 
 
-# نام‌های جایگزین برای حفظ سازگاری کامل با URLهای قبلی پروژه
+def news_list_view(request):
+    news_list = _get_real_news()
+    return render(request, 'core/news_list.html', {
+        'news_list': news_list,
+        'departments': list(DEPARTMENTS_DATA.values()),
+    })
+
+
+def guest_explore_view(request):
+    featured_courses = _get_real_courses()
+    return render(request, 'core/guest_explore.html', {
+        'departments': list(DEPARTMENTS_DATA.values()),
+        'featured_courses': featured_courses,
+    })
+
+
 home = home_view
 index = home_view
 language_landing = department_detail_view
