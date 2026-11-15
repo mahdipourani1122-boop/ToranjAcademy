@@ -401,7 +401,7 @@ def finalize_expired_sessions(now=None):
             }
 
             unresolved_pending_count = 0
-            for stu in enrolled_students:
+            for stu in {u.pk: u for u in list(enrolled_students) + [e.student for e in existing_entries.values()]}.values():
                 entry = existing_entries.get(stu.pk)
                 if entry is None:
                     if policy.auto_finalize_unsubmitted_to_absent:
