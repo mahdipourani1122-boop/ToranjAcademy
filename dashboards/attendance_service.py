@@ -4,7 +4,6 @@ from django.apps import apps
 from django.contrib.auth import get_user_model
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import transaction
-from django.db.models import Q
 from django.utils import timezone
 
 from .models import (
@@ -42,7 +41,6 @@ def is_teacher_user(user):
 
 
 def get_enrolled_student_users_for_course(course_id):
-    """واکشی لیست کاربران زبان‌آموز مجاز در یک دوره مشخص از جداول واقعی دیتابیس"""
     User = get_user_model()
     student_ids = set()
 
@@ -72,16 +70,13 @@ def get_enrolled_student_users_for_course(course_id):
 
 
 def is_student_enrolled_in_course(user, course_id):
-    """بررسی سمت سرور برای اطمینان از ثبت‌نام زبان‌آموز در دوره مربوط به جلسه"""
     enrolled_users = get_enrolled_student_users_for_course(course_id)
     if any(u.pk == user.pk for u in enrolled_users):
         return True
-    # در صورتی که رکورد قبلی در همان جلسه توسط استاد برای زبان‌آموز باز شده باشد
     return AttendanceEntry.objects.filter(session__course_id=course_id, student=user).exists()
 
 
 def _sync_legacy_attendance_model(entry):
-    """همگام‌سازی خودکار با مدل حضور و غیاب قبلی پروژه برای حفظ یکپارچگی کامل"""
     for app_label, model_name in [('academics', 'Attendance'), ('courses', 'Attendance')]:
         try:
             LegacyModel = apps.get_model(app_label, model_name)
@@ -134,10 +129,6 @@ def _notify(recipient, audience_role, session, title, message):
 
 @transaction.atomic
 def submit_student_attendance_request(student_user, session_id, submitted_code='', student_note='', ip_address=None):
-    """
-    مرحله ۱ (STAGE 1): ثبت درخواست حضور توسط زبان‌آموز.
-    وضعیت همواره PENDING می‌شود و زبان‌آموز هرگز نمی‌تواند حضور خود را مستقیماً PRESENT کند.
-    """
     session = AttendanceSession.objects.select_for_update().get(pk=session_id)
     now = timezone.now()
     policy = session.get_policy()
@@ -166,7 +157,6 @@ def submit_student_attendance_request(student_user, session_id, submitted_code='
     if is_late and not session.allows_late_requests:
         raise ValidationError("با توجه به گذشت زمان مجاز، ارسال درخواست حضور با تأخیر در این کلاس مجاز نیست.")
 
-    # بررسی کد امنیتی جلسه برای کلاس‌های آنلاین
     if session.requires_attendance_code:
         clean_code = (submitted_code or '').strip().upper()
         if not session.attendance_code:
@@ -226,27 +216,25 @@ def submit_student_attendance_request(student_user, session_id, submitted_code='
 def teacher_review_attendance(
     teacher_user, session_id, student_id, decision, reason='', private_note='', ip_address=None
 ):
-    """
-    مرحله ۲ (STAGE 2): بررسی، تایید نهایی، رد یا ثبت دستی حضور توسط استادِ مجاز جلسه.
-    decision: 'PRESENT' | 'LATE' | 'REJECTED' | 'ABSENT' | 'EXCUSED'
-    """
     session = AttendanceSession.objects.select_for_update().get(pk=session_id)
     if session.teacher_id != teacher_user.pk and not is_admin_user(teacher_user):
         raise PermissionDenied("خطای امنیتی: شما استاد اختصاصی این جلسه نیستید.")
 
-    if not is_student_enrolled_in_course(
-        get_user_model().objects.get(pk=student_id), session.course_id
-    ):
+    User = get_user_model()
+    try:
+        student_user = User.objects.get(pk=student_id)
+    except User.DoesNotExist:
+        raise ValidationError("زبان‌آموز مورد نظر یافت نشد.")
+
+    if not is_student_enrolled_in_course(student_user, session.course_id):
         raise PermissionDenied("این زبان‌آموز در کلاس انتخابی ثبت‌نام نشده است.")
 
     policy = session.get_policy()
     now = timezone.now()
 
     if session.is_finalized and not is_admin_user(teacher_user):
-        raise ValidationError("مهلت تایید استاد به پایان رسیده و جلسه نهایی شده است. برای تغییر با آموزش هماهنگ کنید.")
+        raise ValidationError("مهلت تایید استاد به پایان رسیده و جلسه نهایی شده است.")
 
-    User = get_user_model()
-    student_user = User.objects.get(pk=student_id)
     entry = AttendanceEntry.objects.select_for_update().filter(session=session, student=student_user).first()
 
     if entry and entry.status in ('PRESENT', 'LATE') and not policy.allow_teacher_edit_after_approval and not is_admin_user(teacher_user):
@@ -316,9 +304,6 @@ def teacher_review_attendance(
 
 @transaction.atomic
 def admin_override_attendance(admin_user, session_id, student_id, new_status, mandatory_reason, ip_address=None):
-    """
-    بازنویسی وضعیت حضور و غیاب توسط مدیریت آموزشگاه همراه با دلیل اجباری و ثبت در لاگ تغییرناپذیر.
-    """
     if not is_admin_user(admin_user):
         raise PermissionDenied("فقط مدیریت آموزشگاه مجاز به بازنویسی مدیریتی حضور و غیاب است.")
 
@@ -375,12 +360,6 @@ def admin_override_attendance(admin_user, session_id, student_id, new_status, ma
 
 
 def finalize_expired_sessions(now=None):
-    """
-    فرآیند خودکار، ایمن و ضدتکرار (Idempotent) برای نهایی‌سازی جلساتی که مهلت تایید استاد آن‌ها گذشته است.
-    - درخواست‌های PRESENT به قوت خود باقی می‌مانند.
-    - زبان‌آموزانی که درخواست نفرستاده‌اند طبق سیاست آموزشگاه ABSENT می‌شوند.
-    - درخواست‌های PENDING هرگز به صورت بلاتکلیف رها نمی‌شوند و به مدیریت گزارش می‌شوند.
-    """
     now = now or timezone.now()
     expired_sessions = AttendanceSession.objects.filter(
         is_finalized=False,
@@ -397,11 +376,15 @@ def finalize_expired_sessions(now=None):
             policy = session.get_policy()
             enrolled_students = get_enrolled_student_users_for_course(session.course_id)
             existing_entries = {
-                e.student_id: e for e in AttendanceEntry.objects.select_for_update().filter(session=session)
+                e.student_id: e for e in AttendanceEntry.objects.select_for_update().filter(session=session).select_related('student')
             }
 
+            all_students = {
+                u.pk: u for u in list(enrolled_students) + [e.student for e in existing_entries.values() if e.student]
+            }.values()
+
             unresolved_pending_count = 0
-            for stu in {u.pk: u for u in list(enrolled_students) + [e.student for e in existing_entries.values()]}.values():
+            for stu in all_students:
                 entry = existing_entries.get(stu.pk)
                 if entry is None:
                     if policy.auto_finalize_unsubmitted_to_absent:

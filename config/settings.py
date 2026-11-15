@@ -136,5 +136,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 ALLOWED_HOSTS = ['*']
 CSRF_TRUSTED_ORIGINS = ['https://*.up.railway.app', 'https://*.railway.app']
 
-WHITENOISE_USE_FINDERS = True
 
+
+WHITENOISE_USE_FINDERS = True

@@ -4,7 +4,8 @@ from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied, ValidationError
-from django.db import transaction
+from django.core.paginator import Paginator
+from django.db.models import Q
 from django.http import HttpResponse, HttpResponseForbidden
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
@@ -91,13 +92,8 @@ def _get_teacher_courses_meta(user):
 @login_required
 @require_http_methods(["GET", "POST"])
 def student_attendance_hub_view(request):
-    """
-    پنل دومرحله‌ای حضور و غیاب ویژه زبان‌آموز:
-    - مشاهده جلسات، ارسال درخواست حضور (STAGE 1) با کد جلسه آنلاین
-    - مشاهده وضعیت‌های PENDING, PRESENT, LATE, REJECTED, ABSENT, EXCUSED
-    - عدم امکان دستکاری مستقیم وضعیت رسمی حضور
-    """
-    if is_teacher_user(request.user) and not request.user.is_superuser:
+    role = str(getattr(request.user, 'role', '')).lower()
+    if (is_teacher_user(request.user) or role in ('supervisor', 'admin')) and not request.user.is_superuser:
         return HttpResponseForbidden("این بخش ویژه زبان‌آموزان است.")
 
     finalize_expired_sessions()
@@ -189,13 +185,6 @@ def student_attendance_hub_view(request):
 @login_required
 @require_http_methods(["GET", "POST"])
 def teacher_attendance_hub_view(request):
-    """
-    پنل دومرحله‌ای مدیریت حضور و غیاب ویژه استاد:
-    - ایجاد جلسه حضوری یا آنلاین و تولید کد امنیتی منقضی‌شونده
-    - مشاهده درخواست‌های PENDING زبان‌آموزان به همراه زمان دقیق ثبت
-    - تایید نهایی (PRESENT)، ثبت تأخیر (LATE)، رد درخواست (REJECTED) یا ثبت دستی
-    - تایید گروهی (Bulk Approval) با انتخاب و تایید صریح استاد
-    """
     if not is_teacher_user(request.user) and not is_admin_user(request.user):
         return HttpResponseForbidden("دسترسی غیرمجاز: این بخش ویژه اساتید است.")
 
@@ -355,13 +344,6 @@ def teacher_attendance_hub_view(request):
 @login_required
 @require_http_methods(["GET", "POST"])
 def admin_attendance_hub_view(request):
-    """
-    پنل جامع نظارت، تنظیمات سیاست‌ها و بازنویسی مدیریتی حضور و غیاب ویژه مدیریت آموزشگاه (Admin):
-    - تنظیم سیاست‌های آموزشگاه و مهلت تایید استاد (AttendancePolicy)
-    - نظارت سراسری بر تمام کلاس‌ها، اساتید، دپارتمان‌ها و درخواست‌های معوق
-    - بازنویسی تصمیم استاد (Admin Override) با الزام ثبت دلیل در لاگ تغییرناپذیر
-    - خروجی کامل گزارش‌های تحلیلی به فرمت Excel / CSV و چاپی PDF
-    """
     if not is_admin_user(request.user):
         return HttpResponseForbidden("دسترسی محدود به مدیریت آموزشگاه زبان تُرَنج است.")
 
@@ -433,7 +415,6 @@ def admin_attendance_hub_view(request):
             messages.success(request, f"جلسه «{session.title}» با موفقیت بازگشایی شد.")
             return redirect('dashboards:admin_attendance_hub')
 
-    # فیلترهای گزارش مدیریتی
     dept_filter = request.GET.get('department', '').strip()
     status_filter = request.GET.get('status', '').strip()
     search_q = request.GET.get('q', '').strip()
@@ -445,12 +426,12 @@ def admin_attendance_hub_view(request):
         entries_qs = entries_qs.filter(status=status_filter)
     if search_q:
         entries_qs = entries_qs.filter(
-            models.Q(session__course_title__icontains=search_q)
-            | models.Q(student__first_name__icontains=search_q)
-            | models.Q(student__last_name__icontains=search_q)
+            Q(session__course_title__icontains=search_q)
+            | Q(student__first_name__icontains=search_q)
+            | Q(student__last_name__icontains=search_q)
+            | Q(student__phone__icontains=search_q)
         )
 
-    # خروجی اکسل / CSV
     if request.GET.get('export') == 'csv':
         response = HttpResponse(content_type='text/csv; charset=utf-8-sig')
         response['Content-Disposition'] = 'attachment; filename="toranj_attendance_master_report.csv"'
@@ -472,6 +453,9 @@ def admin_attendance_hub_view(request):
             ])
         return response
 
+    paginator = Paginator(entries_qs, 30)
+    entries_page = paginator.get_page(request.GET.get('page', 1))
+
     all_entries = AttendanceEntry.objects.all()
     global_stats = {
         'sessions_total': AttendanceSession.objects.count(),
@@ -486,7 +470,7 @@ def admin_attendance_hub_view(request):
     return render(request, 'dashboards/attendance_admin.html', {
         'policy': policy,
         'global_stats': global_stats,
-        'entries': entries_qs[:100],
+        'entries': entries_page,
         'sessions': AttendanceSession.objects.select_related('teacher').order_by('-start_time')[:50],
         'audit_logs': AttendanceAuditLog.objects.select_related('session', 'student', 'actor')[:50],
         'admin_alerts': AttendanceNotification.objects.filter(audience_role='ADMIN')[:15],

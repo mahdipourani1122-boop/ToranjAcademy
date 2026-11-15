@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 from django.contrib import messages
+from django.core.paginator import Paginator
 from django.http import HttpResponseForbidden
 from django.views.decorators.http import require_http_methods
 from django.db import transaction
@@ -86,6 +87,9 @@ def admin_dashboard_view(request):
     if role_filter:
         users_qs = users_qs.filter(role=role_filter)
 
+    paginator = Paginator(users_qs, 25)
+    users_page_obj = paginator.get_page(request.GET.get('page', 1))
+
     total_students = User.objects.filter(role='student').count()
     total_teachers = User.objects.filter(Q(role='teacher') | Q(is_teacher=True)).distinct().count()
     total_supervisors = User.objects.filter(role='supervisor').count()
@@ -95,7 +99,7 @@ def admin_dashboard_view(request):
     CourseModel = _find_first_model([('courses', 'Course'), ('academics', 'Course')])
     if CourseModel:
         try:
-            for c in CourseModel.objects.all().order_by('-id')[:50]:
+            for c in CourseModel.objects.select_related('teacher').order_by('-id')[:60]:
                 courses_list.append({
                     'id': c.pk,
                     'title': getattr(c, 'title', getattr(c, 'name', str(c))),
@@ -119,7 +123,7 @@ def admin_dashboard_view(request):
     SubModel = _find_first_model([('academics', 'PaymentRequest'), ('academics', 'Subscription'), ('courses', 'Payment')])
     if SubModel:
         try:
-            for p in SubModel.objects.all().order_by('-id')[:40]:
+            for p in SubModel.objects.all().order_by('-id')[:50]:
                 st_obj = getattr(p, 'student', getattr(p, 'user', None))
                 payment_requests.append({
                     'id': p.pk,
@@ -153,7 +157,8 @@ def admin_dashboard_view(request):
         'total_courses': len(courses_list),
         'total_enrollments': total_enrollments,
         'courses_list': courses_list,
-        'users_list': users_qs[:60],
+        'users_list': users_page_obj,
+        'users_page_obj': users_page_obj,
         'search_q': search_q,
         'role_filter': role_filter,
         'payment_requests': payment_requests,

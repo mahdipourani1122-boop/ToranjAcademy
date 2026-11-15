@@ -1,4 +1,4 @@
-﻿import os
+import os
 import logging
 from functools import wraps
 from django.shortcuts import render, redirect, get_object_or_404
@@ -21,7 +21,6 @@ MAX_UPLOAD_SIZE_BYTES = 10 * 1024 * 1024  # 10 MB
 
 
 def _get_model_safe(app_label, model_name):
-    """بارگذاری ایمن مدل‌ها بدون ایجاد خطای ImportError"""
     try:
         return apps.get_model(app_label, model_name)
     except LookupError:
@@ -29,7 +28,6 @@ def _get_model_safe(app_label, model_name):
 
 
 def _find_first_model(candidates):
-    """جستجوی اولین مدل موجود در بین اپ‌های پروژه"""
     for app_label, model_name in candidates:
         model = _get_model_safe(app_label, model_name)
         if model is not None:
@@ -38,35 +36,33 @@ def _find_first_model(candidates):
 
 
 def _is_student_user(user):
-    """بررسی نقش زبان‌آموز از روی نشست سرور (Server-Side Session)"""
-    if not user.is_authenticated:
+    """بررسی دقیق نقش زبان‌آموز و مسدودسازی دسترسی سایر نقش‌ها (استاد، ناظر، مدیر عادی)"""
+    if not user or not user.is_authenticated:
         return False
     role = str(getattr(user, 'role', '')).lower()
-    if getattr(user, 'is_teacher', False) or role in ('teacher', 'instructor', 'استاد'):
+    if (
+        getattr(user, 'is_teacher', False)
+        or getattr(user, 'is_supervisor', False)
+        or getattr(user, 'is_staff', False)
+        or role in ('teacher', 'instructor', 'استاد', 'supervisor', 'observer', 'ناظر', 'admin', 'manager', 'مدیر')
+    ):
         return False
     return True
 
 
 def student_required(view_func):
-    """دکوراتور امنیتی برای کنترل دسترسی نقش زبان‌آموز و جلوگیری از IDOR"""
     @wraps(view_func)
     @login_required
     def _wrapped_view(request, *args, **kwargs):
         if 'user_id' in request.GET or 'student_id' in request.GET:
-            audit_logger.warning(
-                f"Suspicious query param tampering by user={request.user.pk}"
-            )
+            audit_logger.warning(f"Suspicious query param tampering by user={request.user.pk}")
         if not _is_student_user(request.user) and not request.user.is_superuser:
-            audit_logger.warning(
-                f"Unauthorized role access attempt to student dashboard by user={request.user.pk}"
-            )
             return HttpResponseForbidden("دسترسی غیرمجاز: این بخش ویژه زبان‌آموزان است.")
         return view_func(request, *args, **kwargs)
     return _wrapped_view
 
 
 def _get_user_display_name(user):
-    """استخراج نام کامل یا شماره موبایل کاربر بدون خطا در مدل کاربری سفارشی"""
     if user is None:
         return 'کاربر'
     full_name = ''
@@ -85,7 +81,6 @@ def _get_user_display_name(user):
 
 
 def _get_student_profile(user):
-    """واکشی پروفایل زبان‌آموز متصل به کاربر احراز هویت‌شده"""
     ProfileModel = _find_first_model([
         ('academics', 'StudentProfile'),
         ('accounts', 'StudentProfile'),
@@ -100,7 +95,6 @@ def _get_student_profile(user):
 
 
 def _get_academy_student_id(user, profile):
-    """دریافت کد زبان‌آموزی واقعی از دیتابیس"""
     for obj in (profile, user):
         if obj is not None:
             for attr in ('student_id', 'academy_id', 'student_code', 'code', 'national_id'):
@@ -112,7 +106,6 @@ def _get_academy_student_id(user, profile):
 
 
 def _get_student_enrollments(user, profile):
-    """واکشی ثبت‌نام‌ها و دوره‌های مجاز متعلق به زبان‌آموز فعلی"""
     EnrollmentModel = _find_first_model([
         ('courses', 'Enrollment'),
         ('academics', 'Enrollment'),
@@ -196,7 +189,6 @@ def _get_student_enrollments(user, profile):
 
 
 def _get_student_attendance(user, profile, authorized_course_ids):
-    """واکشی تاریخچه واقعی حضور و غیاب زبان‌آموز"""
     AttendanceModel = _find_first_model([
         ('academics', 'Attendance'),
         ('courses', 'Attendance'),
@@ -259,7 +251,6 @@ def _get_student_attendance(user, profile, authorized_course_ids):
 
 
 def _get_student_grades_and_skills(user, profile):
-    """واکشی کارنامه و تحلیل ۶ مهارت زبانی (بر اساس رکوردهای واقعی دیتابیس)"""
     GradeModel = _find_first_model([
         ('academics', 'Grade'),
         ('academics', 'Assessment'),
@@ -371,7 +362,6 @@ def _get_student_grades_and_skills(user, profile):
 
 
 def _get_assignments_and_exams(user, profile, authorized_course_ids):
-    """واکشی تکالیف و آزمون‌ها"""
     AssignmentModel = _find_first_model([('academics', 'Assignment'), ('courses', 'Assignment')])
     SubmissionModel = _find_first_model([('academics', 'AssignmentSubmission'), ('academics', 'Submission')])
     ExamModel = _find_first_model([('academics', 'Exam'), ('courses', 'Exam')])
@@ -445,7 +435,6 @@ def _get_assignments_and_exams(user, profile, authorized_course_ids):
 
 
 def _get_sessions_and_resources(authorized_course_ids):
-    """واکشی جلسات و منابع آموزشی"""
     SessionModel = _find_first_model([('courses', 'ClassSession'), ('courses', 'Session'), ('academics', 'ClassSession')])
     ResourceModel = _find_first_model([('courses', 'CourseResource'), ('courses', 'Resource')])
 
@@ -492,7 +481,6 @@ def _get_sessions_and_resources(authorized_course_ids):
 
 
 def _get_subscription_and_payments(user, profile, enrollments):
-    """بررسی وضعیت اشتراک و درخواست‌های پرداخت (تایید دستی مدیریت)"""
     SubModel = _find_first_model([('academics', 'PaymentRequest'), ('academics', 'Subscription'), ('courses', 'Payment')])
     records = []
     if SubModel:
@@ -526,7 +514,6 @@ def _get_subscription_and_payments(user, profile, enrollments):
 
 
 def _get_student_notifications(user, enrollments, assignments, exams, grades):
-    """واکشی اعلان‌ها"""
     notifications = []
     for a in assignments[:3]:
         if not a['is_submitted'] and not a['is_past_deadline']:
@@ -548,7 +535,6 @@ def _get_student_notifications(user, enrollments, assignments, exams, grades):
 
 
 def _validate_uploaded_file(uploaded_file):
-    """بررسی امنیتی پسوند و حجم فایل"""
     if not uploaded_file:
         return True, None
     ext = os.path.splitext(uploaded_file.name)[1].lower()
@@ -562,9 +548,13 @@ def _validate_uploaded_file(uploaded_file):
 
 @login_required
 def dashboard_router_view(request):
-    """مسیردهی هوشمند بر اساس نقش کاربر (هدایت استاد به پنل استاد و زبان‌آموز به پنل زبان‌آموز)"""
+    """مسیردهی هوشمند بر اساس نقش کاربر (مدیر، ناظر، استاد، زبان‌آموز)"""
     user = request.user
     role = str(getattr(user, 'role', '')).lower()
+    if user.is_superuser or user.is_staff or role in ('admin', 'manager', 'مدیر'):
+        return redirect('dashboards:admin_dashboard')
+    if getattr(user, 'is_supervisor', False) or role in ('supervisor', 'observer', 'ناظر'):
+        return redirect('dashboards:supervisor_dashboard')
     if getattr(user, 'is_teacher', False) or role in ('teacher', 'instructor', 'استاد'):
         return redirect('dashboards:teacher_dashboard')
     return redirect('dashboards:student_dashboard')
@@ -573,7 +563,6 @@ def dashboard_router_view(request):
 @student_required
 @require_http_methods(["GET", "POST"])
 def student_dashboard_view(request):
-    """ویوی جامع داشبورد پریمیوم زبان‌آموز"""
     user = request.user
     profile = _get_student_profile(user)
     enrollments, authorized_course_ids = _get_student_enrollments(user, profile)
@@ -762,7 +751,6 @@ def student_dashboard_view(request):
 @student_required
 @require_http_methods(["GET"])
 def student_course_detail_view(request, course_id):
-    """صفحه اختصاصی جزئیات هر دوره برای زبان‌آموز با محافظت IDOR"""
     user = request.user
     profile = _get_student_profile(user)
     enrollments, authorized_course_ids = _get_student_enrollments(user, profile)
@@ -797,7 +785,6 @@ def student_course_detail_view(request, course_id):
 @student_required
 @require_http_methods(["GET"])
 def protected_resource_download_view(request, resource_id):
-    """دانلود امن منابع آموزشی"""
     user = request.user
     profile = _get_student_profile(user)
     _, authorized_course_ids = _get_student_enrollments(user, profile)

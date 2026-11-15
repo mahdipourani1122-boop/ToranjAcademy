@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 from django.http import HttpResponseForbidden
 from django.views.decorators.http import require_http_methods
-from django.db.models import Q
+from django.db.models import Q, Count
 
 from .models import AttendanceSession, AttendanceEntry, AttendanceAuditLog
 from .attendance_service import is_admin_user, get_user_display, finalize_expired_sessions
@@ -21,6 +21,7 @@ def is_supervisor_user(user):
 @login_required
 @require_http_methods(["GET"])
 def supervisor_dashboard_view(request):
+    """داشبورد ناظر آموزشی با کوئری بهینه‌شده (بدون N+1) برای پشتیبانی از صدها زبان‌آموز و کلاس"""
     if not is_supervisor_user(request.user):
         return HttpResponseForbidden("دسترسی غیرمجاز: این بخش ویژه ناظران آموزشی و مدیریت است.")
 
@@ -31,19 +32,35 @@ def supervisor_dashboard_view(request):
     if dept_filter:
         sessions_qs = sessions_qs.filter(department__icontains=dept_filter)
 
-    teachers_qs = User.objects.filter(Q(role='teacher') | Q(is_teacher=True)).distinct()
-    teacher_metrics = []
-    for t in teachers_qs:
-        t_sessions = AttendanceSession.objects.filter(teacher=t)
-        pending_cnt = AttendanceEntry.objects.filter(session__teacher=t, status='PENDING').count()
-        approved_cnt = AttendanceEntry.objects.filter(session__teacher=t, status__in=('PRESENT', 'LATE')).count()
-        teacher_metrics.append({
+    # رفع کامل مشکل N+1 با استفاده از annotate در یک کوئری واحد
+    teachers_qs = (
+        User.objects.filter(Q(role='teacher') | Q(is_teacher=True))
+        .annotate(
+            sessions_cnt=Count('teaching_attendance_sessions', distinct=True),
+            pending_cnt=Count(
+                'teaching_attendance_sessions__entries',
+                filter=Q(teaching_attendance_sessions__entries__status='PENDING'),
+                distinct=True,
+            ),
+            approved_cnt=Count(
+                'teaching_attendance_sessions__entries',
+                filter=Q(teaching_attendance_sessions__entries__status__in=('PRESENT', 'LATE')),
+                distinct=True,
+            ),
+        )
+        .distinct()
+    )
+
+    teacher_metrics = [
+        {
             'name': get_user_display(t),
             'phone': getattr(t, 'phone', ''),
-            'sessions_count': t_sessions.count(),
-            'pending_approvals': pending_cnt,
-            'approved_records': approved_cnt,
-        })
+            'sessions_count': t.sessions_cnt,
+            'pending_approvals': t.pending_cnt,
+            'approved_records': t.approved_cnt,
+        }
+        for t in teachers_qs
+    ]
 
     all_entries = AttendanceEntry.objects.all()
     stats = {
