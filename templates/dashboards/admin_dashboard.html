@@ -26,9 +26,7 @@
         <div class="space-y-6">
             <div class="flex items-center justify-between border-b border-white/10 pb-4">
                 <a href="/" class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-white p-1 flex items-center justify-center overflow-hidden">
-                        {% include 'partials/brand_logo.html' %}
-                    </div>
+                    <div class="w-10 h-10 rounded-xl bg-toranj-orange text-white font-black flex items-center justify-center">T</div>
                     <div>
                         <h1 class="text-base font-black text-white">پورتال مدیریت کل</h1>
                         <p class="text-[11px] text-slate-300 ltr-text">Toranj Enterprise Admin</p>
@@ -54,15 +52,7 @@
         </div>
     </aside>
 
-    <main class="flex-1 min-w-0 p-4 sm:p-8 max-w-7xl mx-auto w-full space-y-6">
-        {% if messages %}
-            {% for message in messages %}
-                <div class="p-4 rounded-2xl border text-xs sm:text-sm font-bold {% if message.tags == 'error' %}bg-rose-50 border-rose-200 text-rose-800{% else %}bg-emerald-50 border-emerald-200 text-emerald-800{% endif %}">
-                    {{ message }}
-                </div>
-            {% endfor %}
-        {% endif %}
-
+    <main class="flex-1 p-4 sm:p-8 max-w-7xl mx-auto w-full space-y-6">
         <div class="bg-toranj-navy text-white rounded-3xl p-6 sm:p-8 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-md">
             <div>
                 <span class="text-xs font-extrabold text-toranj-orange uppercase ltr-text">ENTERPRISE MANAGEMENT CONSOLE</span>
@@ -75,7 +65,6 @@
             </div>
         </div>
 
-        <!-- TAB 1: OVERVIEW -->
         <div id="panel-overview" class="tab-panel active space-y-6">
             <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 text-center">
                 <div class="trj-card p-5"><span class="text-xs font-bold text-toranj-textMuted block">کل زبان‌آموزان</span><strong class="text-2xl font-black text-toranj-navy ltr-text mt-1 block">{{ total_students }}</strong></div>
@@ -85,54 +74,11 @@
                 <div class="trj-card p-5"><span class="text-xs font-bold text-toranj-textMuted block">پرداخت منتظر تایید</span><strong class="text-2xl font-black text-toranj-orange ltr-text mt-1 block">{{ pending_payments_count }}</strong></div>
                 <div class="trj-card p-5"><span class="text-xs font-bold text-toranj-textMuted block">جلسات حضور و غیاب</span><strong class="text-2xl font-black text-toranj-navy ltr-text mt-1 block">{{ attendance_overview.sessions_count }}</strong></div>
             </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div class="trj-card p-6 space-y-4">
-                    <h3 class="text-base font-black text-toranj-navy">خلاصه وضعیت حضور و غیاب کل آموزشگاه</h3>
-                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center text-xs">
-                        <div class="p-3.5 rounded-2xl bg-amber-50 text-amber-900">منتظر تایید استاد<strong class="block text-lg font-black mt-1 ltr-text">{{ attendance_overview.pending_count }}</strong></div>
-                        <div class="p-3.5 rounded-2xl bg-emerald-50 text-emerald-900">حاضر رسمی<strong class="block text-lg font-black mt-1 ltr-text">{{ attendance_overview.present_count }}</strong></div>
-                        <div class="p-3.5 rounded-2xl bg-orange-50 text-orange-900">تأخیر<strong class="block text-lg font-black mt-1 ltr-text">{{ attendance_overview.late_count }}</strong></div>
-                        <div class="p-3.5 rounded-2xl bg-rose-50 text-rose-900">غایب<strong class="block text-lg font-black mt-1 ltr-text">{{ attendance_overview.absent_count }}</strong></div>
-                    </div>
-                </div>
-                <div class="trj-card p-6 space-y-3">
-                    <h3 class="text-base font-black text-toranj-navy">آخرین لاگ‌های ممیزی امنیتی (Audit Trail)</h3>
-                    {% if recent_audits %}
-                        <div class="space-y-2 max-h-56 overflow-y-auto text-xs">
-                            {% for log in recent_audits|slice:":6" %}
-                            <div class="p-3 rounded-xl bg-toranj-bg flex items-center justify-between gap-2">
-                                <span><strong>{{ log.action }}</strong> — {{ log.reason|truncatechars:50 }}</span>
-                                <span class="ltr-text text-toranj-textMuted shrink-0">{{ log.created_at|date:"H:i" }}</span>
-                            </div>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        <p class="text-xs text-toranj-textMuted bg-toranj-bg p-4 rounded-xl">هنوز فعالیت ممیزی ثبت نشده است.</p>
-                    {% endif %}
-                </div>
-            </div>
         </div>
 
-        <!-- TAB 2: USERS SEARCH, FILTER & PAGINATION -->
         <div id="panel-users" class="tab-panel space-y-6">
             <div class="trj-card p-6 space-y-5">
-                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-4">
-                    <h3 class="text-lg font-black text-toranj-navy">جست‌وجو و مدیریت کاربران سامانه (پشتیبانی ۴۰۰+ زبان‌آموز)</h3>
-                    <form method="get" class="flex flex-wrap items-center gap-2">
-                        <input type="hidden" name="tab" value="users">
-                        <input type="text" name="q" value="{{ search_q }}" placeholder="نام یا شماره موبایل..." class="trj-input w-48">
-                        <select name="role" class="trj-input w-40">
-                            <option value="">همه نقش‌ها</option>
-                            <option value="student" {% if role_filter == 'student' %}selected{% endif %}>زبان‌آموز (Student)</option>
-                            <option value="teacher" {% if role_filter == 'teacher' %}selected{% endif %}>استاد (Teacher)</option>
-                            <option value="supervisor" {% if role_filter == 'supervisor' %}selected{% endif %}>ناظر (Supervisor)</option>
-                            <option value="admin" {% if role_filter == 'admin' %}selected{% endif %}>مدیر (Admin)</option>
-                        </select>
-                        <button type="submit" class="trj-btn-navy px-4 py-2 text-xs">اعمال فیلتر</button>
-                    </form>
-                </div>
-
+                <h3 class="text-lg font-black text-toranj-navy">جست‌وجو و مدیریت کاربران سامانه</h3>
                 <div class="trj-table-wrap">
                     <table class="w-full text-right border-collapse text-xs sm:text-sm">
                         <thead>
@@ -140,7 +86,6 @@
                                 <th class="py-3 px-4">نام کامل</th>
                                 <th class="py-3 px-4">شماره موبایل</th>
                                 <th class="py-3 px-4">نقش</th>
-                                <th class="py-3 px-4">وضعیت حساب</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100">
@@ -149,30 +94,14 @@
                                 <td class="py-3 px-4 font-bold text-toranj-navy">{{ u.get_full_name|default:"—" }}</td>
                                 <td class="py-3 px-4 ltr-text font-semibold">{{ u.phone }}</td>
                                 <td class="py-3 px-4"><span class="px-2.5 py-1 rounded-md bg-slate-100 text-xs font-bold">{{ u.role|default:"student" }}</span></td>
-                                <td class="py-3 px-4">{% if u.is_active %}<span class="text-emerald-700 font-bold">فعال</span>{% else %}<span class="text-rose-700">غیرفعال</span>{% endif %}</td>
                             </tr>
                             {% endfor %}
                         </tbody>
                     </table>
                 </div>
-
-                {% if users_page_obj.has_other_pages %}
-                <div class="flex items-center justify-between pt-4 border-t border-slate-100 text-xs">
-                    <span>صفحه {{ users_page_obj.number }} از {{ users_page_obj.paginator.num_pages }}</span>
-                    <div class="flex items-center gap-2">
-                        {% if users_page_obj.has_previous %}
-                            <a href="?tab=users&q={{ search_q }}&role={{ role_filter }}&page={{ users_page_obj.previous_page_number }}" class="px-3 py-1.5 rounded-lg bg-toranj-bg hover:bg-slate-200 font-bold">صفحه قبل</a>
-                        {% endif %}
-                        {% if users_page_obj.has_next %}
-                            <a href="?tab=users&q={{ search_q }}&role={{ role_filter }}&page={{ users_page_obj.next_page_number }}" class="px-3 py-1.5 rounded-lg bg-toranj-navy text-white font-bold">صفحه بعد</a>
-                        {% endif %}
-                    </div>
-                </div>
-                {% endif %}
             </div>
         </div>
 
-        <!-- TAB 3: COURSES -->
         <div id="panel-courses" class="tab-panel space-y-6">
             <div class="trj-card p-6 space-y-4">
                 <h3 class="text-lg font-black text-toranj-navy">لیست دوره‌ها و کلاس‌های آموزشگاه</h3>
@@ -192,7 +121,6 @@
             </div>
         </div>
 
-        <!-- TAB 4: PAYMENTS -->
         <div id="panel-payments" class="tab-panel space-y-6">
             <div class="trj-card p-6 space-y-4">
                 <h3 class="text-lg font-black text-toranj-navy">بررسی و تایید دستی فیش‌های واریزی زبان‌آموزان</h3>
@@ -220,35 +148,16 @@
             </div>
         </div>
 
-        <!-- TAB 5: NEWS -->
         <div id="panel-news" class="tab-panel space-y-6">
             <div class="trj-card p-6 space-y-4">
                 <h3 class="text-lg font-black text-toranj-navy">انتشار اطلاعیه و خبر رسمی در سامانه</h3>
                 <form method="post" class="space-y-3 bg-toranj-bg p-5 rounded-2xl border border-slate-200">
                     {% csrf_token %}
                     <input type="hidden" name="form_action" value="publish_announcement">
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                        <input type="text" name="title" required placeholder="عنوان اطلاعیه..." class="trj-input sm:col-span-2">
-                        <select name="audience" class="trj-input">
-                            <option value="STUDENT">مخاطب: زبان‌آموزان و عموم</option>
-                            <option value="TEACHER">مخاطب: اساتید</option>
-                        </select>
-                    </div>
+                    <input type="text" name="title" required placeholder="عنوان اطلاعیه..." class="trj-input">
                     <textarea name="message" rows="3" required placeholder="متن کامل اطلاعیه یا خبر آموزشی..." class="trj-input"></textarea>
                     <button type="submit" class="trj-btn-primary px-6 py-2.5 text-xs">انتشار رسمی اطلاعیه</button>
                 </form>
-
-                {% if announcements %}
-                <div class="space-y-2 pt-3">
-                    <h4 class="text-sm font-bold text-toranj-navy">اطلاعیه‌های منتشرشده اخیر:</h4>
-                    {% for ann in announcements %}
-                    <div class="p-3.5 rounded-xl bg-toranj-bg border border-slate-200 text-xs flex justify-between">
-                        <span><strong>{{ ann.title }}</strong> — {{ ann.message|truncatechars:80 }}</span>
-                        <span class="ltr-text text-toranj-textMuted">{{ ann.created_at|date:"Y-m-d" }}</span>
-                    </div>
-                    {% endfor %}
-                </div>
-                {% endif %}
             </div>
         </div>
     </main>
@@ -267,11 +176,7 @@
             switchAdminTab("{{ active_tab|default:'overview'|escapejs }}");
             document.querySelectorAll('.nav-item[data-tab]').forEach(btn => {
                 btn.addEventListener('click', function () {
-                    const tab = this.getAttribute('data-tab');
-                    switchAdminTab(tab);
-                    const url = new URL(window.location);
-                    url.searchParams.set('tab', tab);
-                    window.history.replaceState({}, '', url);
+                    switchAdminTab(this.getAttribute('data-tab'));
                 });
             });
         });

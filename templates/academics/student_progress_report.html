@@ -1,0 +1,8 @@
+{% extends 'dashboards/base_dashboard.html' %}
+{% block title %}گزارش پیشرفت تحصیلی | آکادمی زبان تُرنج{% endblock %}
+{% block dashboard_body %}
+<div class="toranj-card max-w-3xl mx-auto space-y-4">
+    <h2 class="text-[20px] font-extrabold text-toranj-navy">گزارش پیشرفت تحصیلی: {{ target_student.full_name }}</h2>
+    <p class="text-[14px]">معدل کل: <strong>{{ analytics.overall_gpa_100|default:"ثبت نشده" }}</strong></p>
+</div>
+{% endblock %}

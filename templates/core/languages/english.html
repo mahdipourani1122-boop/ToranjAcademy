@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% block title %}دپارتمان {{ dept.fa_name }} ({{ dept.en_name }}) | آکادمی زبان تُرنج{% endblock %}
+{% block content %}
+<section class="bg-toranj-navy text-white py-12 lg:py-16 border-b border-white/10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-wrap items-center justify-between gap-4 mb-6 text-[13px] text-gray-300">
+            <a href="{% url 'core:home' %}" class="inline-flex items-center gap-1.5 hover:text-toranj-orange font-bold">
+                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                <span>بازگشت به صفحه اصلی آکادمی تُرنج</span>
+            </a>
+            <div class="flex flex-wrap gap-2">
+                {% for d in all_departments %}
+                    <a href="/languages/{{ d.slug }}/" class="px-3 py-1 rounded-lg border {% if d.slug == dept.slug %}bg-toranj-orange text-toranj-textMain border-toranj-orange font-extrabold{% else %}border-white/15 hover:bg-white/10{% endif %}">
+                        <span>{{ d.flag_emoji }} {{ d.fa_name }}</span>
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+            <div class="lg:col-span-8 space-y-4">
+                <div class="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/15 text-[13px] font-bold">
+                    <span class="text-2xl">{{ dept.flag_emoji }}</span>
+                    <span dir="ltr">{{ dept.en_name }} • {{ dept.country_label }}</span>
+                </div>
+                <h1 class="text-[28px] sm:text-[38px] font-black leading-tight">دپارتمان تخصصی {{ dept.fa_name }} ({{ dept.en_name }})</h1>
+                <p class="text-[16px] text-toranj-orange font-bold">{{ dept.tagline }}</p>
+                <p class="text-[14px] sm:text-[15px] text-gray-200 leading-relaxed max-w-3xl">{{ dept.description }}</p>
+                <div class="pt-3 flex flex-wrap gap-3">
+                    <a href="{% url 'accounts:register' %}" class="btn-primary-orange px-6">ثبت‌نام و تعیین سطح {{ dept.fa_name }}</a>
+                    <a href="#dept-courses" class="px-5 h-[46px] rounded-xl bg-white/10 hover:bg-white/15 border border-white/20 font-bold text-[13px] inline-flex items-center">مشاهده دوره‌های موجود</a>
+                </div>
+            </div>
+            <div class="lg:col-span-4">
+                <div class="p-6 rounded-3xl bg-white/5 border border-white/15 text-center space-y-3">
+                    <div class="text-6xl">{{ dept.flag_emoji }}</div>
+                    <h2 class="text-[22px] font-black text-white" dir="ltr">{{ dept.en_name }}</h2>
+                    <p class="text-[14px] font-bold text-toranj-orange">{{ dept.fa_name }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="py-12 lg:py-16 bg-toranj-bg">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+        <div>
+            <h2 class="text-[22px] sm:text-[26px] font-black text-toranj-textMain">سطوح آموزشی استاندارد {{ dept.fa_name }}</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mt-6">
+                {% for lvl in dept.levels %}
+                <div class="toranj-card space-y-2">
+                    <span class="px-2.5 py-1 rounded-lg bg-toranj-navy text-toranj-orange font-mono text-[12px] font-extrabold inline-block" dir="ltr">{{ lvl.code }}</span>
+                    <h3 class="text-[16px] font-extrabold text-toranj-textMain pt-1">{{ lvl.title }}</h3>
+                    <p class="text-[13px] text-toranj-textMuted leading-relaxed">{{ lvl.desc }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div id="dept-courses" class="space-y-4">
+            <h2 class="text-[22px] font-black text-toranj-textMain">دوره‌های فعال {{ dept.fa_name }} در پایگاه داده</h2>
+            {% if department_courses %}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {% for course in department_courses %}
+                    <article class="toranj-card flex flex-col justify-between space-y-4">
+                        <div>
+                            <h3 class="text-[18px] font-extrabold text-toranj-textMain">{{ course.title }}</h3>
+                            <p class="text-[13px] text-toranj-textMuted mt-1">{{ course.description }}</p>
+                        </div>
+                        <div class="pt-3 border-t border-toranj-border flex items-center justify-between">
+                            <span class="font-bold text-toranj-navy">{{ course.tuition_fee }} تومان</span>
+                            <a href="{% url 'courses:catalog' %}?q={{ course.title|urlencode }}" class="btn-primary-orange px-4 !h-[38px] !text-[12px]">مشاهده و ثبت‌نام</a>
+                        </div>
+                    </article>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="toranj-card text-center py-8 space-y-3">
+                    <p class="text-[15px] font-extrabold text-toranj-textMain">در حال حاضر دوره منتشرشده‌ای برای «{{ dept.fa_name }}» در دیتابیس ثبت نشده است.</p>
+                    <a href="{% url 'accounts:register' %}" class="btn-primary-orange px-6">ثبت‌نام اولیه زبان‌آموز</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}

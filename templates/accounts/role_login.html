@@ -1,0 +1,35 @@
+{% extends 'accounts/base_auth.html' %}
+{% block title %}{{ portal.title }} | آکادمی زبان تُرنج{% endblock %}
+{% block auth_content %}
+<div class="text-center mb-6">
+    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-toranj-navy/10 text-toranj-navy text-[12px] font-extrabold mb-3">
+        <span>{{ portal.badge }}</span>
+    </span>
+    <h1 class="text-[22px] sm:text-[24px] font-extrabold text-toranj-textMain">{{ portal.title }}</h1>
+    <p class="text-[13px] text-toranj-textMuted mt-1">{{ portal.subtitle }}</p>
+</div>
+{% if form.non_field_errors %}
+    <div class="mb-4 p-3.5 rounded-xl bg-toranj-error/10 border border-toranj-error/30 text-toranj-error text-[13px]">
+        {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+    </div>
+{% endif %}
+<form method="post" class="auth-form space-y-4" novalidate>
+    {% csrf_token %}
+    <div>
+        <label class="block text-[13px] font-bold text-toranj-textMain mb-1.5">{{ form.identifier.label }}</label>
+        {{ form.identifier }}
+    </div>
+    <div>
+        <label class="block text-[13px] font-bold text-toranj-textMain mb-1.5">رمز عبور</label>
+        {{ form.password }}
+    </div>
+    <button type="submit" class="w-full btn-primary-orange">ورود امن به پنل</button>
+</form>
+<div class="mt-6 pt-4 border-t border-toranj-border text-center text-[13px] text-toranj-textMuted">
+    {% if portal.allow_registration %}
+        زبان‌آموز جدید هستید؟ <a href="{% url 'accounts:register' %}" class="font-extrabold text-toranj-navy hover:text-toranj-orange">ثبت‌نام زبان‌آموز جدید</a>
+    {% else %}
+        حساب کاربری اساتید صرفاً توسط مدیریت آکادمی زبان تُرنج صادر می‌شود.
+    {% endif %}
+</div>
+{% endblock %}

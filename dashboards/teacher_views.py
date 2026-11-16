@@ -114,7 +114,7 @@ def _get_teacher_academy_id(user, profile):
                 if val:
                     return str(val)
     year_str = user.date_joined.strftime('%Y') if hasattr(user, 'date_joined') and user.date_joined else '2026'
-    return f"TRJ-TCH-{year_str}-{user.pk:03d}"
+    return f"TRJ-TCH-{year_str}-{user.pk}"
 
 
 def _validate_uploaded_file(uploaded_file):

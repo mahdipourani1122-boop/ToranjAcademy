@@ -1,0 +1,88 @@
+<section id="courses" class="py-16 lg:py-24 bg-white border-y border-toranj-border">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <div class="flex flex-col lg:flex-row lg:items-end justify-between mb-10 gap-6">
+            <div>
+                <div class="inline-flex items-center gap-2 text-[13px] font-bold text-toranj-navy bg-toranj-bg border border-toranj-border px-3.5 py-1 rounded-full mb-3">
+                    <span>دوره‌های آموزشی (ساختار نمونه)</span>
+                </div>
+                <h2 class="text-[28px] sm:text-[32px] font-extrabold text-toranj-textMain">
+                    دوره‌های جامع آکادمی تُرنج
+                </h2>
+                <p class="mt-2 text-[15px] sm:text-[16px] text-toranj-textMuted max-w-2xl">
+                    برنامه‌های آموزشی متنوع متناسب با هر گروه سنی و هدف یادگیری. اطلاعات زیر نمونه ساختاری بوده و جزئیات هر ترم از طریق سامانه مدیریت دوره‌ها بارگذاری می‌شود.
+                </p>
+            </div>
+
+            <div class="flex flex-wrap gap-2" role="tablist" aria-label="فیلتر دسته‌بندی دوره‌ها">
+                <button type="button" onclick="filterCourses('all', this)" class="course-filter-btn px-4 py-2 rounded-xl text-[14px] font-semibold border bg-toranj-navy text-white border-toranj-navy transition-all">
+                    همه دوره‌ها
+                </button>
+                <button type="button" onclick="filterCourses('youth', this)" class="course-filter-btn px-4 py-2 rounded-xl text-[14px] font-semibold border bg-white text-toranj-textMain border-toranj-border hover:border-toranj-navy transition-all">
+                    کودکان و نوجوانان
+                </button>
+                <button type="button" onclick="filterCourses('general', this)" class="course-filter-btn px-4 py-2 rounded-xl text-[14px] font-semibold border bg-white text-toranj-textMain border-toranj-border hover:border-toranj-navy transition-all">
+                    بزرگسالان و مکالمه
+                </button>
+                <button type="button" onclick="filterCourses('exam', this)" class="course-filter-btn px-4 py-2 rounded-xl text-[14px] font-semibold border bg-white text-toranj-textMain border-toranj-border hover:border-toranj-navy transition-all">
+                    آزمون و فشرده
+                </button>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for course in courses %}
+            <article class="course-card-item toranj-card !p-0 overflow-hidden flex flex-col justify-between" data-category="{{ course.category }}">
+                <div>
+                    <div class="bg-toranj-navy p-6 text-white relative overflow-hidden">
+                        <div class="flex items-center justify-between relative z-10">
+                            <div class="w-12 h-12 rounded-xl bg-white/10 border border-white/15 flex items-center justify-center text-toranj-orange">
+                                <i data-lucide="{{ course.icon }}" class="w-6 h-6"></i>
+                            </div>
+                            <span class="text-[12px] font-medium px-3 py-1 rounded-full bg-white/10 text-gray-200 border border-white/15">
+                                {{ course.format }}
+                            </span>
+                        </div>
+                        <h3 class="mt-5 text-[20px] font-bold text-white relative z-10">
+                            {{ course.title }}
+                        </h3>
+                    </div>
+
+                    <div class="p-6">
+                        <p class="text-[15px] text-toranj-textMuted leading-[1.75] mb-5">
+                            {{ course.description }}
+                        </p>
+
+                        <div class="bg-toranj-inputBg border border-toranj-border rounded-xl p-3.5 space-y-2 text-[13px]">
+                            <div class="flex items-center justify-between">
+                                <span class="text-toranj-textMuted flex items-center gap-1.5">
+                                    <i data-lucide="bar-chart-2" class="w-4 h-4 text-toranj-navy"></i>
+                                    سطح دوره:
+                                </span>
+                                <span class="font-semibold text-toranj-textMain">{{ course.level }}</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-toranj-textMuted flex items-center gap-1.5">
+                                    <i data-lucide="video" class="w-4 h-4 text-toranj-navy"></i>
+                                    شیوه برگزاری:
+                                </span>
+                                <span class="font-semibold text-toranj-textMain">{{ course.format }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="px-6 pb-6 pt-2">
+                    <button type="button"
+                            onclick="openPhaseModal('{{ course.title }}', 'صفحه اختصاصی سرفصل‌ها، تقویم آموزشی و ثبت‌نام دوره «{{ course.title }}» در فاز مدیریت دوره‌ها به دیتابیس متصل می‌شود.')"
+                            class="w-full btn-outline hover:!bg-toranj-navy hover:!text-white hover:!border-toranj-navy group">
+                        <span>مشاهده جزئیات</span>
+                        <i data-lucide="chevron-left" class="w-4 h-4 transition-transform group-hover:-translate-x-1"></i>
+                    </button>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+
+    </div>
+</section>

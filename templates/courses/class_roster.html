@@ -1,0 +1,57 @@
+{% extends 'dashboards/base_dashboard.html' %}
+{% block title %}لیست کلاس {{ class_group.name }} | آکادمی زبان تُرنج{% endblock %}
+
+{% block dashboard_body %}
+<div class="toranj-card">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 mb-5 border-b border-toranj-border">
+        <div>
+            <span class="text-[12px] font-bold text-toranj-info" dir="ltr">{{ class_group.code }}</span>
+            <h2 class="text-[20px] font-extrabold text-toranj-textMain">{{ class_group.course.title }} — {{ class_group.name }}</h2>
+            <p class="text-[13px] text-toranj-textMuted mt-1">
+                برنامه: {{ class_group.schedule_summary }} • استاد: {{ class_group.teacher.full_name|default:"تعیین نشده" }} • ظرفیت: {{ class_group.approved_enrollments_count }}/{{ class_group.max_capacity }}
+            </p>
+        </div>
+        <a href="{% url 'dashboards:redirect' %}" class="btn-outline px-4">بازگشت به داشبورد</a>
+    </div>
+
+    <h3 class="text-[16px] font-bold text-toranj-textMain mb-3">لیست زبان‌آموزان تاییدشده کلاس ({{ enrollments|length }} نفر)</h3>
+    <div class="overflow-x-auto mb-8">
+        <table class="w-full text-right border-collapse">
+            <thead>
+                <tr class="border-b border-toranj-border text-[13px] text-toranj-textMuted bg-toranj-inputBg">
+                    <th class="py-3 px-4">نام زبان‌آموز</th>
+                    <th class="py-3 px-4">ایمیل</th>
+                    <th class="py-3 px-4">تاریخ عضویت در کلاس</th>
+                    <th class="py-3 px-4">وضعیت ثبت‌نام</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-toranj-border text-[14px]">
+                {% for e in enrollments %}
+                <tr>
+                    <td class="py-3 px-4 font-bold text-toranj-textMain">{{ e.student.full_name }}</td>
+                    <td class="py-3 px-4 text-toranj-textMuted" dir="ltr">{{ e.student.email }}</td>
+                    <td class="py-3 px-4 text-toranj-textMuted">{{ e.reviewed_at|date:"Y/m/d" }}</td>
+                    <td class="py-3 px-4"><span class="px-2.5 py-0.5 rounded-full text-[12px] font-bold badge-success">عضو رسمی کلاس</span></td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="py-6 text-center text-toranj-textMuted">هنوز زبان‌آموزی در این کلاس تایید نشده است.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <h3 class="text-[16px] font-bold text-toranj-textMain mb-3">تقویم جلسات هفتگی تولیدشده</h3>
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        {% for s in sessions %}
+        <div class="p-3 rounded-xl bg-toranj-inputBg border border-toranj-border text-[13px]">
+            <span class="font-bold text-toranj-navy">جلسه {{ s.session_number }}</span>
+            <p class="text-toranj-textMuted mt-1">{{ s.session_date|date:"Y/m/d" }} • {{ s.start_time|time:"H:i" }}</p>
+        </div>
+        {% empty %}
+        <p class="text-[13px] text-toranj-textMuted">جلسه‌ای ثبت نشده است.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

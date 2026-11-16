@@ -1,0 +1,93 @@
+<header class="sticky top-0 z-40 bg-toranj-navy text-white border-b border-white/10 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-20">
+            
+            <a href="{% url 'core:home' %}" class="flex items-center gap-3 group focus:outline-none focus:ring-2 focus:ring-toranj-orange rounded-lg p-1">
+                <div class="w-11 h-11 rounded-xl bg-toranj-orange flex items-center justify-center text-toranj-textMain font-extrabold text-xl shadow-sm group-hover:scale-105 transition-transform duration-150">
+                    ت
+                </div>
+                <div class="flex flex-col">
+                    <span class="font-extrabold text-lg tracking-tight text-white">آکادمی زبان تُرنج</span>
+                    <span class="text-xs text-gray-300 font-normal tracking-wider">TORANJ ACADEMY</span>
+                </div>
+            </a>
+
+            <nav class="hidden lg:flex items-center gap-8" aria-label="منوی اصلی">
+                <a href="{% url 'core:home' %}#hero" class="text-[15px] font-medium text-white hover:text-toranj-orange transition-colors duration-150">صفحه اصلی</a>
+                <a href="{% url 'core:home' %}#courses" class="text-[15px] font-medium text-gray-200 hover:text-toranj-orange transition-colors duration-150">دوره‌ها</a>
+                <a href="{% url 'core:home' %}#about" class="text-[15px] font-medium text-gray-200 hover:text-toranj-orange transition-colors duration-150">درباره ما</a>
+                <a href="{% url 'core:home' %}#teachers" class="text-[15px] font-medium text-gray-200 hover:text-toranj-orange transition-colors duration-150">اساتید</a>
+                <a href="{% url 'core:home' %}#contact" class="text-[15px] font-medium text-gray-200 hover:text-toranj-orange transition-colors duration-150">تماس با ما</a>
+            </nav>
+
+            <div class="hidden lg:flex items-center gap-3">
+                {% if user.is_authenticated %}
+                    <a href="{% url 'dashboards:redirect' %}" class="btn-primary-orange !h-[46px] px-5">
+                        <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+                        <span>پنل کاربری ({{ user.first_name }})</span>
+                    </a>
+                    <form method="post" action="{% url 'accounts:logout' %}" class="inline">
+                        {% csrf_token %}
+                        <button type="submit" class="h-[46px] px-4 rounded-[12px] border border-white/25 text-white hover:bg-white/10 text-[14px] font-semibold transition-all flex items-center gap-2">
+                            <i data-lucide="log-out" class="w-4 h-4"></i>
+                            <span>خروج</span>
+                        </button>
+                    </form>
+                {% else %}
+                    <a href="{% url 'accounts:login' %}"
+                       class="h-[46px] px-5 rounded-[12px] border border-white/25 text-white hover:bg-white/10 text-[15px] font-semibold transition-all duration-150 flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-white">
+                        <i data-lucide="log-in" class="w-4 h-4"></i>
+                        <span>ورود به حساب کاربری</span>
+                    </a>
+                    <a href="{% url 'accounts:register' %}" class="btn-primary-orange !h-[46px] px-6">
+                        <i data-lucide="user-plus" class="w-4 h-4"></i>
+                        <span>ثبت‌نام</span>
+                    </a>
+                {% endif %}
+            </div>
+
+            <div class="flex lg:hidden">
+                <button id="mobileMenuBtn"
+                        type="button"
+                        aria-expanded="false"
+                        aria-controls="mobileMenu"
+                        aria-label="باز کردن منوی کاربری"
+                        class="p-2.5 rounded-xl text-gray-200 hover:text-white hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-toranj-orange">
+                    <i data-lucide="menu" class="w-6 h-6"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="mobileMenu" class="hidden lg:hidden bg-toranj-navyLight border-t border-white/10 px-4 pt-3 pb-6 space-y-3">
+        <nav class="flex flex-col space-y-1">
+            <a href="{% url 'core:home' %}#hero" class="px-3 py-2.5 rounded-lg text-[15px] font-medium text-white hover:bg-white/10">صفحه اصلی</a>
+            <a href="{% url 'core:home' %}#courses" class="px-3 py-2.5 rounded-lg text-[15px] font-medium text-gray-200 hover:bg-white/10">دوره‌ها</a>
+            <a href="{% url 'core:home' %}#about" class="px-3 py-2.5 rounded-lg text-[15px] font-medium text-gray-200 hover:bg-white/10">درباره ما</a>
+            <a href="{% url 'core:home' %}#teachers" class="px-3 py-2.5 rounded-lg text-[15px] font-medium text-gray-200 hover:bg-white/10">اساتید</a>
+            <a href="{% url 'core:home' %}#contact" class="px-3 py-2.5 rounded-lg text-[15px] font-medium text-gray-200 hover:bg-white/10">تماس با ما</a>
+        </nav>
+        <div class="pt-3 border-t border-white/10 grid grid-cols-2 gap-3">
+            {% if user.is_authenticated %}
+                <a href="{% url 'dashboards:redirect' %}" class="btn-primary-orange !h-[48px] text-[14px]">
+                    <span>پنل کاربری</span>
+                </a>
+                <form method="post" action="{% url 'accounts:logout' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="w-full h-[48px] rounded-[12px] border border-white/25 text-white font-semibold text-[14px]">
+                        خروج
+                    </button>
+                </form>
+            {% else %}
+                <a href="{% url 'accounts:login' %}" class="h-[48px] rounded-[12px] border border-white/25 text-white font-semibold text-[14px] flex items-center justify-center gap-2">
+                    <i data-lucide="log-in" class="w-4 h-4"></i>
+                    <span>ورود</span>
+                </a>
+                <a href="{% url 'accounts:register' %}" class="btn-primary-orange !h-[48px] text-[14px]">
+                    <i data-lucide="user-plus" class="w-4 h-4"></i>
+                    <span>ثبت‌نام</span>
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</header>

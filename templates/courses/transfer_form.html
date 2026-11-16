@@ -1,0 +1,31 @@
+{% extends 'dashboards/base_dashboard.html' %}
+{% block title %}انتقال کلاس زبان‌آموز | آکادمی زبان تُرنج{% endblock %}
+
+{% block dashboard_body %}
+<div class="toranj-card max-w-xl mx-auto">
+    <h2 class="text-[19px] font-extrabold text-toranj-textMain mb-2">انتقال زبان‌آموز به گروه کلاسی جدید</h2>
+    <p class="text-[13px] text-toranj-textMuted mb-5">
+        زبان‌آموز: <strong>{{ enrollment.student.full_name }}</strong> • کلاس فعلی: <strong>{{ enrollment.class_group.name }} ({{ enrollment.class_group.code }})</strong>
+    </p>
+
+    <form method="post" class="space-y-4">
+        {% csrf_token %}
+        <div>
+            <label class="block text-[13px] font-bold mb-1.5">انتخاب کلاس مقصد</label>
+            <select name="new_class_id" required class="w-full h-[44px] px-3.5 rounded-[11px] bg-toranj-inputBg border border-toranj-border text-[14px]">
+                {% for cls in available_classes %}
+                    <option value="{{ cls.id }}">{{ cls.course.title }} — {{ cls.name }} ({{ cls.schedule_summary }} | ظرفیت باقی‌مانده: {{ cls.remaining_capacity }})</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div>
+            <label class="block text-[13px] font-bold mb-1.5">علت یا توضیح انتقال</label>
+            <input type="text" name="note" class="w-full h-[44px] px-3.5 rounded-[11px] bg-toranj-inputBg border border-toranj-border text-[14px]" placeholder="مثال: به درخواست زبان‌آموز جهت تغییر ساعت">
+        </div>
+        <div class="pt-3 flex justify-end gap-3">
+            <a href="{% url 'dashboards:admin' %}" class="btn-outline px-5">انصراف</a>
+            <button type="submit" class="btn-primary-orange px-6">تأیید و انتقال کلاس</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

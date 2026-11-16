@@ -1,0 +1,138 @@
+{% extends 'accounts/base_auth.html' %}
+{% block title %}ثبت‌نام زبان‌آموز | آکادمی زبان تُرنج{% endblock %}
+
+{% block auth_content %}
+<div class="text-center mb-6">
+    <div class="w-12 h-12 rounded-2xl bg-toranj-navy text-toranj-orange flex items-center justify-center mx-auto mb-3 shadow-sm">
+        <i data-lucide="user-plus" class="w-6 h-6"></i>
+    </div>
+    <h1 class="text-[24px] font-extrabold text-toranj-textMain">ثبت‌نام زبان‌آموز در آکادمی تُرنج</h1>
+    <p class="text-[13px] text-toranj-textMuted mt-1.5">پس از تأیید آموزشگاه، کد کاربری اختصاصی (TRJ-26XXXX) برای شما صادر می‌شود</p>
+</div>
+
+{% if form.non_field_errors %}
+    <div class="mb-4 p-3.5 rounded-xl bg-toranj-error/10 border border-toranj-error/30 text-toranj-error text-[13px]">
+        {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+    </div>
+{% endif %}
+
+<form method="post" action="{% url 'accounts:register' %}" class="auth-form space-y-4" novalidate>
+    {% csrf_token %}
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+            <label for="{{ form.first_name.id_for_label }}" class="block text-[13px] font-bold text-toranj-textMain mb-1.5">نام *</label>
+            {{ form.first_name }}
+            {% if form.first_name.errors %}<p class="mt-1 text-[12px] text-toranj-error">{{ form.first_name.errors.0 }}</p>{% endif %}
+        </div>
+        <div>
+            <label for="{{ form.last_name.id_for_label }}" class="block text-[13px] font-bold text-toranj-textMain mb-1.5">نام خانوادگی *</label>
+            {{ form.last_name }}
+            {% if form.last_name.errors %}<p class="mt-1 text-[12px] text-toranj-error">{{ form.last_name.errors.0 }}</p>{% endif %}
+        </div>
+    </div>
+
+    <div>
+        <label for="{{ form.phone.id_for_label }}" class="block text-[13px] font-bold text-toranj-textMain mb-1.5">شماره موبایل (جهت دریافت کد تأیید پیامکی) *</label>
+        {{ form.phone }}
+        {% if form.phone.errors %}<p class="mt-1 text-[12px] text-toranj-error">{{ form.phone.errors.0 }}</p>{% endif %}
+    </div>
+
+    <div>
+        <label for="{{ form.email.id_for_label }}" class="block text-[13px] font-bold text-toranj-textMain mb-1.5">آدرس ایمیل (اختیاری)</label>
+        {{ form.email }}
+        {% if form.email.errors %}<p class="mt-1 text-[12px] text-toranj-error">{{ form.email.errors.0 }}</p>{% endif %}
+    </div>
+
+    <!-- فیلد رمز عبور همراه با آیکون چشم -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+            <label for="reg_password" class="block text-[13px] font-bold text-toranj-textMain mb-1.5">رمز عبور *</label>
+            <div class="relative">
+                {{ form.password }}
+                <button type="button"
+                        onclick="togglePasswordVisibility('reg_password', this)"
+                        class="absolute inset-y-0 left-0 pl-3 flex items-center text-toranj-textMuted hover:text-toranj-navy"
+                        aria-label="نمایش یا مخفی کردن رمز عبور">
+                    <i data-lucide="eye" class="w-5 h-5"></i>
+                </button>
+            </div>
+            {% if form.password.errors %}<p class="mt-1 text-[12px] text-toranj-error">{{ form.password.errors.0 }}</p>{% endif %}
+        </div>
+
+        <div>
+            <label for="reg_confirm_password" class="block text-[13px] font-bold text-toranj-textMain mb-1.5">تکرار رمز عبور *</label>
+            <div class="relative">
+                {{ form.confirm_password }}
+                <button type="button"
+                        onclick="togglePasswordVisibility('reg_confirm_password', this)"
+                        class="absolute inset-y-0 left-0 pl-3 flex items-center text-toranj-textMuted hover:text-toranj-navy"
+                        aria-label="نمایش یا مخفی کردن تکرار رمز عبور">
+                    <i data-lucide="eye" class="w-5 h-5"></i>
+                </button>
+            </div>
+            {% if form.confirm_password.errors %}<p class="mt-1 text-[12px] text-toranj-error">{{ form.confirm_password.errors.0 }}</p>{% endif %}
+        </div>
+    </div>
+
+    <!-- راهنمای سیاست رمز عبور و اعتبارسنجی لحظه‌ای تطابق -->
+    <div class="p-3 rounded-xl bg-toranj-inputBg border border-toranj-border text-[12px] space-y-1">
+        <p id="pwdLengthHint" class="text-toranj-textMuted">• حداقل ۸ کاراکتر (ترکیبی از حروف و اعداد)</p>
+        <p id="pwdMatchHint" class="text-toranj-textMuted">• تطابق رمز عبور و تکرار آن</p>
+    </div>
+
+    <div class="pt-1">
+        <label class="flex items-start gap-2.5 cursor-pointer select-none">
+            <span class="mt-1">{{ form.accepted_terms }}</span>
+            <span class="text-[13px] text-toranj-textMain leading-relaxed">
+                قوانین و مقررات آموزشی آکادمی زبان تُرنج را مطالعه کرده و می‌پذیرم.
+            </span>
+        </label>
+        {% if form.accepted_terms.errors %}<p class="mt-1 text-[12px] text-toranj-error">{{ form.accepted_terms.errors.0 }}</p>{% endif %}
+    </div>
+
+    <button type="submit" class="w-full btn-primary-orange mt-2">
+        <span>ثبت‌نام و ادامه به تأیید امنیتی</span>
+        <i data-lucide="arrow-left" class="w-4 h-4"></i>
+    </button>
+</form>
+
+<div class="mt-6 pt-4 border-t border-toranj-border text-center text-[14px] text-toranj-textMuted">
+    قبلاً ثبت‌نام کرده‌اید؟
+    <a href="{% url 'accounts:login' %}" class="font-bold text-toranj-navy hover:text-toranj-orange mr-1">ورود به حساب کاربری</a>
+</div>
+
+<script>
+    const pwdInput = document.getElementById('reg_password');
+    const confInput = document.getElementById('reg_confirm_password');
+    const lenHint = document.getElementById('pwdLengthHint');
+    const matchHint = document.getElementById('pwdMatchHint');
+
+    function validateRealtimePassword() {
+        const val1 = pwdInput.value;
+        const val2 = confInput.value;
+
+        if (val1.length >= 8) {
+            lenHint.className = 'text-toranj-success font-semibold';
+            lenHint.textContent = '✓ طول رمز عبور استاندارد است (حداقل ۸ کاراکتر)';
+        } else {
+            lenHint.className = 'text-toranj-textMuted';
+            lenHint.textContent = '• حداقل ۸ کاراکتر (ترکیبی از حروف و اعداد)';
+        }
+
+        if (!val2) {
+            matchHint.className = 'text-toranj-textMuted';
+            matchHint.textContent = '• تطابق رمز عبور و تکرار آن';
+        } else if (val1 === val2) {
+            matchHint.className = 'text-toranj-success font-semibold';
+            matchHint.textContent = '✓ رمز عبور و تکرار آن مطابقت دارند';
+        } else {
+            matchHint.className = 'text-toranj-error font-semibold';
+            matchHint.textContent = '✗ رمز عبور و تکرار آن یکسان نیستند';
+        }
+    }
+
+    pwdInput?.addEventListener('input', validateRealtimePassword);
+    confInput?.addEventListener('input', validateRealtimePassword);
+</script>
+{% endblock %}

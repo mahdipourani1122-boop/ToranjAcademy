@@ -77,7 +77,7 @@ def admin_dashboard_view(request):
     search_q = request.GET.get('q', '').strip()
     role_filter = request.GET.get('role', '').strip()
 
-    users_qs = User.objects.all().order_by('-id')
+    users_qs = User.objects.all().order_by('-date_joined') if hasattr(User, 'date_joined') else User.objects.all()
     if search_q:
         users_qs = users_qs.filter(
             Q(first_name__icontains=search_q)
@@ -91,15 +91,15 @@ def admin_dashboard_view(request):
     users_page_obj = paginator.get_page(request.GET.get('page', 1))
 
     total_students = User.objects.filter(role='student').count()
-    total_teachers = User.objects.filter(Q(role='teacher') | Q(is_teacher=True)).distinct().count()
-    total_supervisors = User.objects.filter(role='supervisor').count()
+    total_teachers = User.objects.filter(role__in=['teacher', 'instructor', 'استاد']).count()
+    total_supervisors = User.objects.filter(role__in=['supervisor', 'observer', 'ناظر']).count()
     total_admins = User.objects.filter(Q(is_superuser=True) | Q(is_staff=True) | Q(role='admin')).distinct().count()
 
     courses_list = []
     CourseModel = _find_first_model([('courses', 'Course'), ('academics', 'Course')])
     if CourseModel:
         try:
-            for c in CourseModel.objects.select_related('teacher').order_by('-id')[:60]:
+            for c in CourseModel.objects.all().order_by('-id')[:60]:
                 courses_list.append({
                     'id': c.pk,
                     'title': getattr(c, 'title', getattr(c, 'name', str(c))),

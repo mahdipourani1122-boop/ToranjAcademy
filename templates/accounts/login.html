@@ -1,0 +1,63 @@
+{% extends 'accounts/base_auth.html' %}
+{% block title %}ورود به سامانه | آکادمی زبان تُرنج{% endblock %}
+
+{% block auth_content %}
+<div class="text-center mb-6">
+    <div class="w-12 h-12 rounded-2xl bg-toranj-navy text-toranj-orange flex items-center justify-center mx-auto mb-3 shadow-sm">
+        <i data-lucide="log-in" class="w-6 h-6"></i>
+    </div>
+    <h1 class="text-[24px] font-extrabold text-toranj-textMain">ورود به سامانه آموزشی تُرنج</h1>
+    <p class="text-[13px] text-toranj-textMuted mt-1">با نام کاربری آکادمی (TRJ-26XXXX) یا شماره موبایل تأییدشده وارد شوید</p>
+</div>
+
+{% if form.non_field_errors %}
+    <div class="mb-4 p-3.5 rounded-xl bg-toranj-error/10 border border-toranj-error/30 text-toranj-error text-[13px] flex items-center gap-2">
+        <i data-lucide="alert-circle" class="w-5 h-5 shrink-0"></i>
+        <div>{% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}</div>
+    </div>
+{% endif %}
+
+<form method="post" action="{% url 'accounts:login' %}" class="auth-form space-y-4" novalidate>
+    {% csrf_token %}
+
+    <div>
+        <label for="{{ form.identifier.id_for_label }}" class="block text-[13px] font-bold text-toranj-textMain mb-1.5">{{ form.identifier.label }}</label>
+        {{ form.identifier }}
+        {% if form.identifier.errors %}<p class="mt-1 text-[12px] text-toranj-error">{{ form.identifier.errors.0 }}</p>{% endif %}
+    </div>
+
+    <div>
+        <div class="flex items-center justify-between mb-1.5">
+            <label for="login_password" class="block text-[13px] font-bold text-toranj-textMain">رمز عبور</label>
+            <a href="{% url 'accounts:password_reset' %}" class="text-[12px] font-semibold text-toranj-navy hover:text-toranj-orange">فراموشی رمز عبور؟</a>
+        </div>
+        <div class="relative">
+            {{ form.password }}
+            <button type="button"
+                    onclick="togglePasswordVisibility('login_password', this)"
+                    class="absolute inset-y-0 left-0 pl-3 flex items-center text-toranj-textMuted hover:text-toranj-navy"
+                    aria-label="نمایش یا مخفی کردن رمز عبور">
+                <i data-lucide="eye" class="w-5 h-5"></i>
+            </button>
+        </div>
+        {% if form.password.errors %}<p class="mt-1 text-[12px] text-toranj-error">{{ form.password.errors.0 }}</p>{% endif %}
+    </div>
+
+    <div class="flex items-center justify-between pt-1">
+        <label class="flex items-center gap-2 cursor-pointer select-none">
+            {{ form.remember_me }}
+            <span class="text-[13px] text-toranj-textMain">{{ form.remember_me.label }}</span>
+        </label>
+    </div>
+
+    <button type="submit" class="w-full btn-primary-orange">
+        <span>ادامه و بررسی امنیتی</span>
+        <i data-lucide="arrow-left" class="w-4 h-4"></i>
+    </button>
+</form>
+
+<div class="mt-6 pt-4 border-t border-toranj-border text-center text-[14px] text-toranj-textMuted">
+    زبان‌آموز جدید هستید؟
+    <a href="{% url 'accounts:register' %}" class="font-bold text-toranj-navy hover:text-toranj-orange mr-1">ثبت‌نام زبان‌آموز</a>
+</div>
+{% endblock %}

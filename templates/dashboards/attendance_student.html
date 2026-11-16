@@ -1,0 +1,136 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سامانه حضور و غیاب دومرحله‌ای | {{ student_name }} — آموزشگاه زبان تُرَنج</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Vazirmatn:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        toranj: { navy: '#0D2B4E', orange: '#FF8A00', bg: '#F4F7FB', textMain: '#1F2937', textMuted: '#6B7280' }
+                    },
+                    fontFamily: { sans: ['Vazirmatn', 'Inter', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <style>body { font-family: 'Vazirmatn', sans-serif; background-color: #F4F7FB; } .ltr-text { direction: ltr; unicode-bidi: embed; }</style>
+</head>
+<body class="min-h-screen bg-toranj-bg text-toranj-textMain p-4 sm:p-8">
+    <div class="max-w-6xl mx-auto space-y-6">
+        <div class="flex flex-wrap items-center justify-between gap-4 bg-white px-6 py-4 rounded-2xl shadow-xs border border-slate-200">
+            <div class="flex items-center gap-3">
+                <a href="{% url 'dashboards:student_dashboard' %}" class="px-4 py-2 rounded-xl bg-toranj-navy text-white text-xs font-bold hover:bg-toranj-orange transition-colors">
+                    → بازگشت به داشبورد زبان‌آموز
+                </a>
+                <h1 class="text-base sm:text-lg font-black text-toranj-navy">سامانه ثبت و پیگیری حضور و غیاب دومرحله‌ای</h1>
+            </div>
+            <span class="text-xs font-bold text-toranj-textMuted">زبان‌آموز: {{ student_name }}</span>
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="p-4 rounded-2xl border text-xs sm:text-sm font-bold {% if message.tags == 'error' %}bg-rose-50 border-rose-200 text-rose-800{% else %}bg-emerald-50 border-emerald-200 text-emerald-800{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- کارت‌های وضعیت کلی -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 text-center">
+            <div class="p-4 rounded-2xl bg-white border border-slate-200">
+                <span class="text-xs text-toranj-textMuted block">در انتظار تایید استاد</span>
+                <span class="text-xl font-black text-amber-600 ltr-text mt-1 block">{{ stats.pending }}</span>
+            </div>
+            <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200">
+                <span class="text-xs text-emerald-800 block">حاضر (تایید نهایی)</span>
+                <span class="text-xl font-black text-emerald-700 ltr-text mt-1 block">{{ stats.present }}</span>
+            </div>
+            <div class="p-4 rounded-2xl bg-amber-50 border border-amber-200">
+                <span class="text-xs text-amber-800 block">حاضر با تأخیر</span>
+                <span class="text-xl font-black text-amber-700 ltr-text mt-1 block">{{ stats.late }}</span>
+            </div>
+            <div class="p-4 rounded-2xl bg-rose-50 border border-rose-200">
+                <span class="text-xs text-rose-800 block">غایب / ردشده</span>
+                <span class="text-xl font-black text-rose-700 ltr-text mt-1 block">{{ stats.absent|add:stats.rejected }}</span>
+            </div>
+            <div class="p-4 rounded-2xl bg-blue-50 border border-blue-200">
+                <span class="text-xs text-blue-800 block">غیبت موجه</span>
+                <span class="text-xl font-black text-blue-700 ltr-text mt-1 block">{{ stats.excused }}</span>
+            </div>
+            <div class="p-4 rounded-2xl bg-toranj-navy text-white">
+                <span class="text-xs text-slate-300 block">درصد حضور رسمی</span>
+                <span class="text-xl font-black text-toranj-orange ltr-text mt-1 block">{% if stats.percentage is not None %}{{ stats.percentage }}%{% else %}—{% endif %}</span>
+            </div>
+        </div>
+
+        <!-- جدول جلسات و ثبت درخواست مرحله ۱ -->
+        <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-xs border border-slate-200 space-y-5">
+            <div>
+                <h2 class="text-lg font-black text-toranj-navy">جلسات کلاسی و ارسال درخواست حضور (مرحله اول)</h2>
+                <p class="text-xs text-toranj-textMuted mt-1">
+                    پس از ارسال درخواست، وضعیت شما به «در انتظار تایید استاد» تغییر یافته و پس از تایید استاد در مرحله دوم به عنوان حضور رسمی ثبت می‌گردد.
+                </p>
+            </div>
+
+            {% if session_rows %}
+                <div class="space-y-4">
+                    {% for row in session_rows %}
+                    <div class="p-5 rounded-2xl bg-toranj-bg border border-slate-200/80 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                        <div class="space-y-1.5">
+                            <div class="flex flex-wrap items-center gap-2">
+                                <span class="px-2.5 py-0.5 rounded-md bg-toranj-navy text-white text-[11px] font-bold">
+                                    {{ row.session.get_mode_display }}
+                                </span>
+                                <span class="text-xs font-bold text-toranj-textMuted">{{ row.session.course_title }} ({{ row.session.term }})</span>
+                                <span class="px-3 py-0.5 rounded-lg text-xs font-extrabold
+                                    {% if row.display_status == 'PRESENT' %}bg-emerald-100 text-emerald-800
+                                    {% elif row.display_status == 'PENDING' %}bg-amber-100 text-amber-800
+                                    {% elif row.display_status == 'LATE' %}bg-orange-100 text-orange-800
+                                    {% elif row.display_status == 'EXCUSED' %}bg-blue-100 text-blue-800
+                                    {% elif row.display_status == 'ABSENT' or row.display_status == 'REJECTED' %}bg-rose-100 text-rose-800
+                                    {% else %}bg-slate-200 text-slate-700{% endif %}">
+                                    {% if row.entry %}{{ row.entry.status_label_fa }}{% else %}{{ row.display_status }}{% endif %}
+                                </span>
+                            </div>
+                            <h3 class="text-base font-extrabold text-toranj-navy">{{ row.session.title }}</h3>
+                            <p class="text-xs text-toranj-textMuted ltr-text">
+                                Date: {{ row.session.session_date }}
+                                {% if row.entry and row.entry.requested_at %} • ثبت درخواست: {{ row.entry.requested_at|date:"H:i" }}{% endif %}
+                            </p>
+                            {% if row.entry and row.entry.rejection_reason %}
+                                <p class="text-xs text-rose-700 font-bold pt-1">توضیح استاد / سیستم: {{ row.entry.rejection_reason }}</p>
+                            {% endif %}
+                        </div>
+
+                        {% if row.can_request %}
+                            <form method="post" class="flex flex-wrap items-center gap-2 shrink-0">
+                                {% csrf_token %}
+                                <input type="hidden" name="form_action" value="request_attendance">
+                                <input type="hidden" name="session_id" value="{{ row.session.id }}">
+                                {% if row.requires_code %}
+                                    <input type="text" name="attendance_code" required placeholder="کد ۶ رقمی جلسه آنلاین" class="rounded-xl border border-slate-300 px-3 py-2 text-xs ltr-text bg-white w-44">
+                                {% endif %}
+                                <input type="text" name="student_note" placeholder="توضیح کوتاه (اختیاری)" class="rounded-xl border border-slate-300 px-3 py-2 text-xs bg-white w-44">
+                                <button type="submit" class="px-5 py-2.5 rounded-xl bg-toranj-orange hover:bg-toranj-navy text-white text-xs font-extrabold transition-colors">
+                                    ✋ ثبت درخواست حضور (Request Attendance)
+                                </button>
+                            </form>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-xs sm:text-sm text-toranj-textMuted bg-toranj-bg p-6 rounded-2xl text-center">
+                    هنوز جلسه فعالی برای دوره‌های شما باز نشده است.
+                </p>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

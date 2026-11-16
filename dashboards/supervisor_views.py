@@ -21,7 +21,6 @@ def is_supervisor_user(user):
 @login_required
 @require_http_methods(["GET"])
 def supervisor_dashboard_view(request):
-    """داشبورد ناظر آموزشی با کوئری بهینه‌شده (بدون N+1) برای پشتیبانی از صدها زبان‌آموز و کلاس"""
     if not is_supervisor_user(request.user):
         return HttpResponseForbidden("دسترسی غیرمجاز: این بخش ویژه ناظران آموزشی و مدیریت است.")
 
@@ -32,9 +31,8 @@ def supervisor_dashboard_view(request):
     if dept_filter:
         sessions_qs = sessions_qs.filter(department__icontains=dept_filter)
 
-    # رفع کامل مشکل N+1 با استفاده از annotate در یک کوئری واحد
     teachers_qs = (
-        User.objects.filter(Q(role='teacher') | Q(is_teacher=True))
+        User.objects.filter(role__in=['teacher', 'instructor', 'استاد'])
         .annotate(
             sessions_cnt=Count('teaching_attendance_sessions', distinct=True),
             pending_cnt=Count(
@@ -48,7 +46,6 @@ def supervisor_dashboard_view(request):
                 distinct=True,
             ),
         )
-        .distinct()
     )
 
     teacher_metrics = [

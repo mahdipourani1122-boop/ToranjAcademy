@@ -1,0 +1,115 @@
+{% extends 'dashboards/base_dashboard.html' %}
+{% block title %}پنل زبان‌آموز | آکادمی زبان تُرنج{% endblock %}
+
+{% block dashboard_body %}
+
+<!-- ۱. خوش‌آمدگویی -->
+<section id="sec-overview" class="bg-toranj-navy rounded-[18px] p-6 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div>
+        <h2 class="text-[22px] font-extrabold">سلام {{ user.first_name }} عزیز، خوش آمدی!</h2>
+        <p class="text-[14px] text-gray-300 mt-1">از این پنل می‌توانی در دوره‌های منتشرشده ثبت‌نام کنی و وضعیت تأیید و برنامه هفتگی کلاس‌هایت را ببینی.</p>
+    </div>
+    <a href="{% url 'courses:catalog' %}" class="btn-primary-orange px-5 shrink-0">مشاهده کاتالوگ کامل دوره‌ها</a>
+</section>
+
+<!-- ۲. دوره‌ها و گروه‌های کلاسی باز برای ثبت‌نام -->
+<section id="sec-available-courses" class="toranj-card space-y-4">
+    <div class="flex items-center justify-between">
+        <div>
+            <h3 class="text-[18px] font-extrabold text-toranj-textMain">کلاس‌های باز جهت ثبت‌نام</h3>
+            <p class="text-[13px] text-toranj-textMuted">گروه کلاسی مورد نظر خود را انتخاب و درخواست ثبت‌نام را ارسال کنید.</p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {% for cls in available_classes %}
+        <div class="p-4 rounded-xl bg-toranj-inputBg border border-toranj-border flex flex-col justify-between space-y-3">
+            <div>
+                <div class="flex items-center justify-between">
+                    <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold badge-info">{{ cls.course.category.name }}</span>
+                    <span class="text-[12px] font-bold text-toranj-navy">{{ cls.course.tuition_fee }} تومان</span>
+                </div>
+                <h4 class="text-[16px] font-bold text-toranj-textMain mt-2">{{ cls.course.title }} — {{ cls.name }}</h4>
+                <p class="text-[13px] text-toranj-textMuted mt-1">برنامه: {{ cls.schedule_summary }}</p>
+                <p class="text-[12px] text-toranj-textMuted mt-0.5">استاد: {{ cls.teacher.full_name|default:"تعیین توسط آموزشگاه" }} • ظرفیت باقی‌مانده: {{ cls.remaining_capacity }} نفر</p>
+            </div>
+            <form method="post" action="{% url 'courses:student_enroll' cls.id %}">
+                {% csrf_token %}
+                <button type="submit" class="w-full btn-primary-orange !h-[40px] !text-[13px]">ارسال درخواست ثبت‌نام</button>
+            </form>
+        </div>
+        {% empty %}
+        <p class="col-span-full text-[14px] text-toranj-textMuted py-4 text-center">در حال حاضر کلاس جدیدی برای ثبت‌نام باز نیست.</p>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- ۳. وضعیت درخواست‌های ثبت‌نام من -->
+<section id="sec-my-enrollments" class="toranj-card space-y-4">
+    <h3 class="text-[18px] font-extrabold text-toranj-textMain">درخواست‌های ثبت‌نام و تاریخچه من</h3>
+    <div class="overflow-x-auto">
+        <table class="w-full text-right border-collapse">
+            <thead>
+                <tr class="border-b border-toranj-border text-[13px] text-toranj-textMuted bg-toranj-inputBg">
+                    <th class="py-3 px-4">دوره و گروه کلاسی</th>
+                    <th class="py-3 px-4">برنامه هفتگی</th>
+                    <th class="py-3 px-4">وضعیت درخواست</th>
+                    <th class="py-3 px-4">وضعیت شهریه</th>
+                    <th class="py-3 px-4">عملیات</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-toranj-border text-[13px]">
+                {% for e in my_enrollments %}
+                <tr>
+                    <td class="py-3.5 px-4 font-bold text-toranj-textMain">{{ e.course.title }} — {{ e.class_group.name }}</td>
+                    <td class="py-3.5 px-4 text-toranj-textMuted">{{ e.class_group.schedule_summary }}</td>
+                    <td class="py-3.5 px-4">
+                        {% if e.status == 'approved' %}
+                            <span class="px-2.5 py-1 rounded-full font-bold badge-success">تأیید شده (عضو کلاس)</span>
+                        {% elif e.status == 'pending' %}
+                            <span class="px-2.5 py-1 rounded-full font-bold badge-warning">در انتظار تأیید</span>
+                        {% elif e.status == 'rejected' %}
+                            <span class="px-2.5 py-1 rounded-full font-bold badge-error">رد شده</span>
+                        {% else %}
+                            <span class="px-2.5 py-1 rounded-full font-bold bg-gray-100 text-gray-600">{{ e.get_status_display }}</span>
+                        {% endif %}
+                    </td>
+                    <td class="py-3.5 px-4"><span class="px-2.5 py-0.5 rounded font-semibold badge-warning">{{ e.get_payment_status_display }}</span></td>
+                    <td class="py-3.5 px-4">
+                        {% if e.status == 'pending' %}
+                            <form method="post" action="{% url 'courses:student_cancel_enrollment' e.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="text-toranj-error font-bold text-xs hover:underline">لغو درخواست</button>
+                            </form>
+                        {% else %}
+                            <span class="text-xs text-toranj-textMuted">{{ e.decision_note|default:"—" }}</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5" class="py-6 text-center text-toranj-textMuted">شما هنوز درخواستی ثبت نکرده‌اید.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<!-- ۴. برنامه کلاسی تاییدشده من -->
+<section id="sec-schedule" class="toranj-card space-y-4">
+    <h3 class="text-[18px] font-extrabold text-toranj-textMain">برنامه هفتگی کلاس‌های تاییدشده من</h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {% for e in approved_enrollments %}
+        <div class="p-4 rounded-xl border border-toranj-border bg-white space-y-2">
+            <div class="flex justify-between items-center">
+                <span class="font-bold text-toranj-navy">{{ e.class_group.schedule_summary }}</span>
+                <span class="px-2.5 py-0.5 rounded-full text-xs font-bold badge-success">فعال</span>
+            </div>
+            <h4 class="text-[15px] font-bold text-toranj-textMain">{{ e.course.title }} ({{ e.class_group.name }})</h4>
+            <p class="text-[13px] text-toranj-textMuted">محل / لینک: {{ e.class_group.location_or_link }} • استاد: {{ e.class_group.teacher.full_name|default:"—" }}</p>
+        </div>
+        {% empty %}
+        <p class="col-span-full text-[13px] text-toranj-textMuted">پس از تأیید ثبت‌نام توسط مدیریت، برنامه کلاسی شما در این بخش قرار می‌گیرد.</p>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

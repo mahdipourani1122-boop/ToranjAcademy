@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="py-12 sm:py-16 bg-toranj-bg min-h-[calc(100vh-160px)] flex items-center">
+    <div class="max-w-lg w-full mx-auto px-4 sm:px-6">
+        
+        {% if messages %}
+            <div class="mb-6 space-y-2" role="alert">
+                {% for message in messages %}
+                    <div class="p-4 rounded-xl border text-[14px] font-medium flex items-center gap-2.5 bg-white border-toranj-border text-toranj-textMain shadow-xs">
+                        <i data-lucide="shield-alert" class="w-5 h-5 text-toranj-orange shrink-0"></i>
+                        <span>{{ message }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="toranj-card !p-6 sm:!p-8">
+            {% block auth_content %}{% endblock %}
+        </div>
+
+    </div>
+</section>
+
+<script>
+    function togglePasswordVisibility(inputId, btnEl) {
+        const input = document.getElementById(inputId);
+        if (!input) return;
+        const isPassword = input.type === 'password';
+        input.type = isPassword ? 'text' : 'password';
+        btnEl.innerHTML = isPassword
+            ? '<i data-lucide="eye-off" class="w-5 h-5"></i>'
+            : '<i data-lucide="eye" class="w-5 h-5"></i>';
+        lucide.createIcons();
+    }
+
+    document.querySelectorAll('form.auth-form').forEach(form => {
+        form.addEventListener('submit', function() {
+            const btn = this.querySelector('button[type="submit"]');
+            if (btn && this.checkValidity()) {
+                btn.disabled = true;
+                btn.classList.add('opacity-75', 'cursor-not-allowed');
+                btn.innerHTML = '<span>در حال بررسی امنیتی...</span>';
+            }
+        });
+    });
+</script>
+{% endblock %}

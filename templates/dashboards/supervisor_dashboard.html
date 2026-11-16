@@ -24,23 +24,12 @@
 <body class="min-h-screen bg-toranj-bg text-toranj-textMain p-4 sm:p-8">
     <div class="max-w-7xl mx-auto space-y-6">
         <div class="bg-toranj-navy text-white rounded-3xl p-6 sm:p-8 flex flex-wrap items-center justify-between gap-4">
-            <div class="flex items-center gap-4">
-                <div class="w-12 h-12 rounded-2xl bg-white p-1.5 flex items-center justify-center shrink-0">
-                    {% include 'partials/brand_logo.html' %}
-                </div>
-                <div>
-                    <span class="text-xs font-extrabold text-toranj-orange uppercase ltr-text">ACADEMIC QUALITY SUPERVISION</span>
-                    <h1 class="text-xl sm:text-2xl font-black mt-0.5">پورتال نظارت و ارزیابی آموزشی — {{ supervisor_name }}</h1>
-                    <p class="text-xs text-slate-300 mt-1">پایش کیفیت برگزاری کلاس‌ها، عملکرد اساتید، روند پیشرفت زبان‌آموزان و نظارت بر حضور و غیاب.</p>
-                </div>
+            <div>
+                <span class="text-xs font-extrabold text-toranj-orange uppercase ltr-text">ACADEMIC QUALITY SUPERVISION</span>
+                <h1 class="text-2xl font-black mt-1">پورتال نظارت و ارزیابی آموزشی — {{ supervisor_name }}</h1>
+                <p class="text-xs text-slate-300 mt-1">پایش کیفیت برگزاری کلاس‌ها، عملکرد اساتید، روند پیشرفت زبان‌آموزان و نظارت بر حضور و غیاب.</p>
             </div>
-            <div class="flex items-center gap-2">
-                <form method="get" class="flex items-center gap-2">
-                    <input type="text" name="department" value="{{ dept_filter }}" placeholder="فیلتر دپارتمان..." class="rounded-xl px-3 py-2 text-xs text-toranj-textMain">
-                    <button type="submit" class="trj-btn-primary px-4 py-2 text-xs">فیلتر</button>
-                </form>
-                <a href="/" class="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold">صفحه اصلی</a>
-            </div>
+            <a href="/" class="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold">بازگشت به صفحه اصلی</a>
         </div>
 
         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 text-center">
@@ -52,61 +41,31 @@
             <div class="trj-card p-4"><span class="text-xs text-rose-800 block">غیبت ثبت‌شده</span><strong class="text-xl font-black text-rose-600 ltr-text mt-1 block">{{ stats.absent_records }}</strong></div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div class="trj-card p-6 space-y-4">
-                <h2 class="text-base sm:text-lg font-black text-toranj-navy">عملکرد اساتید در مدیریت جلسات و تایید حضور</h2>
-                <div class="trj-table-wrap">
-                    <table class="w-full text-right border-collapse text-xs sm:text-sm">
-                        <thead>
-                            <tr class="bg-toranj-bg text-toranj-textMuted font-extrabold border-b border-slate-200">
-                                <th class="py-3 px-4">نام استاد</th>
-                                <th class="py-3 px-4">تعداد جلسات</th>
-                                <th class="py-3 px-4">تاییدشده</th>
-                                <th class="py-3 px-4">منتظر بررسی</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-100">
-                            {% for tm in teacher_metrics %}
-                            <tr>
-                                <td class="py-3 px-4 font-bold text-toranj-navy">{{ tm.name }}</td>
-                                <td class="py-3 px-4 ltr-text">{{ tm.sessions_count }}</td>
-                                <td class="py-3 px-4 ltr-text text-emerald-700 font-bold">{{ tm.approved_records }}</td>
-                                <td class="py-3 px-4 ltr-text {% if tm.pending_approvals > 0 %}text-amber-600 font-extrabold{% else %}text-slate-400{% endif %}">{{ tm.pending_approvals }}</td>
-                            </tr>
-                            {% empty %}
-                            <tr><td colspan="4" class="py-6 text-center text-toranj-textMuted">استادی ثبت نشده است.</td></tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div class="trj-card p-6 space-y-4">
-                <h2 class="text-base sm:text-lg font-black text-toranj-navy">پایش آخرین جلسات کلاسی</h2>
-                <div class="trj-table-wrap">
-                    <table class="w-full text-right border-collapse text-xs">
-                        <thead>
-                            <tr class="bg-toranj-bg text-toranj-textMuted font-extrabold border-b border-slate-200">
-                                <th class="py-3 px-3">کلاس و جلسه</th>
-                                <th class="py-3 px-3">دپارتمان</th>
-                                <th class="py-3 px-3">استاد</th>
-                                <th class="py-3 px-3">وضعیت</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-100">
-                            {% for s in sessions|slice:":10" %}
-                            <tr>
-                                <td class="py-3 px-3 font-bold text-toranj-navy">{{ s.course_title }} — {{ s.title }}</td>
-                                <td class="py-3 px-3">{{ s.department }}</td>
-                                <td class="py-3 px-3">{{ s.teacher }}</td>
-                                <td class="py-3 px-3"><span class="px-2 py-0.5 rounded-md bg-slate-100 font-bold">{{ s.status }}</span></td>
-                            </tr>
-                            {% empty %}
-                            <tr><td colspan="4" class="py-6 text-center text-toranj-textMuted">جلسه‌ای یافت نشد.</td></tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
+        <div class="trj-card p-6 space-y-4">
+            <h2 class="text-lg font-black text-toranj-navy">عملکرد اساتید در مدیریت جلسات و تایید حضور و غیاب</h2>
+            <div class="trj-table-wrap">
+                <table class="w-full text-right border-collapse text-xs sm:text-sm">
+                    <thead>
+                        <tr class="bg-toranj-bg text-toranj-textMuted font-extrabold border-b border-slate-200">
+                            <th class="py-3 px-4">نام استاد</th>
+                            <th class="py-3 px-4">تعداد جلسات</th>
+                            <th class="py-3 px-4">رکوردهای تاییدشده</th>
+                            <th class="py-3 px-4">درخواست‌های معوق (Pending)</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        {% for tm in teacher_metrics %}
+                        <tr>
+                            <td class="py-3 px-4 font-bold text-toranj-navy">{{ tm.name }}</td>
+                            <td class="py-3 px-4 ltr-text">{{ tm.sessions_count }}</td>
+                            <td class="py-3 px-4 ltr-text text-emerald-700 font-bold">{{ tm.approved_records }}</td>
+                            <td class="py-3 px-4 ltr-text {% if tm.pending_approvals > 0 %}text-amber-600 font-extrabold{% else %}text-slate-400{% endif %}">{{ tm.pending_approvals }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="4" class="py-6 text-center text-toranj-textMuted">استادی ثبت نشده است.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>

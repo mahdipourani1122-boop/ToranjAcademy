@@ -1,0 +1,209 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مدیریت حضور و غیاب دومرحله‌ای | استاد {{ teacher_name }} — تُرَنج</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Vazirmatn:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        toranj: { navy: '#0D2B4E', orange: '#FF8A00', bg: '#F4F7FB', textMain: '#1F2937', textMuted: '#6B7280' }
+                    },
+                    fontFamily: { sans: ['Vazirmatn', 'Inter', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <style>body { font-family: 'Vazirmatn', sans-serif; background-color: #F4F7FB; } .ltr-text { direction: ltr; unicode-bidi: embed; }</style>
+</head>
+<body class="min-h-screen bg-toranj-bg text-toranj-textMain p-4 sm:p-8">
+    <div class="max-w-7xl mx-auto space-y-6">
+        <div class="flex flex-wrap items-center justify-between gap-4 bg-white px-6 py-4 rounded-2xl shadow-xs border border-slate-200">
+            <div class="flex items-center gap-3">
+                <a href="{% url 'dashboards:teacher_dashboard' %}" class="px-4 py-2 rounded-xl bg-toranj-navy text-white text-xs font-bold hover:bg-toranj-orange transition-colors">
+                    → بازگشت به پورتال استاد
+                </a>
+                <h1 class="text-base sm:text-lg font-black text-toranj-navy">پنل تایید دومرحله‌ای حضور و غیاب ویژه استاد</h1>
+            </div>
+            <span class="text-xs font-bold text-toranj-textMuted">استاد: {{ teacher_name }} • جلسات امروز: {{ today_sessions_count }}</span>
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="p-4 rounded-2xl border text-xs sm:text-sm font-bold {% if message.tags == 'error' %}bg-rose-50 border-rose-200 text-rose-800{% else %}bg-emerald-50 border-emerald-200 text-emerald-800{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- ایجاد جلسه جدید حضوری یا آنلاین -->
+        <div class="bg-white rounded-3xl p-6 border border-slate-200 space-y-4">
+            <h2 class="text-base font-black text-toranj-navy">باز کردن جلسه جدید حضور و غیاب (حضوری / آنلاین)</h2>
+            <form method="post" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 items-end">
+                {% csrf_token %}
+                <input type="hidden" name="form_action" value="create_session">
+                <div>
+                    <label class="block text-xs font-bold text-toranj-navy mb-1">کلاس مجاز:</label>
+                    <select name="course_id" required class="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs bg-white">
+                        {% for c in courses_meta %}
+                            <option value="{{ c.id }}">{{ c.title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-toranj-navy mb-1">عنوان جلسه:</label>
+                    <input type="text" name="title" required value="جلسه آموزشی" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-toranj-navy mb-1">نوع برگزاری:</label>
+                    <select name="mode" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-xs bg-white font-bold">
+                        <option value="PHYSICAL">کلاس حضوری (Physical)</option>
+                        <option value="ONLINE">کلاس آنلاین (Online + Code)</option>
+                    </select>
+                </div>
+                <div class="flex items-center gap-2 pb-2">
+                    <input type="checkbox" id="gen_code" name="generate_code" checked class="rounded text-toranj-orange">
+                    <label for="gen_code" class="text-xs font-semibold text-toranj-textMain">تولید کد امنیتی (آنلاین)</label>
+                </div>
+                <button type="submit" class="px-5 py-2.5 rounded-xl bg-toranj-navy hover:bg-toranj-orange text-white text-xs font-extrabold transition-colors">
+                    + شروع جلسه و باز کردن پنجره حضور
+                </button>
+            </form>
+        </div>
+
+        <!-- انتخاب جلسه و بررسی درخواست‌های زبان‌آموزان (مرحله ۲) -->
+        {% if selected_session %}
+        <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 space-y-6">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="px-3 py-1 rounded-lg bg-toranj-navy text-white text-xs font-bold">{{ selected_session.get_mode_display }}</span>
+                        <span class="text-xs font-bold text-toranj-orange">مهلت تایید نهایی استاد: <strong class="ltr-text">{{ selected_session.teacher_approval_deadline|date:"Y-m-d H:i" }}</strong></span>
+                    </div>
+                    <h2 class="text-xl font-black text-toranj-navy mt-2">{{ selected_session.course_title }} — {{ selected_session.title }}</h2>
+                </div>
+
+                {% if selected_session.mode == 'ONLINE' %}
+                <div class="flex items-center gap-3 bg-toranj-bg px-4 py-3 rounded-2xl border border-slate-200">
+                    <div>
+                        <span class="text-[11px] text-toranj-textMuted block">کد امنیتی جلسه آنلاین:</span>
+                        <strong class="text-lg font-black text-toranj-navy ltr-text tracking-widest">{{ selected_session.attendance_code|default:"—" }}</strong>
+                    </div>
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="form_action" value="regenerate_code">
+                        <input type="hidden" name="session_id" value="{{ selected_session.id }}">
+                        <button type="submit" class="px-3 py-1.5 rounded-xl bg-toranj-orange text-white text-xs font-bold">تولید کد جدید</button>
+                    </form>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- آمار لحظه‌ای جلسه -->
+            <div class="grid grid-cols-2 sm:grid-cols-6 gap-3 text-center text-xs">
+                <div class="p-3 rounded-xl bg-toranj-bg">کل زبان‌آموزان: <strong>{{ session_counts.enrolled }}</strong></div>
+                <div class="p-3 rounded-xl bg-amber-50 text-amber-800">در انتظار تایید: <strong>{{ session_counts.pending }}</strong></div>
+                <div class="p-3 rounded-xl bg-emerald-50 text-emerald-800">تاییدشده (حاضر): <strong>{{ session_counts.present }}</strong></div>
+                <div class="p-3 rounded-xl bg-orange-50 text-orange-800">تأخیر: <strong>{{ session_counts.late }}</strong></div>
+                <div class="p-3 rounded-xl bg-rose-50 text-rose-800">ردشده: <strong>{{ session_counts.rejected }}</strong></div>
+                <div class="p-3 rounded-xl bg-slate-100 text-slate-800">غایب: <strong>{{ session_counts.absent }}</strong></div>
+            </div>
+
+            <!-- فرم تایید گروهی با تایید صریح استاد -->
+            <form method="post" class="p-4 rounded-2xl bg-toranj-bg border border-slate-200 flex flex-wrap items-center justify-between gap-3">
+                {% csrf_token %}
+                <input type="hidden" name="form_action" value="bulk_approve">
+                <input type="hidden" name="session_id" value="{{ selected_session.id }}">
+                <div class="flex flex-wrap items-center gap-3 text-xs">
+                    <span class="font-extrabold text-toranj-navy">تایید گروهی درخواست‌های منتظر:</span>
+                    {% for item in roster %}
+                        {% if item.status == 'PENDING' %}
+                            <label class="inline-flex items-center gap-1.5 bg-white px-2.5 py-1 rounded-lg border border-slate-200">
+                                <input type="checkbox" name="student_ids" value="{{ item.student.id }}" checked>
+                                <span>{{ item.student_name }}</span>
+                            </label>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <div class="flex items-center gap-3">
+                    <label class="inline-flex items-center gap-1.5 text-xs font-bold text-toranj-navy">
+                        <input type="checkbox" name="confirm_bulk" value="yes" required>
+                        <span>حضور افراد انتخاب‌شده را تایید می‌کنم</span>
+                    </label>
+                    <button type="submit" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold">
+                        ✓ تایید گروهی انتخاب‌شده‌ها
+                    </button>
+                </div>
+            </form>
+
+            <!-- جدول تک‌تک زبان‌آموزان جلسه و تصمیم مرحله ۲ استاد -->
+            <div class="overflow-x-auto">
+                <table class="w-full text-right border-collapse">
+                    <thead>
+                        <tr class="border-b border-slate-200 text-xs font-extrabold text-toranj-textMuted bg-toranj-bg">
+                            <th class="py-3 px-4 rounded-r-xl">زبان‌آموز و کد</th>
+                            <th class="py-3 px-4">وضعیت فعلی</th>
+                            <th class="py-3 px-4">زمان درخواست و روش</th>
+                            <th class="py-3 px-4 rounded-l-xl">تصمیم نهایی استاد (Approve / Reject / Late / Manual)</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 text-xs">
+                        {% for item in roster %}
+                        <tr>
+                            <td class="py-3.5 px-4">
+                                <p class="font-extrabold text-toranj-navy">{{ item.student_name }}</p>
+                                <p class="text-[11px] text-toranj-textMuted ltr-text">{{ item.academy_id }} • {{ item.student_phone }}</p>
+                            </td>
+                            <td class="py-3.5 px-4">
+                                <span class="px-2.5 py-1 rounded-lg font-extrabold
+                                    {% if item.status == 'PRESENT' %}bg-emerald-100 text-emerald-800
+                                    {% elif item.status == 'PENDING' %}bg-amber-100 text-amber-800
+                                    {% elif item.status == 'LATE' %}bg-orange-100 text-orange-800
+                                    {% elif item.status == 'ABSENT' or item.status == 'REJECTED' %}bg-rose-100 text-rose-800
+                                    {% else %}bg-slate-100 text-slate-600{% endif %}">
+                                    {% if item.entry %}{{ item.entry.status_label_fa }}{% else %}ثبت‌نشده (امکان ثبت دستی){% endif %}
+                                </span>
+                            </td>
+                            <td class="py-3.5 px-4 text-toranj-textMuted">
+                                {% if item.entry and item.entry.requested_at %}
+                                    <span class="ltr-text font-bold block">{{ item.entry.requested_at|date:"H:i:s" }}</span>
+                                    <span>{{ item.entry.get_attendance_method_display }}</span>
+                                {% else %}
+                                    <span>بدون درخواست زبان‌آموز</span>
+                                {% endif %}
+                            </td>
+                            <td class="py-3.5 px-4">
+                                <form method="post" class="flex flex-wrap items-center gap-2">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="form_action" value="decide_single">
+                                    <input type="hidden" name="session_id" value="{{ selected_session.id }}">
+                                    <input type="hidden" name="student_id" value="{{ item.student.id }}">
+                                    <select name="decision" class="rounded-lg border border-slate-300 px-2.5 py-1.5 text-xs bg-white font-bold">
+                                        <option value="PRESENT" {% if item.status == 'PRESENT' %}selected{% endif %}>تایید حضور (PRESENT)</option>
+                                        <option value="LATE" {% if item.status == 'LATE' %}selected{% endif %}>حاضر با تأخیر (LATE)</option>
+                                        <option value="REJECTED" {% if item.status == 'REJECTED' %}selected{% endif %}>رد درخواست (REJECTED)</option>
+                                        <option value="ABSENT" {% if item.status == 'ABSENT' %}selected{% endif %}>غایب (ABSENT)</option>
+                                        <option value="EXCUSED" {% if item.status == 'EXCUSED' %}selected{% endif %}>غیبت موجه (EXCUSED)</option>
+                                    </select>
+                                    <input type="text" name="reason" placeholder="دلیل رد یا توضیح..." class="rounded-lg border border-slate-300 px-2.5 py-1.5 text-xs bg-white w-36">
+                                    <input type="text" name="private_note" placeholder="یادداشت خصوصی استاد..." class="rounded-lg border border-slate-300 px-2.5 py-1.5 text-xs bg-white w-36">
+                                    <button type="submit" class="px-3.5 py-1.5 rounded-lg bg-toranj-navy hover:bg-toranj-orange text-white font-bold transition-colors">
+                                        ثبت تصمیم
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

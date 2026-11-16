@@ -1,0 +1,101 @@
+{% extends 'dashboards/base_dashboard.html' %}
+{% block title %}{{ page_title }} | آکادمی زبان تُرنج{% endblock %}
+
+{% block dashboard_body %}
+<div class="toranj-card max-w-4xl mx-auto">
+    <div class="flex items-center justify-between pb-4 mb-6 border-b border-toranj-border">
+        <div>
+            <h2 class="text-[20px] font-extrabold text-toranj-textMain">{{ page_title }}</h2>
+            <p class="text-[13px] text-toranj-textMuted mt-1">اطلاعات کامل دوره آموزشی، ظرفیت، شهریه و وضعیت انتشار را تنظیم کنید.</p>
+        </div>
+        <a href="{% url 'dashboards:admin' %}" class="btn-outline px-4">بازگشت به پنل</a>
+    </div>
+
+    {% if form.errors %}
+        <div class="mb-5 p-4 rounded-xl bg-toranj-error/10 border border-toranj-error/30 text-toranj-error text-[13px]">
+            <p class="font-bold mb-1">لطفاً خطاهای زیر را بررسی فرمایید:</p>
+            {{ form.non_field_errors }}
+            {% for field in form %}
+                {% for error in field.errors %}
+                    <p>• {{ field.label }}: {{ error }}</p>
+                {% endfor %}
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <form method="post" class="space-y-5">
+        {% csrf_token %}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="md:col-span-2">
+                <label class="block text-[13px] font-bold mb-1.5">{{ form.title.label }}</label>
+                {{ form.title }}
+            </div>
+            <div>
+                <label class="block text-[13px] font-bold mb-1.5">{{ form.category.label }}</label>
+                {{ form.category }}
+            </div>
+            <div>
+                <label class="block text-[13px] font-bold mb-1.5">{{ form.language_level.label }}</label>
+                {{ form.language_level }}
+            </div>
+            <div>
+                <label class="block text-[13px] font-bold mb-1.5">{{ form.age_group.label }}</label>
+                {{ form.age_group }}
+            </div>
+            <div>
+                <label class="block text-[13px] font-bold mb-1.5">{{ form.course_type.label }}</label>
+                {{ form.course_type }}
+            </div>
+            <div>
+                <label class="block text-[13px] font-bold mb-1.5">{{ form.course_format.label }}</label>
+                {{ form.course_format }}
+            </div>
+            <div>
+                <label class="block text-[13px] font-bold mb-1.5">{{ form.tuition_fee.label }}</label>
+                {{ form.tuition_fee }}
+            </div>
+            <div>
+                <label class="block text-[13px] font-bold mb-1.5">{{ form.duration_weeks.label }}</label>
+                {{ form.duration_weeks }}
+            </div>
+            <div>
+                <label class="block text-[13px] font-bold mb-1.5">{{ form.sessions_count.label }}</label>
+                {{ form.sessions_count }}
+            </div>
+            <div>
+                <label class="block text-[13px] font-bold mb-1.5">{{ form.min_capacity.label }}</label>
+                {{ form.min_capacity }}
+            </div>
+            <div>
+                <label class="block text-[13px] font-bold mb-1.5">{{ form.max_capacity.label }}</label>
+                {{ form.max_capacity }}
+            </div>
+            <div>
+                <label class="block text-[13px] font-bold mb-1.5">{{ form.enrollment_status.label }}</label>
+                {{ form.enrollment_status }}
+            </div>
+            <div>
+                <label class="block text-[13px] font-bold mb-1.5">{{ form.publication_status.label }}</label>
+                {{ form.publication_status }}
+            </div>
+            <div class="md:col-span-2">
+                <label class="block text-[13px] font-bold mb-1.5">{{ form.cover_image.label }}</label>
+                {{ form.cover_image }}
+            </div>
+            <div class="md:col-span-2">
+                <label class="block text-[13px] font-bold mb-1.5">{{ form.description.label }}</label>
+                {{ form.description }}
+            </div>
+            <div class="md:col-span-2">
+                <label class="block text-[13px] font-bold mb-1.5">{{ form.learning_objectives.label }}</label>
+                {{ form.learning_objectives }}
+            </div>
+        </div>
+
+        <div class="pt-4 border-t border-toranj-border flex justify-end gap-3">
+            <a href="{% url 'dashboards:admin' %}" class="btn-outline px-6">انصراف</a>
+            <button type="submit" class="btn-primary-orange px-8">ذخیره اطلاعات دوره</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

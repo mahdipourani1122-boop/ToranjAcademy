@@ -1,0 +1,54 @@
+{% extends 'dashboards/base_dashboard.html' %}
+{% block title %}راه‌اندازی TOTP Authenticator | آکادمی زبان تُرنج{% endblock %}
+
+{% block dashboard_body %}
+<div class="toranj-card max-w-2xl mx-auto space-y-5">
+    <div class="flex items-center justify-between border-b border-toranj-border pb-4">
+        <h2 class="text-[19px] font-extrabold text-toranj-textMain">اپلیکیشن احراز هویت دومرحله‌ای (TOTP)</h2>
+        <a href="{% url 'accounts:security_settings' %}" class="btn-outline px-4">بازگشت</a>
+    </div>
+
+    {% if not is_active %}
+        <p class="text-[14px] text-toranj-textMuted leading-relaxed">
+            ۱. اپلیکیشن <strong>Google Authenticator</strong> یا <strong>Microsoft Authenticator</strong> را باز کنید.<br>
+            ۲. کلید مخفی زیر را وارد کرده یا بارکد URI استاندارد را اسکن نمایید.<br>
+            ۳. کد ۶ رقمی نمایش‌داده‌شده در برنامه را جهت فعال‌سازی نهایی وارد کنید.
+        </p>
+
+        <div class="p-4 rounded-xl bg-toranj-inputBg border border-toranj-border space-y-2 text-center">
+            <span class="text-xs text-toranj-textMuted block">کلید مخفی اختصاصی شما (Base32 Secret):</span>
+            <code class="text-[16px] font-mono font-extrabold text-toranj-navy tracking-wider select-all block" dir="ltr">{{ secret_key }}</code>
+            <p class="text-[11px] text-toranj-textMuted break-all font-mono" dir="ltr">{{ otpauth_uri }}</p>
+        </div>
+
+        <form method="post" class="space-y-4">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="activate">
+            <div>
+                <label class="block text-[13px] font-bold mb-1.5">{{ activate_form.code.label }}</label>
+                {{ activate_form.code }}
+                {% if activate_form.code.errors %}
+                    <p class="mt-1 text-xs text-toranj-error font-bold">{{ activate_form.code.errors.0 }}</p>
+                {% endif %}
+            </div>
+            <button type="submit" class="btn-primary-orange px-8">تأیید کد و فعال‌سازی TOTP</button>
+        </form>
+    {% else %}
+        <div class="p-4 rounded-xl badge-success font-semibold text-[14px]">
+            ✓ احراز هویت TOTP روی حساب شما فعال است.
+        </div>
+
+        <form method="post" class="space-y-4 pt-3 border-t border-toranj-border">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="disable">
+            <div>
+                <label class="block text-[13px] font-bold mb-1.5">{{ disable_form.current_password.label }}</label>
+                {{ disable_form.current_password }}
+            </div>
+            <button type="submit" class="px-5 py-2.5 rounded-xl bg-toranj-error text-white font-bold text-[13px]">
+                تأیید رمز و غیرفعال‌سازی TOTP
+            </button>
+        </form>
+    {% endif %}
+</div>
+{% endblock %}

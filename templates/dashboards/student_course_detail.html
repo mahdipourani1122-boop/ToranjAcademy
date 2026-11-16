@@ -1,0 +1,170 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ course.course_title }} | پورتال زبان‌آموز تُرَنج</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Vazirmatn:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        toranj: {
+                            navy: '#0D2B4E',
+                            orange: '#FF8A00',
+                            bg: '#F4F7FB',
+                            textMain: '#1F2937',
+                            textMuted: '#6B7280',
+                        }
+                    },
+                    fontFamily: { sans: ['Vazirmatn', 'Inter', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Vazirmatn', sans-serif; background-color: #F4F7FB; }
+        .ltr-text { direction: ltr; unicode-bidi: embed; }
+    </style>
+</head>
+<body class="min-h-screen bg-toranj-bg text-toranj-textMain p-4 sm:p-8">
+
+    <div class="max-w-6xl mx-auto space-y-6">
+        <!-- نوار بازگشت -->
+        <div class="flex items-center justify-between bg-white px-6 py-4 rounded-2xl shadow-xs border border-slate-200/80">
+            <div class="flex items-center gap-3">
+                <a href="{% url 'dashboards:student_dashboard' %}?tab=courses" class="px-4 py-2 rounded-xl bg-toranj-navy text-white text-xs font-bold hover:bg-toranj-orange transition-colors">
+                    → بازگشت به دوره‌های من
+                </a>
+                <span class="text-xs sm:text-sm font-extrabold text-toranj-navy">{{ course.course_title }}</span>
+            </div>
+            <span class="text-xs font-bold text-toranj-textMuted ltr-text">{{ academy_student_id }}</span>
+        </div>
+
+        <!-- هدر اطلاعات کلی دوره -->
+        <section class="bg-toranj-navy text-white rounded-3xl p-6 sm:p-8 space-y-4">
+            <div class="flex flex-wrap items-center gap-2">
+                <span class="px-3 py-1 rounded-lg bg-toranj-orange text-white text-xs font-extrabold">{{ course.language }}</span>
+                <span class="px-3 py-1 rounded-lg bg-white/10 text-white text-xs font-bold ltr-text">Level: {{ course.level }}</span>
+                <span class="px-3 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 text-xs font-bold">{{ course.status_label }}</span>
+            </div>
+            <h1 class="text-2xl sm:text-3xl font-black">{{ course.course_title }}</h1>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-3 text-xs sm:text-sm text-slate-200 border-t border-white/10">
+                <div>👨‍🏫 <strong>استاد دوره:</strong> {{ course.teacher_name }}</div>
+                <div>🗓️ <strong>ترم:</strong> {{ course.term }}</div>
+                <div>⏰ <strong>زمان‌بندی:</strong> {{ course.schedule_text }}</div>
+            </div>
+        </section>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- جلسات و کلاس آنلاین دوره -->
+            <div class="bg-white rounded-3xl p-6 border border-slate-200/80 space-y-4">
+                <h2 class="text-base font-black text-toranj-navy">جلسات و برنامه کلاسی این دوره</h2>
+                {% if course_sessions %}
+                    <div class="space-y-2.5">
+                        {% for s in course_sessions %}
+                        <div class="p-3.5 rounded-2xl bg-toranj-bg flex items-center justify-between text-xs">
+                            <div>
+                                <p class="font-bold text-toranj-navy">{{ s.title }}</p>
+                                <p class="text-toranj-textMuted">{{ s.date_time }} • {{ s.room }}</p>
+                            </div>
+                            {% if s.meeting_url %}
+                                <a href="{{ s.meeting_url }}" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 rounded-lg bg-toranj-orange text-white font-bold">ورود به جلسه</a>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-xs text-toranj-textMuted bg-toranj-bg p-4 rounded-xl">جلسه‌ای برای این دوره ثبت نشده است.</p>
+                {% endif %}
+            </div>
+
+            <!-- منابع آموزشی دوره -->
+            <div class="bg-white rounded-3xl p-6 border border-slate-200/80 space-y-4">
+                <h2 class="text-base font-black text-toranj-navy">منابع و فایل‌های آموزشی دوره</h2>
+                {% if course_resources %}
+                    <div class="space-y-2.5">
+                        {% for r in course_resources %}
+                        <div class="p-3.5 rounded-2xl bg-toranj-bg flex items-center justify-between text-xs">
+                            <div>
+                                <p class="font-bold text-toranj-navy">{{ r.title }}</p>
+                                <p class="text-toranj-textMuted">{{ r.type }}</p>
+                            </div>
+                            {% if r.has_file %}
+                                <a href="{% url 'dashboards:resource_download' r.id %}" class="px-3.5 py-1.5 rounded-lg bg-toranj-navy text-white font-bold">دانلود</a>
+                            {% elif r.external_url %}
+                                <a href="{{ r.external_url }}" target="_blank" rel="noopener noreferrer" class="px-3.5 py-1.5 rounded-lg bg-toranj-orange text-white font-bold">مشاهده لینک</a>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-xs text-toranj-textMuted bg-toranj-bg p-4 rounded-xl">منبع آموزشی برای این دوره بارگذاری نشده است.</p>
+                {% endif %}
+            </div>
+
+            <!-- تکالیف و آزمون‌های دوره -->
+            <div class="bg-white rounded-3xl p-6 border border-slate-200/80 space-y-4">
+                <h2 class="text-base font-black text-toranj-navy">تکالیف و آزمون‌های دوره</h2>
+                {% if course_assignments or course_exams %}
+                    <div class="space-y-2.5">
+                        {% for a in course_assignments %}
+                        <div class="p-3.5 rounded-2xl bg-toranj-bg flex items-center justify-between text-xs">
+                            <div>
+                                <p class="font-bold text-toranj-navy">تکلیف: {{ a.title }}</p>
+                                <p class="text-toranj-textMuted">وضعیت: {{ a.submission_status }}</p>
+                            </div>
+                            <a href="{% url 'dashboards:student_dashboard' %}?tab=assignments" class="text-toranj-orange font-bold">ارسال پاسخ ←</a>
+                        </div>
+                        {% endfor %}
+                        {% for ex in course_exams %}
+                        <div class="p-3.5 rounded-2xl bg-toranj-bg flex items-center justify-between text-xs">
+                            <div>
+                                <p class="font-bold text-toranj-navy">آزمون: {{ ex.title }}</p>
+                                <p class="text-toranj-textMuted">زمان: {{ ex.date|default:"—" }}</p>
+                            </div>
+                            <span class="font-bold text-toranj-navy">{{ ex.status_label }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-xs text-toranj-textMuted bg-toranj-bg p-4 rounded-xl">تکلیف یا آزمونی برای این دوره ثبت نشده است.</p>
+                {% endif %}
+            </div>
+
+            <!-- نمرات و حضور و غیاب دوره -->
+            <div class="bg-white rounded-3xl p-6 border border-slate-200/80 space-y-4">
+                <h2 class="text-base font-black text-toranj-navy">نمرات و حضور و غیاب در این دوره</h2>
+                {% if course_grades %}
+                    <div class="space-y-2">
+                        {% for g in course_grades %}
+                        <div class="p-3 rounded-xl bg-toranj-bg flex items-center justify-between text-xs">
+                            <span class="font-bold text-toranj-navy">{{ g.title }}</span>
+                            <span class="font-black text-toranj-orange ltr-text">{{ g.score }} / {{ g.max_score }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-xs text-toranj-textMuted bg-toranj-bg p-4 rounded-xl">هنوز نمره‌ای برای این دوره ثبت نشده است.</p>
+                {% endif %}
+
+                {% if course_attendance %}
+                    <div class="pt-2 space-y-2">
+                        <h3 class="text-xs font-extrabold text-toranj-navy">آخرین وضعیت حضور و غیاب:</h3>
+                        {% for att in course_attendance|slice:":5" %}
+                        <div class="p-2.5 rounded-xl bg-toranj-bg flex items-center justify-between text-xs">
+                            <span>{{ att.session_title }} ({{ att.date|default:"—" }})</span>
+                            <span class="font-bold text-toranj-navy">{{ att.status_label }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

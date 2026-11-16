@@ -1,0 +1,290 @@
+{% extends 'dashboards/base_dashboard.html' %}
+{% block title %}پنل مدیریت کل | آکادمی زبان تُرنج{% endblock %}
+
+{% block dashboard_body %}
+
+<!-- ۱. شاخص‌های کلیدی زنده دیتابیس -->
+<section id="sec-overview" class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="toranj-card">
+        <span class="text-[13px] text-toranj-textMuted font-semibold">درخواست‌های ثبت‌نام در انتظار</span>
+        <p class="text-[28px] font-extrabold text-toranj-warning mt-1">{{ pending_enrollments_count }}</p>
+        <span class="text-[12px] text-toranj-warning font-medium">نیازمند تأیید یا رد مدیریت</span>
+    </div>
+    <div class="toranj-card">
+        <span class="text-[13px] text-toranj-textMuted font-semibold">دوره‌های آموزشی</span>
+        <p class="text-[28px] font-extrabold text-toranj-navy mt-1">{{ courses|length }}</p>
+        <a href="{% url 'courses:course_create' %}" class="text-[12px] text-toranj-info font-bold">+ افزودن دوره جدید</a>
+    </div>
+    <div class="toranj-card">
+        <span class="text-[13px] text-toranj-textMuted font-semibold">گروه‌های کلاسی فعال</span>
+        <p class="text-[28px] font-extrabold text-toranj-success mt-1">{{ classes|length }}</p>
+        <a href="{% url 'courses:class_create' %}" class="text-[12px] text-toranj-success font-bold">+ تعریف کلاس جدید</a>
+    </div>
+    <div class="toranj-card">
+        <span class="text-[13px] text-toranj-textMuted font-semibold">کل زبان‌آموزان / اساتید</span>
+        <p class="text-[28px] font-extrabold text-toranj-textMain mt-1">{{ students_count }} / {{ teachers_count }}</p>
+        <span class="text-[12px] text-toranj-textMuted">کاربران فعال سامانه</span>
+    </div>
+</section>
+
+<!-- ۲. مدیریت درخواست‌های ثبت‌نام و ثبت‌نام دستی -->
+<section id="sec-enrollments" class="toranj-card space-y-5">
+    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-toranj-border pb-4">
+        <div>
+            <h2 class="text-[18px] font-extrabold text-toranj-textMain">بررسی درخواست‌های ثبت‌نام زبان‌آموزان</h2>
+            <p class="text-[13px] text-toranj-textMuted">تأیید درخواست ظرفیت کلاس را بررسی کرده و زبان‌آموز را عضو کلاس می‌کند (وضعیت پرداخت تغییر نمی‌کند).</p>
+        </div>
+
+        <!-- فرم ثبت‌نام دستی زبان‌آموز توسط مدیر -->
+        <form method="post" action="{% url 'courses:manual_enroll' %}" class="flex flex-wrap items-center gap-2 bg-toranj-inputBg p-2.5 rounded-xl border border-toranj-border">
+            {% csrf_token %}
+            <span class="text-[12px] font-bold text-toranj-navy px-1">ثبت‌نام مستقیم:</span>
+            {{ manual_enroll_form.student }}
+            {{ manual_enroll_form.class_group }}
+            <button type="submit" class="btn-primary-navy !h-[40px] px-4 !text-[12px]">ثبت و تأیید آنی</button>
+        </form>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="w-full text-right border-collapse">
+            <thead>
+                <tr class="border-b border-toranj-border text-[13px] text-toranj-textMuted bg-toranj-inputBg">
+                    <th class="py-3 px-4">زبان‌آموز</th>
+                    <th class="py-3 px-4">دوره و گروه کلاسی</th>
+                    <th class="py-3 px-4">وضعیت ثبت‌نام</th>
+                    <th class="py-3 px-4">وضعیت مالی</th>
+                    <th class="py-3 px-4">بررسی‌کننده</th>
+                    <th class="py-3 px-4">عملیات مدیریت</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-toranj-border text-[13px]">
+                {% for e in enrollments %}
+                <tr class="hover:bg-toranj-inputBg/50">
+                    <td class="py-3.5 px-4">
+                        <strong class="text-toranj-textMain block">{{ e.student.full_name }}</strong>
+                        <span class="text-xs text-toranj-textMuted" dir="ltr">{{ e.student.phone }}</span>
+                    </td>
+                    <td class="py-3.5 px-4">
+                        <strong class="text-toranj-navy block">{{ e.course.title }}</strong>
+                        <span class="text-xs text-toranj-textMuted">{{ e.class_group.name }} ({{ e.class_group.schedule_summary }})</span>
+                    </td>
+                    <td class="py-3.5 px-4">
+                        {% if e.status == 'approved' %}
+                            <span class="px-2.5 py-1 rounded-full font-bold badge-success">تأیید شده</span>
+                        {% elif e.status == 'pending' %}
+                            <span class="px-2.5 py-1 rounded-full font-bold badge-warning">در انتظار تأیید</span>
+                        {% elif e.status == 'rejected' %}
+                            <span class="px-2.5 py-1 rounded-full font-bold badge-error">رد شده</span>
+                        {% else %}
+                            <span class="px-2.5 py-1 rounded-full font-bold bg-gray-100 text-gray-600">{{ e.get_status_display }}</span>
+                        {% endif %}
+                    </td>
+                    <td class="py-3.5 px-4">
+                        <span class="px-2.5 py-1 rounded-lg font-semibold badge-warning">{{ e.get_payment_status_display }}</span>
+                    </td>
+                    <td class="py-3.5 px-4 text-xs text-toranj-textMuted">
+                        {% if e.reviewed_by %}
+                            {{ e.reviewed_by.full_name }}<br>{{ e.reviewed_at|date:"Y/m/d H:i" }}
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
+                    <td class="py-3.5 px-4">
+                        <div class="flex flex-wrap items-center gap-1.5">
+                            {% if e.status == 'pending' %}
+                                <form method="post" action="{% url 'courses:enrollment_review' e.id %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="approve">
+                                    <button type="submit" class="px-3 py-1.5 rounded-lg bg-toranj-success text-white font-bold text-xs">تأیید</button>
+                                </form>
+                                <form method="post" action="{% url 'courses:enrollment_review' e.id %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="reject">
+                                    <button type="submit" class="px-3 py-1.5 rounded-lg bg-toranj-error text-white font-bold text-xs">رد</button>
+                                </form>
+                            {% elif e.status == 'approved' %}
+                                <a href="{% url 'courses:enrollment_transfer' e.id %}" class="px-2.5 py-1.5 rounded-lg border border-toranj-border text-toranj-navy font-bold text-xs hover:bg-toranj-bg">انتقال کلاس</a>
+                                <form method="post" action="{% url 'courses:enrollment_review' e.id %}" onsubmit="return confirm('آیا از لغو ثبت‌نام این زبان‌آموز اطمینان دارید؟');">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="cancel">
+                                    <button type="submit" class="px-2.5 py-1.5 rounded-lg text-toranj-error hover:bg-red-50 font-bold text-xs">لغو</button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6" class="py-6 text-center text-toranj-textMuted">درخواست ثبت‌نامی ثبت نشده است.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<!-- ۳. مدیریت دوره‌های آموزشی -->
+<section id="sec-courses" class="toranj-card space-y-4">
+    <div class="flex items-center justify-between">
+        <div>
+            <h2 class="text-[18px] font-extrabold text-toranj-textMain">مدیریت دوره‌های آموزشی</h2>
+            <p class="text-[13px] text-toranj-textMuted">ایجاد، ویرایش، انتشار، آرشیو و حذف امن دوره‌ها</p>
+        </div>
+        <a href="{% url 'courses:course_create' %}" class="btn-primary-orange px-5">+ ایجاد دوره جدید</a>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="w-full text-right border-collapse">
+            <thead>
+                <tr class="border-b border-toranj-border text-[13px] text-toranj-textMuted bg-toranj-inputBg">
+                    <th class="py-3 px-4">عنوان دوره</th>
+                    <th class="py-3 px-4">دسته‌بندی و سطح</th>
+                    <th class="py-3 px-4">شهریه (تومان)</th>
+                    <th class="py-3 px-4">وضعیت انتشار</th>
+                    <th class="py-3 px-4">عملیات</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-toranj-border text-[13px]">
+                {% for c in courses %}
+                <tr>
+                    <td class="py-3.5 px-4 font-bold text-toranj-textMain">{{ c.title }}</td>
+                    <td class="py-3.5 px-4 text-toranj-textMuted">{{ c.category.name }} • {{ c.get_language_level_display }}</td>
+                    <td class="py-3.5 px-4 font-bold text-toranj-navy">{{ c.tuition_fee }}</td>
+                    <td class="py-3.5 px-4">
+                        {% if c.publication_status == 'published' %}
+                            <span class="px-2.5 py-1 rounded-full font-bold badge-success">منتشر شده</span>
+                        {% elif c.publication_status == 'draft' %}
+                            <span class="px-2.5 py-1 rounded-full font-bold badge-warning">پیش‌نویس</span>
+                        {% else %}
+                            <span class="px-2.5 py-1 rounded-full font-bold bg-gray-100 text-gray-600">آرشیو شده</span>
+                        {% endif %}
+                    </td>
+                    <td class="py-3.5 px-4">
+                        <div class="flex flex-wrap items-center gap-1.5">
+                            <a href="{% url 'courses:course_edit' c.id %}" class="px-2.5 py-1 rounded-lg border border-toranj-border text-toranj-navy font-semibold">ویرایش</a>
+                            <form method="post" action="{% url 'courses:course_status' c.id %}">
+                                {% csrf_token %}
+                                {% if c.publication_status != 'published' %}
+                                    <input type="hidden" name="action" value="publish">
+                                    <button type="submit" class="px-2.5 py-1 rounded-lg badge-success font-bold">انتشار</button>
+                                {% else %}
+                                    <input type="hidden" name="action" value="unpublish">
+                                    <button type="submit" class="px-2.5 py-1 rounded-lg badge-warning font-bold">لغو انتشار</button>
+                                {% endif %}
+                            </form>
+                            <form method="post" action="{% url 'courses:course_status' c.id %}" onsubmit="return confirm('آیا از آرشیو یا حذف امن این دوره اطمینان دارید؟');">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="delete">
+                                <button type="submit" class="px-2.5 py-1 rounded-lg badge-error font-bold">حذف امن</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5" class="py-6 text-center text-toranj-textMuted">هنوز دوره‌ای ثبت نشده است.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<!-- ۴. مدیریت کلاس‌ها و تخصیص اساتید -->
+<section id="sec-classes" class="toranj-card space-y-4">
+    <div class="flex items-center justify-between">
+        <div>
+            <h2 class="text-[18px] font-extrabold text-toranj-textMain">مدیریت گروه‌های کلاسی و تخصیص استاد</h2>
+            <p class="text-[13px] text-toranj-textMuted">بررسی خودکار تداخل زمانی اساتید و ظرفیت کلاس‌ها</p>
+        </div>
+        <a href="{% url 'courses:class_create' %}" class="btn-primary-navy px-5">+ تعریف کلاس جدید</a>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="w-full text-right border-collapse">
+            <thead>
+                <tr class="border-b border-toranj-border text-[13px] text-toranj-textMuted bg-toranj-inputBg">
+                    <th class="py-3 px-4">کد و نام کلاس</th>
+                    <th class="py-3 px-4">برنامه هفتگی</th>
+                    <th class="py-3 px-4">ظرفیت</th>
+                    <th class="py-3 px-4">تخصیص / تغییر استاد</th>
+                    <th class="py-3 px-4">لیست و ویرایش</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-toranj-border text-[13px]">
+                {% for cls in classes %}
+                <tr>
+                    <td class="py-3.5 px-4">
+                        <strong class="text-toranj-textMain block">{{ cls.course.title }} — {{ cls.name }}</strong>
+                        <span class="text-xs text-toranj-info font-mono" dir="ltr">{{ cls.code }}</span>
+                    </td>
+                    <td class="py-3.5 px-4 text-toranj-textMuted">
+                        {{ cls.schedule_summary }}<br>
+                        <span class="text-xs">{{ cls.start_date|date:"Y/m/d" }} تا {{ cls.end_date|date:"Y/m/d" }}</span>
+                    </td>
+                    <td class="py-3.5 px-4 font-bold">
+                        {{ cls.approved_enrollments_count }} / {{ cls.max_capacity }}
+                    </td>
+                    <td class="py-3.5 px-4">
+                        <form method="post" action="{% url 'courses:assign_teacher' cls.id %}" class="flex items-center gap-2">
+                            {% csrf_token %}
+                            <select name="teacher_id" class="h-[36px] px-2.5 rounded-lg bg-toranj-inputBg border border-toranj-border text-xs">
+                                <option value="">-- بدون استاد --</option>
+                                {% for t in teachers %}
+                                    <option value="{{ t.id }}" {% if cls.teacher_id == t.id %}selected{% endif %}>{{ t.full_name }} ({{ t.active_classes_count }} کلاس)</option>
+                                {% endfor %}
+                            </select>
+                            <button type="submit" class="px-3 py-1.5 rounded-lg bg-toranj-navy text-white text-xs font-bold">ثبت استاد</button>
+                        </form>
+                    </td>
+                    <td class="py-3.5 px-4">
+                        <div class="flex items-center gap-2">
+                            <a href="{% url 'courses:class_roster' cls.id %}" class="px-2.5 py-1 rounded-lg badge-info font-bold">لیست زبان‌آموزان</a>
+                            <a href="{% url 'courses:class_edit' cls.id %}" class="px-2.5 py-1 rounded-lg border border-toranj-border text-toranj-textMain">ویرایش</a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5" class="py-6 text-center text-toranj-textMuted">گروه کلاسی ثبت نشده است.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<!-- ۵. جدول مدیریت نقش کاربران (RBAC از فاز ۳) -->
+<section id="sec-users" class="toranj-card">
+    <h2 class="text-[18px] font-extrabold text-toranj-textMain mb-4">مدیریت کاربران و تخصیص نقش‌ها (RBAC)</h2>
+    <div class="overflow-x-auto">
+        <table class="w-full text-right border-collapse">
+            <thead>
+                <tr class="border-b border-toranj-border text-[13px] text-toranj-textMuted bg-toranj-inputBg">
+                    <th class="py-3 px-4">نام کاربر</th>
+                    <th class="py-3 px-4">ایمیل</th>
+                    <th class="py-3 px-4">تغییر نقش و وضعیت</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-toranj-border text-[13px]">
+                {% for u in recent_users %}
+                <tr>
+                    <td class="py-3 px-4 font-bold">{{ u.full_name }}</td>
+                    <td class="py-3 px-4" dir="ltr">{{ u.email }}</td>
+                    <td class="py-3 px-4">
+                        <form method="post" action="{% url 'dashboards:update_user_role' u.id %}" class="flex items-center gap-2">
+                            {% csrf_token %}
+                            <select name="role" class="h-[34px] px-2 rounded border border-toranj-border">
+                                {% for r_val, r_label in role_choices %}
+                                    <option value="{{ r_val }}" {% if u.role == r_val %}selected{% endif %}>{{ r_label }}</option>
+                                {% endfor %}
+                            </select>
+                            <select name="status" class="h-[34px] px-2 rounded border border-toranj-border">
+                                {% for s_val, s_label in status_choices %}
+                                    <option value="{{ s_val }}" {% if u.status == s_val %}selected{% endif %}>{{ s_label }}</option>
+                                {% endfor %}
+                            </select>
+                            <button type="submit" class="px-3 py-1 rounded bg-toranj-navy text-white text-xs font-bold">ذخیره</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

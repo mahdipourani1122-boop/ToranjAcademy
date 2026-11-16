@@ -1,0 +1,31 @@
+{% if code == 'english' or code == 'uk' %}
+<svg class="w-6 h-4 rounded-xs shadow-2xs shrink-0 inline-block" viewBox="0 0 60 30" aria-label="UK Flag" role="img">
+    <clipPath id="uk-clip"><path d="M0,0 v30 h60 v-30 z"/></clipPath>
+    <g clip-path="url(#uk-clip)">
+        <path d="M0,0 v30 h60 v-30 z" fill="#012169"/>
+        <path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" stroke-width="6"/>
+        <path d="M0,0 L60,30 M60,0 L0,30" stroke="#C8102E" stroke-width="2"/>
+        <path d="M30,0 v30 M0,15 h60" stroke="#fff" stroke-width="10"/>
+        <path d="M30,0 v30 M0,15 h60" stroke="#C8102E" stroke-width="6"/>
+    </g>
+</svg>
+{% elif code == 'german' or code == 'de' %}
+<svg class="w-6 h-4 rounded-xs shadow-2xs shrink-0 inline-block" viewBox="0 0 5 3" aria-label="Germany Flag" role="img">
+    <rect width="5" height="3" y="0" fill="#000"/>
+    <rect width="5" height="2" y="1" fill="#D00"/>
+    <rect width="5" height="1" y="2" fill="#FFCE00"/>
+</svg>
+{% elif code == 'french' or code == 'fr' %}
+<svg class="w-6 h-4 rounded-xs shadow-2xs shrink-0 inline-block" viewBox="0 0 3 2" aria-label="France Flag" role="img">
+    <rect width="1" height="2" x="0" fill="#002395"/>
+    <rect width="1" height="2" x="1" fill="#fff"/>
+    <rect width="1" height="2" x="2" fill="#ED2939"/>
+</svg>
+{% elif code == 'turkish' or code == 'tr' %}
+<svg class="w-6 h-4 rounded-xs shadow-2xs shrink-0 inline-block" viewBox="0 0 30 20" aria-label="Turkey Flag" role="img">
+    <rect width="30" height="20" fill="#E30A17"/>
+    <circle cx="10.5" cy="10" r="5" fill="#fff"/>
+    <circle cx="11.7" cy="10" r="4" fill="#E30A17"/>
+    <polygon points="15,10 18.5,11.1 16.3,8.1 16.3,11.9 18.5,8.9" fill="#fff"/>
+</svg>
+{% endif %}
